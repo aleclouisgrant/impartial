@@ -5,12 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImpartialUI.Controls"
              xmlns:m="clr-namespace:Impartial;assembly=Impartial"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="800"
+             mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=m:Competition, IsDesignTimeCreatable=True}">
-    
-    <StackPanel Orientation="Vertical" Background="White">
-        <Border Background="Orange" BorderBrush="Black" BorderThickness="2" Grid.Row="0">
+
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
             <TextBlock Margin="2">
                 <Run Text="Jack &amp; Jill"/>
                 <Run Text="{Binding Division, Mode=OneWay}"/>
@@ -18,78 +22,28 @@
             </TextBlock>
         </Border>
 
-        <StackPanel Height="Auto" Orientation="Horizontal">
+        <Grid Grid.Row="1" x:Name="ScoreGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <Border BorderThickness="1" BorderBrush="Gray" Margin="1">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="Gray" Margin="1">
                 <TextBlock
                     Text="Place"
                     FontWeight="Bold" FontStyle="Italic" Margin="1"/>
             </Border>
 
-            <Border BorderThickness="1" BorderBrush="Gray" Margin="1">
+            <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray" Margin="1">
                 <TextBlock
                     Text="Competitor" 
                     FontWeight="Bold" FontStyle="Italic" Margin="1"/>
             </Border>
 
-            <ItemsControl ItemsSource="{Binding Judges}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderThickness="1" BorderBrush="Gray" Margin="1">
-                            <TextBlock
-                                Text="{Binding FullName, Mode=OneWay}" 
-                                FontWeight="Bold" FontStyle="Italic" Margin="1"
-                                TextWrapping="Wrap"/>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </StackPanel>
-
-        <ItemsControl ItemsSource="{Binding Couples}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Border BorderThickness="1" BorderBrush="Gray" Margin="1">
-                            <TextBlock Margin="1" Text="{Binding ActualPlacement}" TextWrapping="Wrap"/>
-                        </Border>
-
-                        <Border BorderThickness="1" BorderBrush="Gray" Margin="1">
-                            <TextBlock Margin="1" TextWrapping="Wrap">
-                                    <Run Text="{Binding Leader.FullName, Mode=OneWay}"/>
-                                    <Run Text="&amp;"/>
-                                    <Run Text="{Binding Follower.FullName, Mode=OneWay}"/>
-                            </TextBlock>
-                        </Border>
-
-                        <ItemsControl ItemsSource="{Binding Scores}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderThickness="1" BorderBrush="Gray" Margin="1">
-                                        <TextBlock Margin="1" Text="{Binding Placement}" TextWrapping="Wrap"/>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>
-    </StackPanel>
+        </Grid>
+    </Grid>
 </UserControl>

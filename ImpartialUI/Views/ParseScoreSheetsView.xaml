@@ -13,8 +13,12 @@
              d:DataContext="{d:DesignInstance Type=vm:ParseScoreSheetsViewModel, IsDesignTimeCreatable=True}"
              Background="White">
     <Grid>
-        <StackPanel Margin="20">
-            <StackPanel Orientation="Vertical" Height="120" VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Top" Margin="20">
                 <StackPanel Orientation="Horizontal" Margin="0 5">
                     <Button 
                         Content="Select Prelims Score Sheet"
@@ -45,33 +49,35 @@
                     Command="{Binding ParseScoreSheetsCommand}"/>
             </StackPanel>
 
-            <ScrollViewer>
-                <StackPanel>
-                    <ItemsControl ItemsSource="{Binding Competitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <c:CompetitionViewer/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
+        <ScrollViewer Grid.Row="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                    <Button 
-                    Grid.Row="1" Grid.ColumnSpan="2"
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding Competitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <c:CompetitionViewer Competition="{Binding }" Margin="20"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <Button 
+                    Grid.Row="1"
                     Content="Send to Database"
                     Width="150" Height="20"
                     FontWeight="Bold"
                     Command="{Binding SendToDatabaseCommand}"
-                    IsEnabled="False"/>
-                </StackPanel>
-            </ScrollViewer>
-        </StackPanel>
-
-        <TextBlock Foreground="Green" Text="{Binding MessageLog, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                   VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10 5" TextWrapping="WrapWithOverflow"/>
+                    IsEnabled="False"
+                    Margin="20"/>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </UserControl>
