@@ -24,7 +24,7 @@ namespace ImpartialUI.ViewModels
 
         public List<Competition> Competitions { get; set; }
 
-        private string prelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\swingfling2022\swingfling2022_prelims.html";
+        private string prelimsPath;
         public string PrelimsPath
         {
             get { return prelimsPath; }
@@ -37,7 +37,7 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private string finalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\swingfling2022\swingfling2022_finals.html";
+        private string finalsPath;
         public string FinalsPath
         {
             get { return finalsPath; }
@@ -115,9 +115,6 @@ namespace ImpartialUI.ViewModels
 
             _databaseProvider = new MongoDatabaseProvider(DATABASE_STRING);
             RefreshJudgesDatabase();
-
-            // temp for testing
-            ParseScoreSheets();
         }
 
         private void RefreshJudgesDatabase()
