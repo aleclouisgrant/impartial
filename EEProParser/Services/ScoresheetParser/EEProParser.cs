@@ -132,8 +132,8 @@ namespace Impartial
                     var score = new Score(judges[j - 2], placement, actualPlacement)
                     {
                         Accuracy = Util.GetAccuracy(placement, actualPlacement),
-                        Leader = new Competitor(node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and "))),
-                        Follower = new Competitor(node[1].InnerText.Substring(node[1].InnerText.IndexOf(" and ") + " and ".Length)),
+                        Leader = new Competitor(node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and ")), string.Empty),
+                        Follower = new Competitor(node[1].InnerText.Substring(node[1].InnerText.IndexOf(" and ") + " and ".Length), string.Empty),
                     };
 
                     scores.Add(score);

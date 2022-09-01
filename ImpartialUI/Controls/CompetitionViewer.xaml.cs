@@ -1,6 +1,10 @@
 ﻿using Impartial;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace ImpartialUI.Controls
@@ -26,7 +30,16 @@ namespace ImpartialUI.Controls
 
             var judges = competition.Judges;
             var couples = competition.Couples;
-            
+
+            foreach (var score in competition.Scores)
+            {
+                if (score.Judge.Scores == null)
+                    score.Judge.Scores = new List<Score>();
+
+                score.Judge.Accuracy = Math.Round(score.Judge.Scores.Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
+                score.Judge.Top5Accuracy = Math.Round(score.Judge.Scores.FindAll(s => s.ActualPlacement <= 5).Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
+            }
+
             // judge names
             foreach (var judge in judges)
             {
@@ -41,7 +54,7 @@ namespace ImpartialUI.Controls
 
                 var textBlock = new TextBlock()
                 {
-                    Text = judge.FullName,
+                    Text = judge.FullName + "(" + judge.Accuracy.ToString() + ")" + " (" + judge.Top5Accuracy.ToString() + ")",
                     FontWeight = FontWeights.Bold,
                     FontStyle = FontStyles.Italic,
                     Margin = new Thickness(1)
@@ -112,12 +125,24 @@ namespace ImpartialUI.Controls
 
                     var textBlock = new TextBlock()
                     {
-                        Text = score.Placement.ToString(),
                         Margin = new Thickness(1)
                     };
 
-                    if (score.Placement != score.ActualPlacement)
-                        textBlock.Foreground = Brushes.Red;
+                    if (score.Placement == score.ActualPlacement){
+                        textBlock.Text = score.Placement.ToString();
+                    }
+                    else
+                    {
+                        textBlock.Inlines.Add(new Run()
+                        {
+                            Text = score.Placement.ToString()
+                        });
+                        textBlock.Inlines.Add(new Run()
+                        {
+                            Text = " (" + (-1 * Math.Abs(score.Placement - score.ActualPlacement)).ToString() + ")",
+                            Foreground = Brushes.Red
+                        });
+                    }
 
                     border.Child = textBlock;
 

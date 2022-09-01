@@ -9,14 +9,9 @@ namespace Impartial
         public Guid Id { get; set; }
 
         // personal info
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string FullName => FirstName + " " + LastName; 
-
-        public Competitor(string firstName)
-        {
-            FirstName = firstName;
-        }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName; 
 
         public Competitor(string firstName, string lastName)
         {
