@@ -258,6 +258,9 @@ namespace ImpartialUI.ViewModels
                 Competitions.Add(_scoresheetParser.GetCompetition(division));
             }
 
+            // sort from lowest to highest division
+            Competitions = Competitions.OrderBy(c => (int)c.Division).ToList();
+
             OnPropertyChanged(nameof(Competitions));
         }
 
