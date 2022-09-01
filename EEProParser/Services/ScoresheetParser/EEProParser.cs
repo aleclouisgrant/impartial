@@ -1,0 +1,319 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using HtmlAgilityPack;
+
+namespace Impartial
+{
+    public class EEProParser : IScoresheetParser
+    {
+        string prelimsSheetDoc { get; set; }
+        string finalsSheetDoc { get; set; }
+
+        public List<Judge> Judges { get; set; }
+        public List<Score> Scores { get; set; }
+
+        public EEProParser(string prelimsSheetPath, string finalsSheetPath)
+        {
+            prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
+            finalsSheetDoc = File.ReadAllText(finalsSheetPath).Replace("\n", "").Replace("\r", "");
+        }
+
+        public List<Division> GetDivisions()
+        {
+            var divisions = new List<Division>();
+
+            int c = 1;
+
+            while (c < 21)
+            {
+                Division div;
+                var finals = GetSubStringN(
+                    s: finalsSheetDoc,
+                    from: "<tr bgcolor=\"#ffae5e\">",
+                    to: "</tr></tbody></table><p>",
+                    n: c++);
+
+                var divisionString = GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+
+                if (divisionString.Contains("Masters"))
+                    continue;
+
+                if (divisionString.Contains("Newcomer"))
+                    div = Division.Newcomer;
+                else if (divisionString.Contains("Novice"))
+                    div = Division.Novice;
+                else if (divisionString.Contains("Intermediate"))
+                    div = Division.Intermediate;
+                else if (divisionString.Contains("Advanced"))
+                    div = Division.Advanced;
+                else if (divisionString.Contains("All-Star"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("All Star"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("Champion"))
+                    div = Division.Champion;
+                else if (divisionString.Contains("Invitational"))
+                    div = Division.Open;
+                else
+                    continue;
+
+                divisions.Add(div);
+            }
+
+            return divisions;
+        }
+
+        public List<Judge> GetJudgesByDivision(Division division)
+        {
+            var judges = new List<Judge>();
+            
+            string sheet = GetFinalsDocByDivision(division);
+            string sub = GetSubString(
+                s: sheet,
+                from: "<td><em><strong>Competitor</strong></em></td>",
+                to: "<td><em><strong>BIB</strong></em></td>");
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(sub);
+
+            var nodes = doc.DocumentNode.SelectNodes("td/em/strong");
+
+            if (nodes == null) //division may not exist
+                return judges;
+    
+            foreach (var node in nodes)
+            {
+                judges.Add(new Judge(node.InnerText));
+            }
+
+            return judges;
+        }
+        public Competition GetCompetition(Division division)
+        {
+            var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader);
+
+            HtmlDocument leadsDoc = new HtmlDocument();
+            leadsDoc.LoadHtml(leadsPrelims);
+
+            var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
+            leadNodes.RemoveAt(0);
+
+            var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower);
+
+            HtmlDocument followsDoc = new HtmlDocument();
+            followsDoc.LoadHtml(followsPrelims);
+
+            var followNodes = followsDoc.DocumentNode.SelectNodes("tr");
+            followNodes.RemoveAt(0);
+
+            var sub = GetFinalsDocByDivision(division);
+
+            var judges = GetJudgesByDivision(division);
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(sub);
+
+            var nodes = doc.DocumentNode.SelectNodes("tr");
+
+            var scores = new List<Score>();
+
+            //used for weighted ranking with points
+            int totalCouples = leadNodes.Count > followNodes.Count ? leadNodes.Count : followNodes.Count;
+
+            for (int i = 1; i < nodes.Count; i++)
+            {
+                var node = nodes[i].SelectNodes("td");
+                int actualPlacement = Int32.Parse(node[0].InnerText);
+
+                for (int j = 2; j < judges.Count + 2; j++)
+                {
+                    int placement = Int32.Parse(node[j].InnerText);
+                    var score = new Score(judges[j - 2], placement, actualPlacement)
+                    {
+                        Accuracy = Util.GetAccuracy(placement, actualPlacement),
+                        Leader = new Competitor(node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and "))),
+                        Follower = new Competitor(node[1].InnerText.Substring(node[1].InnerText.IndexOf(" and ") + " and ".Length)),
+                    };
+
+                    scores.Add(score);
+                    
+                    if (judges[j - 2].Scores == null)
+                        judges[j - 2].Scores = new List<Score>();
+
+                    judges[j - 2].Scores.Add(score);
+                }
+            }
+
+            #region Output
+            Console.WriteLine("Division: " + division);
+            Console.WriteLine("Judges: ");
+            foreach (var j in judges)
+            {
+                Console.WriteLine(j.FirstName);
+            }
+            Console.WriteLine("");
+            Console.WriteLine("Scores: ");
+            foreach (var score in scores)
+            {
+                Console.WriteLine("{0}: {1} & {2} ({3}: {4} ({5}%))",
+                    score.ActualPlacement,
+                    score.Leader.FirstName,
+                    score.Follower.FirstName,
+                    score.Judge.FirstName,
+                    score.Placement,
+                    score.Accuracy * 100);
+            }
+            Console.WriteLine("");
+            #endregion
+
+            return new Competition(division)
+            {
+                Scores = scores
+            };
+        }
+
+        private string GetPrelimsDocByDivision(Division division, Role role)
+        {
+            int c = 1;
+
+            while (true)
+            {
+                Division div;
+                var prelims = GetSubStringN(
+                    s: prelimsSheetDoc,
+                    from: "<tr bgcolor=\"#ffae5e\">",
+                    to: "</tr></tbody></table><p>",
+                    n: c++);
+
+                var divisionString = GetSubString(prelims, "<td colspan=\"11\">", "</td></tr><tr>");
+
+                if (divisionString.Contains("Newcomer"))
+                    div = Division.Newcomer;
+                else if (divisionString.Contains("Novice"))
+                    div = Division.Novice;
+                else if (divisionString.Contains("Intermediate"))
+                    div = Division.Intermediate;
+                else if (divisionString.Contains("Advanced"))
+                    div = Division.Advanced;
+                else if (divisionString.Contains("All-Star"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("All Star"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("Champion"))
+                    div = Division.Champion;
+                else
+                    div = Division.Open;
+
+                Role r;
+                if (divisionString.Contains("Leader"))
+                    r = Role.Leader;
+                else if (divisionString.Contains("Follower"))
+                    r = Role.Follower;
+                else
+                    r = Role.None;
+
+                if (division == div && r == role)
+                    return prelims;
+
+                if (c > 20)
+                    return "";
+            }
+        }
+        private string GetFinalsDocByDivision(Division division)
+        {
+            int c = 1;
+
+            while (true)
+            {
+                Division div;
+                var finals = GetSubStringN(
+                    s: finalsSheetDoc,
+                    from: "<tr bgcolor=\"#ffae5e\">",
+                    to: "</tr></tbody></table><p>",
+                    n: c++);
+
+                var divisionString = GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+
+                if (divisionString.Contains("Masters"))
+                    continue;
+
+                if (divisionString.Contains("Newcomer"))
+                    div = Division.Newcomer;
+                else if (divisionString.Contains("Novice"))
+                    div = Division.Novice;
+                else if (divisionString.Contains("Intermediate"))
+                    div = Division.Intermediate;
+                else if (divisionString.Contains("Advanced"))
+                    div = Division.Advanced;
+                else if (divisionString.Contains("All-Star"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("All Star"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("Champion"))
+                    div = Division.Champion;
+                else if (divisionString.Contains("Invitational"))
+                    div = Division.Open;
+                else
+                    div = Division.Open;
+
+                if (division == div)
+                    return finals;
+
+                if (c > 20)
+                    return "";
+            }
+        }
+
+        private static string GetSubString(string s, string from, string to)
+        {
+            int fromIndex = s.IndexOf(from) + from.Length;
+            int toIndex = s.IndexOf(to);
+            string sub = "";
+
+            try
+            {
+                sub = s.Substring(fromIndex, toIndex - fromIndex);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                
+            }
+
+            return sub;
+        }
+        private static string GetSubStringN(string s, string from, string to, int n)
+        {
+            int fromIndex = IndexOfN(s, from, n) + from.Length;
+            int toIndex = IndexOfN(s, to, n);
+            string sub = "";
+
+            try
+            {
+                sub = s.Substring(fromIndex, toIndex - fromIndex);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+
+            }
+
+            return sub;
+        }
+        private static int IndexOfN(string s, string match, int n)
+        {
+            int i = 1;
+            int index = -1;
+
+            while (i <= n && (index = s.IndexOf(match, index + 1)) != -1)
+            {
+                if (i == n)
+                    return index;
+
+                i++;
+            }
+
+            return -1;
+        }
+
+    }
+}

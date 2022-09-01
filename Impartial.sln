@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32505.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImpartialUI", "ImpartialUI\ImpartialUI.csproj", "{6A52F629-3389-4D58-B35F-B0DEB4D47814}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impartial", "EEProParser\Impartial.csproj", "{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A52F629-3389-4D58-B35F-B0DEB4D47814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A52F629-3389-4D58-B35F-B0DEB4D47814}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A52F629-3389-4D58-B35F-B0DEB4D47814}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A52F629-3389-4D58-B35F-B0DEB4D47814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4CEDBE87-5C6C-4301-8E6D-34AF62B1D854}
+	EndGlobalSection
+EndGlobal

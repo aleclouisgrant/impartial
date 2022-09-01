@@ -1,0 +1,13 @@
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\EEProParser.deps.json
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\EEProParser.dll
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\EEProParser.pdb
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\ModelsLibrary.dll
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\ModelsLibrary.pdb
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.csproj.AssemblyReference.cache
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.AssemblyInfoInputs.cache
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.AssemblyInfo.cs
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.csproj.CoreCompileInputs.cache
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.csproj.CopyComplete
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.dll
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.pdb
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\EEProParser.GeneratedMSBuildEditorConfig.editorconfig
