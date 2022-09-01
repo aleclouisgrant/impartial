@@ -62,7 +62,7 @@ namespace ImpartialUI.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/ImpartialUI;component/views/selectscoresheetsview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/ImpartialUI;V1.0.0.0;component/views/selectscoresheetsview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\SelectScoreSheetsView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

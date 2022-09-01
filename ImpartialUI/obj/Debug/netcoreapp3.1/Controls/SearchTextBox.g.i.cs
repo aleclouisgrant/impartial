@@ -53,7 +53,7 @@ namespace ImpartialUI.Controls {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/ImpartialUI;component/controls/searchtextbox.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/ImpartialUI;V1.0.0.0;component/controls/searchtextbox.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Controls\SearchTextBox.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
