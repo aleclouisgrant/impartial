@@ -145,14 +145,6 @@
                                         </TextBlock>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button 
-                                                Background="Green" Foreground="White"
-                                                Content="?"
-                                                Height="20" Margin="0 0 5 0"
-                                                HorizontalAlignment="Right" 
-                                                FontWeight="Bold"
-                                                Command="{Binding DataContext.ShowCalculationCommand, ElementName=View}"
-                                                CommandParameter="{Binding}"/>
-                                            <Button 
                                                 Background="Red" Foreground="White"
                                                 Content="x"
                                                 Height="20" Margin="0 0 5 0"

@@ -3,7 +3,7 @@ using System;
 
 namespace Impartial
 {
-    public class Competitor
+    public class Competitor : IPersonModel
     {
         [BsonId]
         public Guid Id { get; set; }
@@ -11,7 +11,7 @@ namespace Impartial
         // personal info
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName; 
+        public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
 
         public Competitor(string firstName, string lastName)
         {

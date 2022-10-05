@@ -5,17 +5,15 @@ using System.Linq;
 
 namespace Impartial
 {
-    public class Judge
+    public class Judge : IPersonModel
     {
         [BsonId]
         public Guid Id { get; set; }
 
         // personal info
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
-        public string FullName => FirstName + " " + LastName;
-        public int Count => Scores == null ? 0 : Scores.Count;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
 
         // data
         public List<Score> Scores { get; set; }
@@ -25,10 +23,6 @@ namespace Impartial
 
         public double Top5Accuracy { get; set; }
 
-        public Judge(string firstName)
-        {
-            FirstName = firstName;
-        }
         public Judge(string firstName, string lastName)
         {
             FirstName = firstName;

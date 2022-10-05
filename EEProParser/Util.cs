@@ -135,7 +135,9 @@ namespace Impartial
         }
         public static double GetWeightedAccuracy(int placement, int actualPlacement, int totalCouples)
         {
-            return GetAccuracy(placement, actualPlacement) * GetAwardedPoints(totalCouples, placement);
+            return Math.Abs(
+                placement * GetAwardedPoints(totalCouples, placement) - 
+                actualPlacement * GetAwardedPoints(totalCouples, actualPlacement));
         }
     }
 }

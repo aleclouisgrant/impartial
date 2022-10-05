@@ -11,8 +11,6 @@ namespace ImpartialUI.ViewModels
 {
     public class ParseScoreSheetsViewModel : BaseViewModel
     {
-        static string DATABASE_STRING = "Impartial";
-
         private IDatabaseProvider _databaseProvider;
         private IScoresheetParser _scoresheetParser;
 
@@ -83,8 +81,8 @@ namespace ImpartialUI.ViewModels
         public ICommand ToggleSortJudgesCommand { get; set; }
         public ICommand ClearJudgesDatabaseCommand { get; set; }
         public ICommand SendToDatabaseCommand { get; set; }
+        public ICommand CancelCommand { get; set; }
 
-        public ICommand ShowCalculationCommand { get; set; }
         public ICommand GuessJudgesCommand { get; set; }
 
         private string messageLog;
@@ -107,13 +105,15 @@ namespace ImpartialUI.ViewModels
             RefreshJudgesDatabaseCommand = new DelegateCommand(RefreshJudgesDatabase);
             AddJudgeCommand = new DelegateCommand(AddJudge);
             DeleteJudgeCommand = new DelegateCommand(DeleteJudge);
-            ShowCalculationCommand = new DelegateCommand(ShowCalculation);
             GuessJudgesCommand = new DelegateCommand(GuessJudges);
             ToggleSortJudgesCommand = new DelegateCommand(ToggleSortJudges);
             ClearJudgesDatabaseCommand = new DelegateCommand(ClearJudgesDatabase);
             SendToDatabaseCommand = new DelegateCommand(SendToDatabase);
+            CancelCommand = new DelegateCommand(Cancel);
 
-            _databaseProvider = new MongoDatabaseProvider(DATABASE_STRING);
+            //this should be passed in the constructor via DI
+            _databaseProvider = App.DatabaseProvider;
+
             RefreshJudgesDatabase();
         }
 
@@ -124,24 +124,6 @@ namespace ImpartialUI.ViewModels
             OnPropertyChanged(nameof(JudgesDb));
         }
 
-        private void ShowCalculation(object obj)
-        {
-            Judge judge = (Judge)obj;
-
-            string s = judge.FullName + " (" + judge.Accuracy + "):";
-            int e = 0;
-
-            foreach (var score in judge.Scores)
-            {
-                int e1 = Math.Abs(score.ActualPlacement - score.Placement);
-                s += " (" + score.ActualPlacement + "-" + score.Placement + " = " + e1 + ") +";
-                e = e + e1;
-            }
-            s = s.Trim('+');
-            s += "= " + e + "/" + judge.Count + " = " + Math.Round((double)e / judge.Count, 2);
-
-            MessageLog = s;
-        }
         private void GuessJudges()
         {
             if (SelectJudges == null)
@@ -248,12 +230,16 @@ namespace ImpartialUI.ViewModels
             _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
 
             Competitions = new List<Competition>();
+
+            /// for testing
             var divisions = _scoresheetParser.GetDivisions();
 
             foreach (var division in divisions)
             {
                 Competitions.Add(_scoresheetParser.GetCompetition(division));
             }
+
+            //Competitions.Add(_scoresheetParser.GetCompetition(Division.Novice));
 
             // sort from lowest to highest division
             Competitions = Competitions.OrderBy(c => (int)c.Division).ToList();
@@ -271,7 +257,7 @@ namespace ImpartialUI.ViewModels
                         score.Judge.Scores = new List<Score>();
 
                     score.Judge.Accuracy = Math.Round(score.Judge.Scores.Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
-                    score.Judge.Top5Accuracy = Math.Round(score.Judge.Scores.FindAll(s => s.ActualPlacement <= 5).Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
+                    score.Judge.Top5Accuracy = Math.Round(score.Judge.Scores.FindAll(s => s.ActualPlacement <= 5).Sum(s => s.Accuracy) / 5, 2);
                     _databaseProvider.UpdateJudge(score.Judge.Id, score.Judge);
                 }
             }
@@ -282,6 +268,11 @@ namespace ImpartialUI.ViewModels
             Judges = null; SelectJudges = null;
             OnPropertyChanged(nameof(Judges));
             OnPropertyChanged(nameof(SelectJudges));
+        }
+
+        private void Cancel()
+        {
+            //close window
         }
 
         private Judge GetClosestJudgeByFirstName(string input, List<Judge> list)

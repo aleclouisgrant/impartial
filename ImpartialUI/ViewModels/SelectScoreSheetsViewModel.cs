@@ -95,7 +95,6 @@ namespace ImpartialUI.ViewModels
         public ICommand ToggleSortJudgesCommand { get; set; }
         public ICommand ClearJudgesDatabaseCommand { get; set; }
 
-        public ICommand ShowCalculationCommand { get; set; }
         public ICommand GuessJudgesCommand { get; set; }
 
         private string messageLog;
@@ -118,12 +117,11 @@ namespace ImpartialUI.ViewModels
             RefreshJudgesDatabaseCommand = new DelegateCommand(RefreshJudgesDatabase);
             AddJudgeCommand = new DelegateCommand(AddJudge);
             DeleteJudgeCommand = new DelegateCommand(DeleteJudge);
-            ShowCalculationCommand = new DelegateCommand(ShowCalculation);
             GuessJudgesCommand = new DelegateCommand(GuessJudges);
             ToggleSortJudgesCommand = new DelegateCommand(ToggleSortJudges);
             ClearJudgesDatabaseCommand = new DelegateCommand(ClearJudgesDatabase);
 
-            _databaseProvider = new MongoDatabaseProvider(DATABASE_STRING);
+            _databaseProvider = App.DatabaseProvider;
             RefreshJudgesDatabase();
         }
 
@@ -134,24 +132,6 @@ namespace ImpartialUI.ViewModels
             OnPropertyChanged(nameof(JudgesDb));
         }
 
-        private void ShowCalculation(object obj)
-        {
-            Judge judge = (Judge)obj;
-
-            string s = judge.FullName + " (" + judge.Accuracy + "):";
-            int e = 0;
-
-            foreach (var score in judge.Scores)
-            {
-                int e1 = Math.Abs(score.ActualPlacement - score.Placement);
-                s += " (" + score.ActualPlacement + "-" + score.Placement + " = " + e1 + ") +";
-                e = e + e1;
-            }
-            s = s.Trim('+');
-            s += "= " + e + "/" + judge.Count + " = " + Math.Round((double)e / judge.Count, 2);
-
-            MessageLog = s;
-        }
         private void GuessJudges()
         {
             if (SelectJudges == null)

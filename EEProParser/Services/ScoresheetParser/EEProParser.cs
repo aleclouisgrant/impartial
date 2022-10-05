@@ -7,16 +7,16 @@ namespace Impartial
 {
     public class EEProParser : IScoresheetParser
     {
-        string prelimsSheetDoc { get; set; }
-        string finalsSheetDoc { get; set; }
+        string _prelimsSheetDoc { get; set; }
+        string _finalsSheetDoc { get; set; }
 
         public List<Judge> Judges { get; set; }
         public List<Score> Scores { get; set; }
 
         public EEProParser(string prelimsSheetPath, string finalsSheetPath)
         {
-            prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
-            finalsSheetDoc = File.ReadAllText(finalsSheetPath).Replace("\n", "").Replace("\r", "");
+            _prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
+            _finalsSheetDoc = File.ReadAllText(finalsSheetPath).Replace("\n", "").Replace("\r", "");
         }
 
         public List<Division> GetDivisions()
@@ -29,7 +29,7 @@ namespace Impartial
             {
                 Division div;
                 var finals = GetSubStringN(
-                    s: finalsSheetDoc,
+                    s: _finalsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c++);
@@ -84,7 +84,7 @@ namespace Impartial
     
             foreach (var node in nodes)
             {
-                judges.Add(new Judge(node.InnerText));
+                judges.Add(new Judge(node.InnerText.Replace("&nbsp;", ""), string.Empty));
             }
 
             return judges;
@@ -92,23 +92,18 @@ namespace Impartial
         public Competition GetCompetition(Division division)
         {
             var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader);
-
             HtmlDocument leadsDoc = new HtmlDocument();
             leadsDoc.LoadHtml(leadsPrelims);
-
             var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
             leadNodes.RemoveAt(0);
 
             var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower);
-
             HtmlDocument followsDoc = new HtmlDocument();
             followsDoc.LoadHtml(followsPrelims);
-
             var followNodes = followsDoc.DocumentNode.SelectNodes("tr");
             followNodes.RemoveAt(0);
 
             var sub = GetFinalsDocByDivision(division);
-
             var judges = GetJudgesByDivision(division);
 
             HtmlDocument doc = new HtmlDocument();
@@ -128,10 +123,21 @@ namespace Impartial
 
                 for (int j = 2; j < judges.Count + 2; j++)
                 {
-                    int placement = Int32.Parse(node[j].InnerText);
+                    int placement;
+
+                    try
+                    {
+                        placement = Int32.Parse(node[j].InnerText);
+                    }
+                    catch
+                    {
+                        placement = Int32.Parse(node[j].InnerText.Substring(0, 1));
+                    }
+                    
                     var score = new Score(judges[j - 2], placement, actualPlacement)
                     {
                         Accuracy = Util.GetAccuracy(placement, actualPlacement),
+                        //Accuracy = Util.GetWeightedAccuracy(placement, actualPlacement, totalCouples),
                         Leader = new Competitor(node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and ")), string.Empty),
                         Follower = new Competitor(node[1].InnerText.Substring(node[1].InnerText.IndexOf(" and ") + " and ".Length), string.Empty),
                     };
@@ -181,7 +187,7 @@ namespace Impartial
             {
                 Division div;
                 var prelims = GetSubStringN(
-                    s: prelimsSheetDoc,
+                    s: _prelimsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c++);
@@ -228,7 +234,7 @@ namespace Impartial
             {
                 Division div;
                 var finals = GetSubStringN(
-                    s: finalsSheetDoc,
+                    s: _finalsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c++);
@@ -275,7 +281,7 @@ namespace Impartial
             {
                 sub = s.Substring(fromIndex, toIndex - fromIndex);
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 
             }
@@ -292,7 +298,7 @@ namespace Impartial
             {
                 sub = s.Substring(fromIndex, toIndex - fromIndex);
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
 
             }

@@ -37,7 +37,7 @@ namespace ImpartialUI.Controls
                     score.Judge.Scores = new List<Score>();
 
                 score.Judge.Accuracy = Math.Round(score.Judge.Scores.Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
-                score.Judge.Top5Accuracy = Math.Round(score.Judge.Scores.FindAll(s => s.ActualPlacement <= 5).Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
+                score.Judge.Top5Accuracy = Math.Round(score.Judge.Scores.FindAll(s => s.ActualPlacement <= 5).Sum(s => s.Accuracy) / 5, 2);
             }
 
             // judge names
@@ -54,13 +54,21 @@ namespace ImpartialUI.Controls
 
                 var textBlock = new TextBlock()
                 {
-                    Text = judge.FullName + "(" + judge.Accuracy.ToString() + ")" + " (" + judge.Top5Accuracy.ToString() + ")",
+                    Text = judge.FullName + " (" + judge.Accuracy.ToString() + ")" + "(" + judge.Top5Accuracy.ToString() + ")",
                     FontWeight = FontWeights.Bold,
                     FontStyle = FontStyles.Italic,
                     Margin = new Thickness(1)
                 };
-
                 border.Child = textBlock;
+
+                //var searchText = new SearchTextBox()
+                //{
+                //    Margin = new Thickness(2, 0, 2, 0),
+                //    DatabaseProvider = App.DatabaseProvider, //TODO: shouldn't do this
+                //    Text = judge.FullName,
+                //    ItemsSource = App.DatabaseProvider.GetAllJudges() //TODO: also shouldnt do this
+                //};
+                //border.Child = searchText;
 
                 viewer.ScoreGrid.Children.Add(border);
                 Grid.SetColumn(border, viewer.ScoreGrid.Children.Count - 1);
@@ -152,8 +160,8 @@ namespace ImpartialUI.Controls
                 }
             }
         }
-
         #endregion
+
         public CompetitionViewer()
         {
             InitializeComponent();
