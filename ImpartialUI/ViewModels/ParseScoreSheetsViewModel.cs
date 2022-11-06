@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Windows;
 using System;
+using Impartial.Services.ScoresheetParser;
 
 namespace ImpartialUI.ViewModels
 {
@@ -228,6 +229,7 @@ namespace ImpartialUI.ViewModels
         private void ParseScoreSheets()
         {
             _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
+            //_scoresheetParser = new DanceConventionParser(@"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\swingtacular2022\novice_jnj_finals.pdf");
 
             Competitions = new List<Competition>();
 
