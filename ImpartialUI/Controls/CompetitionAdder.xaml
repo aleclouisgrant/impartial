@@ -21,7 +21,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBox Margin="2" MinWidth="100" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" />
+                <TextBox Margin="2" MinWidth="10" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" />
 
                 <TextBlock Margin="2" Grid.Column="1" VerticalAlignment="Center">
                     <Run Text="Jack &amp; Jill"/>
@@ -36,8 +36,9 @@
         <Grid Grid.Row="1" x:Name="ScoreGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -63,8 +64,9 @@
                     FontWeight="Bold" FontStyle="Italic" Margin="1"/>
             </Border>
 
-            <!-- Add Row Button -->
+            <Button x:Name="AddColumnButton" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="3" Content="+" Width="20" Margin="1" Click="AddColumn_Click"/>
 
+            <!-- Add Row Button -->
             <Border Grid.Row="1" Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Margin="1" x:Name="AddRowBorder">
                 <Button 
                     Content="+"

@@ -177,11 +177,24 @@ namespace ImpartialUI.Controls
             }
         }
 
+        private List<Judge> _judges;
+        public List<Judge> Judges
+        {
+            get { return _judges; }
+            set
+            {
+                _judges = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ObservableCollection<Couple> Couples { get; set; } = new ObservableCollection<Couple>();
 
         public CompetitionAdder()
         {
             Competitors = App.DatabaseProvider.GetAllCompetitors();
+            Judges = App.DatabaseProvider.GetAllJudges();
+
             InitializeComponent();
 
             AddRow();
@@ -264,45 +277,26 @@ namespace ImpartialUI.Controls
             Grid.SetRow(followerBorder, ScoreGrid.RowDefinitions.Count - 2);
 
             // scores
-            //for (int i = 0; i < couple.Scores.Count; i++)
-            //{
-            //    var score = couple.Scores[i];
+            for (int i = 1; i < ScoreGrid.ColumnDefinitions.Count - 3; i++)
+            {
+                Border scoreBorder = new Border()
+                {
+                    BorderBrush = Brushes.Gray,
+                    BorderThickness = new Thickness(1),
+                    Margin = new Thickness(1)
+                };
 
-            //    var border = new Border()
-            //    {
-            //        BorderBrush = Brushes.Gray,
-            //        BorderThickness = new Thickness(1),
-            //        Margin = new Thickness(1)
-            //    };
+                TextBox scoreTextBox = new TextBox()
+                {
+                    Margin = new Thickness(1)
+                };
 
-            //    var textBlock = new TextBlock()
-            //    {
-            //        Margin = new Thickness(1)
-            //    };
+                scoreBorder.Child = scoreTextBox;
 
-            //    if (score.Placement == score.ActualPlacement)
-            //    {
-            //        textBlock.Text = score.Placement.ToString();
-            //    }
-            //    else
-            //    {
-            //        textBlock.Inlines.Add(new Run()
-            //        {
-            //            Text = score.Placement.ToString()
-            //        });
-            //        textBlock.Inlines.Add(new Run()
-            //        {
-            //            Text = " (" + (-1 * Math.Abs(score.Placement - score.ActualPlacement)).ToString() + ")",
-            //            Foreground = Brushes.Red
-            //        });
-            //    }
-
-            //    border.Child = textBlock;
-
-            //    ScoreGrid.Children.Add(border);
-            //    Grid.SetColumn(border, i + 2);
-            //    Grid.SetRow(border, couple.ActualPlacement);
-            //}
+                ScoreGrid.Children.Add(scoreBorder);
+                Grid.SetRow(scoreBorder, ScoreGrid.RowDefinitions.Count() - 2);
+                Grid.SetColumn(scoreBorder, i + 2);
+            }
 
             Grid.SetRow(AddRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
 
@@ -311,22 +305,75 @@ namespace ImpartialUI.Controls
                 (Competitor)followerSearchBox.SelectedPerson, 
                 ScoreGrid.RowDefinitions.Count - 2));
         }
+        private void AddColumn()
+        {
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto } );
+            //ScoreGrid.ColumnDefinitions[ScoreGrid.ColumnDefinitions.Count - 2].Width = new GridLength(1.0, GridUnitType.Star);
+
+            Border judgeBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1)
+            };
+
+            SearchTextBox judgeSearchBox = new SearchTextBox()
+            {
+                ItemsSource = Judges
+            };
+
+            judgeBorder.Child = judgeSearchBox;
+
+            ScoreGrid.Children.Add(judgeBorder);
+            Grid.SetColumn(judgeBorder, ScoreGrid.ColumnDefinitions.Count() - 2);
+
+            for (int i = 1; i < ScoreGrid.RowDefinitions.Count - 1; i++)
+            {
+                Border scoreBorder = new Border()
+                {
+                    BorderBrush = Brushes.Gray,
+                    BorderThickness = new Thickness(1),
+                    Margin = new Thickness(1)
+                };
+
+                TextBox scoreTextBox = new TextBox()
+                {
+                    Margin = new Thickness(1)
+                };
+
+                scoreBorder.Child = scoreTextBox;
+
+                ScoreGrid.Children.Add(scoreBorder);
+                Grid.SetRow(scoreBorder, i);
+                Grid.SetColumn(scoreBorder, ScoreGrid.ColumnDefinitions.Count() - 2);
+            }
+
+            Grid.SetColumn(AddColumnButton, ScoreGrid.ColumnDefinitions.Count() - 1);
+
+        }
 
         private void UpdateCompetition()
         {
             Competition.Clear();
 
-            for (int placement = 1; placement < ScoreGrid.RowDefinitions.Count - 1; placement++)
+            for (int placement = 1; placement <= ScoreGrid.RowDefinitions.Count - 2; placement++)
             {
-                var leaderSearchBox = (SearchTextBox)ScoreGrid.Children.Cast<Border>().
-                    First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == 1).Child;
-                var followerSearchBox = (SearchTextBox)ScoreGrid.Children.Cast<Border>().
-                    First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == 2).Child;
+                var leader = (Competitor)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
+                    First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == 1).Child).SelectedPerson;
+                var follower = (Competitor)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
+                    First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == 2).Child).SelectedPerson;
 
-                Competition.Couples.Add(new Couple(
-                    (Competitor)leaderSearchBox.SelectedPerson, 
-                    (Competitor)followerSearchBox.SelectedPerson, 
-                    placement));
+                Competition.Couples.Add(new Couple(leader, follower, placement));
+
+                for (int i = 3; i < ScoreGrid.ColumnDefinitions.Count - 1; i++)
+                {
+                    var judge = (Judge)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
+                        First(c => Grid.GetRow(c) == 0 && Grid.GetColumn(c) == i).Child).SelectedPerson;
+                    var scoreBox = (TextBox)ScoreGrid.Children.OfType<Border>().
+                        First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == i).Child;
+
+                    Competition.Scores.Add(new Score(judge, leader, follower, Int32.Parse(scoreBox.Text), placement));
+                }
             }
 
             OnPropertyChanged(nameof(Competition));
@@ -335,6 +382,10 @@ namespace ImpartialUI.Controls
         private void AddRow_Click(object sender, RoutedEventArgs e)
         {
             AddRow();
+        }
+        private void AddColumn_Click(object sender, RoutedEventArgs e)
+        {
+            AddColumn();
         }
 
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };

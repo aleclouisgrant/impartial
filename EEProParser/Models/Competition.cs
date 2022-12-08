@@ -1,5 +1,4 @@
-﻿using Org.BouncyCastle.Crypto.Tls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -90,9 +89,36 @@ namespace Impartial
 
             for (int placement = 1; placement <= TotalCouples; placement++)
             {
-                str += System.Environment.NewLine + placement + ": " + 
-                    Couples[placement-1].Leader.FullName + " & " + 
-                    Couples[placement - 1].Follower.FullName;
+                var couple = Couples[placement - 1];
+
+                str += System.Environment.NewLine + placement + ": " +
+                    couple.Leader.FullName + " & " +
+                    couple.Follower.FullName;
+
+                var scores = new List<int>();
+
+                foreach (var score in Scores)
+                {
+                    if (score.Leader == couple.Leader && score.Follower == couple.Follower)
+                    {
+                        scores.Add(score.Placement);
+                    }
+                }
+
+                if (scores.Count > 0)
+                {
+                    str += " (";
+
+                    scores = scores.OrderBy(s => s).ToList();
+
+                    for (int i = 0; i < scores.Count; i++)
+                    {
+                        str += scores[i] + " ";
+                    }
+
+                    str = str.Remove(str.Length - 1);
+                    str += ")";
+                }
             }
 
             return str;
