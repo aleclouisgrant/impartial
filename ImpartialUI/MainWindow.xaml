@@ -10,7 +10,6 @@
         x:Name="View"
         Title="Impartial" Height="800" Width="1600">
     <Grid>
-        <v:ParseScoreSheetsView
-            d:DataContext="{d:DesignInstance Type=vm:ParseScoreSheetsViewModel, IsDesignTimeCreatable=True}"/>
+        <v:RankingsView d:DataContext="{d:DesignInstance Type=vm:RankingsViewModel, IsDesignTimeCreatable=True}"/>
     </Grid>
 </Window>

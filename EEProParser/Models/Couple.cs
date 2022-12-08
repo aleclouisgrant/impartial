@@ -9,5 +9,12 @@ namespace Impartial
         public int ActualPlacement { get; set; }
 
         public List<Score> Scores { get; set; } = new List<Score>();
+
+        public Couple(Competitor leader, Competitor follower, int placement)
+        {
+            Leader = leader;
+            Follower = follower;
+            ActualPlacement = placement;
+        }
     }
 }

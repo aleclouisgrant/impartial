@@ -1,0 +1,10 @@
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\Impartial.deps.json
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\Impartial.dll
+C:\Users\Alec\source\Impartial\EEProParser\bin\Debug\netcoreapp3.1\Impartial.pdb
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\Impartial.csproj.AssemblyReference.cache
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\Impartial.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\Impartial.AssemblyInfoInputs.cache
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\Impartial.AssemblyInfo.cs
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\Impartial.csproj.CoreCompileInputs.cache
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\Impartial.dll
+C:\Users\Alec\source\Impartial\EEProParser\obj\Debug\netcoreapp3.1\Impartial.pdb

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Crypto.Tls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,21 +9,43 @@ namespace Impartial
     {
         public Guid Id { get; }
 
-        public Division Division { get; }
+        public string Name { get; set; }
 
-        public List<Score> Scores { get; set; }
+        public Division Division { get; set; }
+
+        public List<Score> Scores { get; set; } = new List<Score>();
 
         public int TotalCouples => Couples?.Count ?? 0;
 
-        public List<Couple> Couples => GetCouples();
+        public List<Couple> Couples { get; set; } = new List<Couple>(); //temporary until GetCouples works
 
         public List<Judge> Judges => GetJudges();
 
-        public Competition() { }
+        public Competition() 
+        { 
+            Id = Guid.NewGuid();
+        }
+
+        public Competition(string name)
+        {
+            Name = name;
+
+            Id = Guid.NewGuid();
+        }
 
         public Competition(Division division)
         {
             Division = division;
+
+            Id = Guid.NewGuid();
+        }
+
+        public Competition(string name, Division division)
+        {
+            Name = name;
+            Division = division;
+
+            Id = Guid.NewGuid();
         }
 
         private List<Judge> GetJudges()
@@ -38,6 +61,7 @@ namespace Impartial
             return judges;
         }
 
+        // this is good but needs more built around it to work as intended
         private List<Couple> GetCouples()
         {
             var couples = new List<Couple>();
@@ -46,13 +70,7 @@ namespace Impartial
             {
                 if (!couples.Any(c => c.ActualPlacement == score.ActualPlacement))
                 {
-                    var couple = new Couple()
-                    {
-                        Leader = score.Leader,
-                        Follower = score.Follower,
-                        ActualPlacement = score.ActualPlacement,
-                    };
-
+                    var couple = new Couple(score.Leader, score.Follower, score.ActualPlacement);
                     couples.Add(couple);
                     couple.Scores.Add(score);
                 }
@@ -64,6 +82,27 @@ namespace Impartial
             }
 
             return couples;
+        }
+
+        public override string ToString()
+        {
+            string str = "COMPETITION (" + Division + ", " + TotalCouples + " couples)";
+
+            for (int placement = 1; placement <= TotalCouples; placement++)
+            {
+                str += System.Environment.NewLine + placement + ": " + 
+                    Couples[placement-1].Leader.FullName + " & " + 
+                    Couples[placement - 1].Follower.FullName;
+            }
+
+            return str;
+        }
+
+        public void Clear()
+        {
+            Couples.Clear();
+            Scores.Clear();
+            Judges.Clear();
         }
     }
 }

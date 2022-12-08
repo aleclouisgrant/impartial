@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NETCOREAPP;NETCOREAPP3_1;
 C:\Users\Alec\source\Impartial\ImpartialUI\App.xaml
-52052607146
+7-1114597617
 
-16-48976676
+19254340917
 220-1009624288
-Controls\CompetitionViewer.xaml;Controls\SearchTextBox.xaml;MainWindow.xaml;Views\ParseScoreSheetsView.xaml;Views\SelectScoreSheetsView.xaml;
+Controls\CompetitionAdder.xaml;Controls\CompetitionViewer.xaml;Controls\SearchTextBox.xaml;MainWindow.xaml;Views\ParseScoreSheetsView.xaml;Views\RankingsView.xaml;Views\SelectScoreSheetsView.xaml;
 
 True
 

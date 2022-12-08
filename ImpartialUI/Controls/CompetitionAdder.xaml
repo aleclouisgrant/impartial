@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="ImpartialUI.Controls.CompetitionAdder"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ImpartialUI.Controls"
+             xmlns:m="clr-namespace:Impartial;assembly=Impartial"
+             mc:Ignorable="d">
+
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBox Margin="2" MinWidth="100" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" />
+
+                <TextBlock Margin="2" Grid.Column="1" VerticalAlignment="Center">
+                    <Run Text="Jack &amp; Jill"/>
+                    <Run Text="{Binding Competiton.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Run Text="Finals"/>
+                </TextBlock>
+
+                <Button Grid.Column="2" Content="Update" Click="Button_Click" HorizontalAlignment="Right"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" x:Name="ScoreGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="Gray" Margin="1">
+                <TextBlock
+                    Text="Place"
+                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
+            </Border>
+
+            <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray" Margin="1">
+                <TextBlock
+                    Text="Competitor (Leader)" 
+                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
+            </Border>
+
+            <Border Grid.Row="0" Grid.Column="2" BorderThickness="1" BorderBrush="Gray" Margin="1">
+                <TextBlock
+                    Text="Competitor (Follower)" 
+                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
+            </Border>
+
+            <!-- Add Row Button -->
+
+            <Border Grid.Row="1" Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Margin="1" x:Name="AddRowBorder">
+                <Button 
+                    Content="+"
+                    Click="AddRow_Click"/>
+            </Border>
+            
+        </Grid>
+    </Grid>
+</UserControl>

@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImpartialUI.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="20">
+             d:DesignHeight="20"
+             x:Name="Self">
     <Grid>
         <Grid x:Name="SelectPersonGrid">
             <Grid.ColumnDefinitions>
@@ -21,10 +22,21 @@
                 x:Name="ComboBoxItems"
                 Grid.Column="1"
                 IsTextSearchEnabled="True"
-                SelectedValue="{Binding SelectedJudge}"
-                DisplayMemberPath="FullName"
+                SelectedValue="{Binding SelectedPerson, ElementName=Self}"
                 Margin="2 0"
-                MinWidth="60"/>
+                MinWidth="60"
+                SelectionChanged="ComboBoxItems_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="{Binding FullName, Mode=OneWay}"/>
+                            <Run Text="("/>
+                            <Run Text="{Binding WsdcId, Mode=OneWay}"/>
+                            <Run Text=")"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
 
             <Button
                 x:Name="GuessButton"
@@ -63,7 +75,8 @@
                     Content="Add"
                     Padding="5 0"
                     Margin="2 0"
-                    Click="AddToDatabaseButton_Click"/>
+                    Click="AddToDatabaseButton_Click"
+                    IsEnabled="False"/>
                 <Button
                     x:Name="HideAddPersonButton"
                     Content="Cancel"

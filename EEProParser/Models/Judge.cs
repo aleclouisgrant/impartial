@@ -5,14 +5,9 @@ using System.Linq;
 
 namespace Impartial
 {
-    public class Judge : IPersonModel
+    public class Judge : PersonModel
     {
-        [BsonId]
-        public Guid Id { get; set; }
-
-        // personal info
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
+        // personal data
         public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
 
         // data

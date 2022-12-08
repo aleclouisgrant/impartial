@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="ImpartialUI.Views.RankingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:ImpartialUI.ViewModels"
+             xmlns:v="clr-namespace:ImpartialUI.Views"
+             xmlns:c="clr-namespace:ImpartialUI.Controls"
+             xmlns:local="clr-namespace:ImpartialUI.Views"
+             mc:Ignorable="d"
+             x:Name="View"
+             d:DesignHeight="800" d:DesignWidth="1600"
+             d:DataContext="{d:DesignInstance Type=vm:RankingsViewModel, IsDesignTimeCreatable=True}"
+             Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical" Grid.Row="0" Width="400" Margin="20">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="First Name:" Margin="0 0 5 0"/>
+                    <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
+                    <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="WSDC Id:" Margin="0 0 5 0"/>
+                    <TextBox Text="{Binding WsdcId, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                </StackPanel>
+
+            </StackPanel>
+            
+            <Button 
+                Grid.Row="1"
+                Content="Add Competitor To Database"
+                Width="200" Height="20"
+                FontWeight="Bold"
+                Command="{Binding AddCompetitorCommand}"
+                IsDefault="True"
+                Margin="20"/>
+
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <c:CompetitionAdder Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+            
+            <Button 
+                Grid.Row="1"
+                Content="Add Competition To Database"
+                Width="200" Height="20"
+                FontWeight="Bold"
+                Command="{Binding AddCompetitionCommand}"
+                IsDefault="True"
+                Margin="20"
+                VerticalAlignment="Bottom"/>
+            
+        </Grid>
+
+    </Grid>
+</UserControl>

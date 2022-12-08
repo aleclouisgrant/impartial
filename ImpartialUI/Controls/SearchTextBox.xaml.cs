@@ -15,9 +15,20 @@ using System.Windows.Shapes;
 
 namespace ImpartialUI.Controls
 {
-    public partial class SearchTextBox : UserControl 
+    public partial class SearchTextBox : UserControl
     {
         #region DependencyProperties
+
+        public static readonly DependencyProperty SelectedPersonProperty = DependencyProperty.Register(
+            nameof(SelectedPerson),
+            typeof(PersonModel),
+            typeof(SearchTextBox),
+            new FrameworkPropertyMetadata());
+        public PersonModel SelectedPerson
+        {
+            get { return (PersonModel)GetValue(SelectedPersonProperty); }
+            set { SetValue(SelectedPersonProperty, value); }
+        }
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
             nameof(Text),
@@ -35,25 +46,25 @@ namespace ImpartialUI.Controls
             control.TextBlock1.Text = (string)e.NewValue;
             control.TextBlock2.Text = (string)e.NewValue;
 
-            control.GuessJudge();
+            control.GuessPerson();
         }
 
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             nameof(ItemsSource),
-            typeof(IEnumerable<Judge>),
+            typeof(IEnumerable<PersonModel>),
             typeof(SearchTextBox),
             new FrameworkPropertyMetadata(null, OnItemsSourcePropertyChanged));
-        public IEnumerable<Judge> ItemsSource
+        public IEnumerable<PersonModel> ItemsSource
         {
-            get { return (IEnumerable<Judge>)GetValue(ItemsSourceProperty); }
+            get { return (IEnumerable<PersonModel>)GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
         }
         private static void OnItemsSourcePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var control = (SearchTextBox)source;
-            control.ComboBoxItems.ItemsSource = (IEnumerable<Judge>)e.NewValue;
+            control.ComboBoxItems.ItemsSource = (IEnumerable<PersonModel>)e.NewValue;
 
-            control.GuessJudge();
+            control.GuessPerson();
         }
 
         public static readonly DependencyProperty DatabaseProviderProperty = DependencyProperty.Register(
@@ -73,25 +84,41 @@ namespace ImpartialUI.Controls
 
         #endregion
 
+
+        public static readonly RoutedEvent SelectionChangedEvent =
+           EventManager.RegisterRoutedEvent("SelectionChanged", RoutingStrategy.Bubble,
+           typeof(RoutedEventHandler), typeof(SearchTextBox));
+
+        public event RoutedEventHandler SelectionChanged
+        {
+            add { AddHandler(SelectionChangedEvent, value); }
+            remove { RemoveHandler(SelectionChangedEvent, value); }
+        }
+        protected virtual void RaiseSelectionChangedEvent()
+        {
+            RoutedEventArgs args = new RoutedEventArgs(SearchTextBox.SelectionChangedEvent);
+            RaiseEvent(args);
+        }
+
         public SearchTextBox()
         {
             InitializeComponent();
         }
 
-        private void GuessJudge()
+        private void GuessPerson()
         {
             if (ComboBoxItems.ItemsSource == null)
                 return;
 
-            ComboBoxItems.SelectedItem = GetClosestJudgeByFirstName(Text, ItemsSource.ToList());
+            ComboBoxItems.SelectedItem = GetClosestPersonByFirstName(Text, ItemsSource.ToList());
         }
 
-        private Judge GetClosestJudgeByFirstName(string input, List<Judge> list)
+        private PersonModel GetClosestPersonByFirstName(string input, List<PersonModel> list)
         {
             int leastDistance = 10000;
-            Judge match = null;
+            PersonModel match = null;
 
-            foreach (Judge j in list)
+            foreach (PersonModel j in list)
             {
                 int d = GetEditDistance(input, j.FirstName);
                 if (d == 0)
@@ -157,7 +184,10 @@ namespace ImpartialUI.Controls
 
         private void AddToDatabaseButton_Click(object sender, RoutedEventArgs e)
         {
-            DatabaseProvider.InsertJudge(new Judge(FirstNameTextBox.Text, LastNameTextBox.Text));
+            //if (typeof(ComboBoxItems.SelectedItem) is Judge)
+            //    DatabaseProvider.InsertJudge(new Judge(FirstNameTextBox.Text, LastNameTextBox.Text));
+            //else if (typeof(ComboBoxItems.SelectedItem) is Competitor)
+            //    DatabaseProvider.InsertCompetitor(new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text));
 
             SelectPersonGrid.Visibility = Visibility.Visible;
             AddPersonGrid.Visibility = Visibility.Collapsed;
@@ -174,7 +204,12 @@ namespace ImpartialUI.Controls
         }
         private void GuessButton_Click(object sender, RoutedEventArgs e)
         {
-            GuessJudge();
+            GuessPerson();
+        }
+
+        private void ComboBoxItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RaiseEvent(e);
         }
     }
 }

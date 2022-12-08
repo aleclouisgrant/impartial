@@ -229,24 +229,31 @@ namespace ImpartialUI.ViewModels
         private void ParseScoreSheets()
         {
             _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
-            //_scoresheetParser = new DanceConventionParser(@"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\swingtacular2022\novice_jnj_finals.pdf");
 
             Competitions = new List<Competition>();
+            Judges = new List<Judge>();
 
-            /// for testing
             var divisions = _scoresheetParser.GetDivisions();
 
             foreach (var division in divisions)
             {
-                Competitions.Add(_scoresheetParser.GetCompetition(division));
-            }
+                var comp = _scoresheetParser.GetCompetition(division);
+                Competitions.Add(comp);
 
-            //Competitions.Add(_scoresheetParser.GetCompetition(Division.Novice));
+                foreach (var judge in comp.Judges)
+                {
+                    if (!Judges.Any(j => j.FullName == judge.FullName)) //these should actually be compared with IDs
+                    {
+                        Judges.Add(judge);
+                    }
+                }
+            }
 
             // sort from lowest to highest division
             Competitions = Competitions.OrderBy(c => (int)c.Division).ToList();
 
             OnPropertyChanged(nameof(Competitions));
+            OnPropertyChanged(nameof(Judges));
         }
 
         private void SendToDatabase()
