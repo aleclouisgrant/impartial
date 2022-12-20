@@ -189,6 +189,9 @@ namespace ImpartialUI.Controls
             //else if (typeof(ComboBoxItems.SelectedItem) is Competitor)
             //    DatabaseProvider.InsertCompetitor(new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text));
 
+            App.DatabaseProvider.InsertJudge(new Judge(FirstNameTextBox.Text, LastNameTextBox.Text));
+            ItemsSource = App.DatabaseProvider.GetAllJudges();
+
             SelectPersonGrid.Visibility = Visibility.Visible;
             AddPersonGrid.Visibility = Visibility.Collapsed;
         }

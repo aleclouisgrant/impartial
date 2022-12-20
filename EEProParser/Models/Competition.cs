@@ -85,7 +85,7 @@ namespace Impartial
 
         public override string ToString()
         {
-            string str = "COMPETITION (" + Division + ", " + TotalCouples + " couples)";
+            string str = Name + " " + Division + " Jack & Jill (" + TotalCouples + " couples)";
 
             for (int placement = 1; placement <= TotalCouples; placement++)
             {

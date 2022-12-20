@@ -34,6 +34,13 @@ namespace Impartial
             return collection.Find(filter).First();
         }
 
+        public T LoadByString<T>(string table, string value)
+        {
+            var collection = db.GetCollection<T>(table);
+            var filter = Builders<T>.Filter.Eq("FullName", value);
+            return collection.Find(filter).First();
+        }
+
         public void UpsertById<T>(string table, Guid id, T record)
         {
             var collection = db.GetCollection<T>(table);

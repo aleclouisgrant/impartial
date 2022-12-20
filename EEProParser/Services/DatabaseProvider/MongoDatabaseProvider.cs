@@ -105,6 +105,10 @@ namespace Impartial
         {
             return _helper.LoadById<Judge>(JUDGES_TABLE_STRING, id);
         }
+        public Judge GetJudgeByName(string firstName, string lastName)
+        {
+            return _helper.LoadByString<Judge>(JUDGES_TABLE_STRING, firstName + " " + lastName);
+        }
         public List<Judge> GetAllJudges()
         {
             return _helper.LoadAll<Judge>(JUDGES_TABLE_STRING);

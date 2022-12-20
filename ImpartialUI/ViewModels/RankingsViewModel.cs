@@ -93,9 +93,9 @@ namespace ImpartialUI.ViewModels
         {
             Trace.WriteLine(Competition.ToString());
 
-            //_databaseProvider.InsertCompetition(Competition);
+            _databaseProvider.InsertCompetition(Competition);
 
-            //Competition = new Competition(Division.AllStar);
+            Competition = new Competition(Division.AllStar);
         }
     }
 }

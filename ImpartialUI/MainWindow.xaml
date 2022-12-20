@@ -10,6 +10,16 @@
         x:Name="View"
         Title="Impartial" Height="800" Width="1600">
     <Grid>
-        <v:RankingsView d:DataContext="{d:DesignInstance Type=vm:RankingsViewModel, IsDesignTimeCreatable=True}"/>
+        <TabControl Margin="0 20 0 0" BorderThickness="0 2 0 0">
+            <TabItem Header="View Competition">
+                <v:ViewCompetitionView Margin="30"/>
+            </TabItem>
+            <TabItem Header="Add Competition">
+                <v:RankingsView Margin="20" d:DataContext="{d:DesignInstance Type=vm:RankingsViewModel, IsDesignTimeCreatable=True}"/>
+            </TabItem>
+            <TabItem Header="Judge">
+                <v:ParseScoreSheetsView/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

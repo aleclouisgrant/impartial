@@ -21,11 +21,11 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBox Margin="2" MinWidth="10" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" />
+                <TextBox Margin="2" MinWidth="10" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" Text="{Binding Competition.Name, Mode=OneWay}" />
 
                 <TextBlock Margin="2" Grid.Column="1" VerticalAlignment="Center">
                     <Run Text="Jack &amp; Jill"/>
-                    <Run Text="{Binding Competiton.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Run Text="{Binding Competition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <Run Text="Finals"/>
                 </TextBlock>
 

@@ -16,10 +16,9 @@ namespace Impartial
         public EEProParser(string prelimsSheetPath, string finalsSheetPath)
         {
             if (prelimsSheetPath == null || prelimsSheetPath == String.Empty)
-                throw new ArgumentNullException(nameof(prelimsSheetPath));
-            
+                return;
             if (finalsSheetPath == null || finalsSheetPath == String.Empty)
-                throw new ArgumentNullException(nameof(finalsSheetPath));
+                return;
 
             _prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
             _finalsSheetDoc = File.ReadAllText(finalsSheetPath).Replace("\n", "").Replace("\r", "");

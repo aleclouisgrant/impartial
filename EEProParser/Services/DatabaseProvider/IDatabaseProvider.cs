@@ -30,6 +30,7 @@ namespace Impartial
         void InsertJudge(Judge judge);
         void UpdateJudge(Guid id, Judge judge);
         Judge GetJudgeById(Guid id);
+        Judge GetJudgeByName(string firstName, string lastName);
         void DeleteJudge(Judge judge);
         List<Judge> GetAllJudges();
         void DeleteAllJudges();
