@@ -10,6 +10,8 @@ namespace Impartial
 
         public string Name { get; set; }
 
+        public DateTime Date { get; set; }
+
         public Division Division { get; set; }
 
         public List<Score> Scores { get; set; } = new List<Score>();
@@ -25,11 +27,12 @@ namespace Impartial
             Id = Guid.NewGuid();
         }
 
-        public Competition(string name)
+        public Competition(string name, DateTime date)
         {
             Name = name;
 
             Id = Guid.NewGuid();
+            Date = date;
         }
 
         public Competition(Division division)
@@ -85,7 +88,21 @@ namespace Impartial
 
         public override string ToString()
         {
-            string str = Name + " " + Division + " Jack & Jill (" + TotalCouples + " couples)";
+            return Name + " " + Division + " Jack & Jill (" + Date.ToShortDateString() + ")";
+        }
+
+        public string ToLongString()
+        {
+            string str = Name + " " + Division + " Jack & Jill (" + Date.ToShortDateString() + ", " + TotalCouples + " couples)";
+
+            str += System.Environment.NewLine + "JUDGES: ";
+            foreach (Judge judge in Judges)
+            {
+                str += judge.ToString() + ", ";
+            }
+            str = str.Remove(str.Length - 2, 2);
+
+            str += System.Environment.NewLine + "PLACEMENTS:";
 
             for (int placement = 1; placement <= TotalCouples; placement++)
             {

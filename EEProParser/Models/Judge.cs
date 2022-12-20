@@ -23,5 +23,10 @@ namespace Impartial
             FirstName = firstName;
             LastName = lastName;
         }
+
+        public override string ToString()
+        {
+            return FullName;
+        }
     }
 }

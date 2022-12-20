@@ -91,7 +91,7 @@ namespace ImpartialUI.ViewModels
 
         private void AddCompetition()
         {
-            Trace.WriteLine(Competition.ToString());
+            //Trace.WriteLine(Competition.ToLongString());
 
             _databaseProvider.InsertCompetition(Competition);
 

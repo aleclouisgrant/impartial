@@ -19,9 +19,10 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBox Margin="2" MinWidth="10" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" Text="{Binding Competition.Name, Mode=OneWay}" />
+                <TextBox Margin="2" MinWidth="10" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" Text="{Binding Competition.Name, Mode=OneWay}"/>
 
                 <TextBlock Margin="2" Grid.Column="1" VerticalAlignment="Center">
                     <Run Text="Jack &amp; Jill"/>
@@ -29,7 +30,8 @@
                     <Run Text="Finals"/>
                 </TextBlock>
 
-                <Button Grid.Column="2" Content="Update" Click="Button_Click" HorizontalAlignment="Right"/>
+                <DatePicker x:Name="CompDatePicker" Grid.Column="2" HorizontalAlignment="Right" DisplayDate="{Binding Competition.Date, Mode=OneWay}"/>
+                <Button Grid.Column="3" Content="Update" Click="Button_Click" HorizontalAlignment="Right"/>
             </Grid>
         </Border>
 

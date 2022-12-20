@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -197,6 +198,9 @@ namespace ImpartialUI.Controls
 
             InitializeComponent();
 
+            CompDatePicker.DisplayDateStart = DateTime.Now;
+            CompDatePicker.DisplayDate = DateTime.Now;
+
             AddRow();
         }
 
@@ -357,6 +361,8 @@ namespace ImpartialUI.Controls
             Competition.Clear();
 
             Competition.Name = NameTextBox.Text;
+            Competition.Date = CompDatePicker.DisplayDate;
+
             for (int placement = 1; placement <= ScoreGrid.RowDefinitions.Count - 2; placement++)
             {
                 var leader = (Competitor)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
@@ -378,6 +384,7 @@ namespace ImpartialUI.Controls
             }
 
             OnPropertyChanged(nameof(Competition));
+            Trace.WriteLine(Competition.ToLongString());
         }
 
         private void AddRow_Click(object sender, RoutedEventArgs e)
