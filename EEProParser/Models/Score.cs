@@ -2,7 +2,7 @@
 {
     public class Score
     {
-        public Judge Judge { get; }
+        public Judge Judge { get; set; }
         public Competitor Leader { get; set; }
         public Competitor Follower { get; set; }
 

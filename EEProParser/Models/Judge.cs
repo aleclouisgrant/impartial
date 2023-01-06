@@ -14,9 +14,19 @@ namespace Impartial
         public List<Score> Scores { get; set; }
 
         // total accuracy 
-        public double Accuracy { get; set; }
+        public double Accuracy => Scores == null ? 0 : Math.Round(Scores.Sum(s => s.Accuracy) / Scores.Count, 2);
+        
+        public double Top5Accuracy
+        {
+            get
+            {
+                if (Scores == null)
+                    return 0;
 
-        public double Top5Accuracy { get; set; }
+                var scores = Scores.FindAll(s => s.ActualPlacement <= 5);
+                return Math.Round(scores.Sum(s => s.Accuracy) / scores.Count, 2);
+            }
+        }
 
         public Judge(string firstName, string lastName)
         {

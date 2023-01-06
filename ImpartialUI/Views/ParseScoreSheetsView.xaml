@@ -116,7 +116,7 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
 
-                    <Border Grid.Row="1" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1">
+                    <Border Grid.Row="1" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" >
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -127,11 +127,13 @@
                                     <ColumnDefinition Width="150"/>
                                     <ColumnDefinition Width="50"/>
                                     <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="60"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
                                 <TextBlock Grid.Column="1" Text="Acc" FontWeight="Bold"/>
                                 <TextBlock Grid.Column="2" Text="Top 5 Acc" FontWeight="Bold"/>
+                                <TextBlock Grid.Column="3" Text="# of Scores" FontWeight="Bold"/>
                             </Grid>
 
                             <ItemsControl Grid.Row="1" ItemsSource="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
@@ -142,11 +144,13 @@
                                                 <ColumnDefinition Width="150"/>
                                                 <ColumnDefinition Width="50"/>
                                                 <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="60"/>
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>
                                             <TextBlock Grid.Column="1" Text="{Binding Accuracy, Mode=OneWay}"/>
                                             <TextBlock Grid.Column="2" Text="{Binding Top5Accuracy, Mode=OneWay}"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding Scores.Count, Mode=OneWay}"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

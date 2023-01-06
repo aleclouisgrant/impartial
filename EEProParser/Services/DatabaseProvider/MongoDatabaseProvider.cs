@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Impartial
 {
-    public class MongoDatabaseProvider : IDatabaseProvider
+    public class MongoDatabaseProvider
     {
         private MongoHelper _helper;
 

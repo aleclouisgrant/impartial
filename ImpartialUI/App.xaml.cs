@@ -1,16 +1,11 @@
 ﻿using Impartial;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace ImpartialUI
 {
     public partial class App : Application
     {
-        public static IDatabaseProvider DatabaseProvider { get; } = new MongoDatabaseProvider("Impartial");
+        //public static IDatabaseProvider DatabaseProvider { get; } = new LocalDatabaseProvider();
+        public static IDatabaseProvider DatabaseProvider { get; } = new SqlDatabaseProvider("Data Source=desktop;Initial Catalog=Impartial;Integrated Security=True");
     }
 }

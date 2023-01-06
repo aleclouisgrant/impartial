@@ -18,6 +18,9 @@
     <Compile Update="Controls\CompetitionAdder.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\RatingsView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\RankingsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -45,6 +48,9 @@
     <Page Update="Controls\CompetitionAdder.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\RatingsView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Views\RankingsView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

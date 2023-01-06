@@ -1,38 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Impartial
 {
     public interface IDatabaseProvider
     {
-        void InsertSdcEvent(SdcEvent sdcEvent);
-        void UpdateSdcEvent(Guid id, SdcEvent sdcEvent);
-        SdcEvent GetSdcEventById(Guid id);
-        void DeleteSdcEvent(SdcEvent sdcEvent);
-        List<SdcEvent> GetAllSdcEvents();
-        void DeleteAllSdcEvents();
+        Task InsertCompetitionAsync(Competition competition);
+        Task UpdateCompetitionAsync(Guid id, Competition competition);
+        Task<Competition> GetCompetitionByIdAsync(Guid id);
+        Task DeleteCompetitionAsync(Competition competition);
+        Task<IEnumerable<Competition>> GetAllCompetitionsAsync();
+        Task DeleteAllCompetitionsAsync();
 
-        void InsertCompetition(Competition competition);
-        void UpdateCompetition(Guid id, Competition competition);
-        Competition GetCompetitionById(Guid id);
-        void DeleteCompetition(Competition competition);
-        List<Competition> GetAllCompetitions();
-        void DeleteAllCompetitions();
+        Task InsertCompetitorAsync(Competitor competitor);
+        Task UpdateCompetitorAsync(Guid id, Competitor competitor);
+        Task<Competitor> GetCompetitorByIdAsync(Guid id);
+        Task<Competitor> GetCompetitorByNameAsync(string firstName, string lastName);
+        Task DeleteCompetitorAsync(Competitor competitor);
+        Task<IEnumerable<Competitor>> GetAllCompetitorsAsync();
+        Task DeleteAllCompetitorsAsync();
 
-        void InsertCompetitor(Competitor competitor);
-        void UpdateCompetitor(Guid id, Competitor competitor);
-        Competitor GetCompetitorById(Guid id);
-        void DeleteCompetitor(Competitor competitor);
-        List<Competitor> GetAllCompetitors();
-        void DeleteAllCompetitors();
-
-        void InsertJudge(Judge judge);
-        void UpdateJudge(Guid id, Judge judge);
-        Judge GetJudgeById(Guid id);
-        Judge GetJudgeByName(string firstName, string lastName);
-        void DeleteJudge(Judge judge);
-        List<Judge> GetAllJudges();
-        void DeleteAllJudges();
+        Task InsertJudgeAsync(Judge judge);
+        Task UpdateJudgeAsync(Guid id, Judge judge);
+        Task<Judge> GetJudgeByIdAsync(Guid id);
+        Task<Judge> GetJudgeByNameAsync(string firstName, string lastName);
+        Task DeleteJudgeAsync(Judge judge);
+        Task<IEnumerable<Judge>> GetAllJudgesAsync();
+        Task DeleteAllJudgesAsync();
     }
 }

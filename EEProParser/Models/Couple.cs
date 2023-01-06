@@ -8,6 +8,8 @@ namespace Impartial
         public Competitor Follower { get; set; }
         public int ActualPlacement { get; set; }
 
+        public int CombinedRating => Leader.LeadStats.Rating + Follower.FollowStats.Rating;
+
         public List<Score> Scores { get; set; } = new List<Score>();
 
         public Couple(Competitor leader, Competitor follower, int placement)

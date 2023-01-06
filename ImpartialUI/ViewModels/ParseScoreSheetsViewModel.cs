@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System;
 using Impartial.Services.ScoresheetParser;
+using System.Threading.Tasks;
 
 namespace ImpartialUI.ViewModels
 {
@@ -118,9 +119,9 @@ namespace ImpartialUI.ViewModels
             RefreshJudgesDatabase();
         }
 
-        private void RefreshJudgesDatabase()
+        private async void RefreshJudgesDatabase()
         {
-            JudgesDb = _databaseProvider.GetAllJudges();
+            JudgesDb = (await _databaseProvider.GetAllJudgesAsync()).ToList();
             JudgesDb = JudgesDb.OrderBy(j => j.Accuracy).ToList();
             OnPropertyChanged(nameof(JudgesDb));
         }
@@ -136,9 +137,9 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private void AddJudge()
+        private async void AddJudge()
         {
-            _databaseProvider.InsertJudge(new Judge(FirstName, LastName));
+            await _databaseProvider.InsertJudgeAsync(new Judge(FirstName, LastName));
             RefreshJudgesDatabase();
 
             // clear the name fields
@@ -146,12 +147,12 @@ namespace ImpartialUI.ViewModels
         }
         private void DeleteJudge(object obj)
         {
-            _databaseProvider.DeleteJudge((Judge)obj);
+            _databaseProvider.DeleteJudgeAsync((Judge)obj);
             RefreshJudgesDatabase();
         }
         private void ClearJudgesDatabase()
         {
-            _databaseProvider.DeleteAllJudges();
+            _databaseProvider.DeleteAllJudgesAsync();
             RefreshJudgesDatabase();
         }
 
@@ -244,7 +245,14 @@ namespace ImpartialUI.ViewModels
                 {
                     if (!Judges.Any(j => j.FullName == judge.FullName)) //these should actually be compared with IDs
                     {
-                        Judges.Add(judge);
+                        Judges.Add(new Judge(judge.FirstName, judge.LastName)
+                        {
+                            Scores = judge.Scores
+                        });
+                    }
+                    else
+                    {
+                        Judges.FirstOrDefault(j => j.FullName == judge.FullName).Scores.AddRange(judge.Scores);
                     }
                 }
             }
@@ -265,9 +273,7 @@ namespace ImpartialUI.ViewModels
                     if (score.Judge.Scores == null)
                         score.Judge.Scores = new List<Score>();
 
-                    score.Judge.Accuracy = Math.Round(score.Judge.Scores.Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
-                    score.Judge.Top5Accuracy = Math.Round(score.Judge.Scores.FindAll(s => s.ActualPlacement <= 5).Sum(s => s.Accuracy) / 5, 2);
-                    _databaseProvider.UpdateJudge(score.Judge.Id, score.Judge);
+                    _databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
                 }
             }
 

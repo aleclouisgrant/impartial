@@ -14,7 +14,16 @@ namespace Impartial
 
         public Division Division { get; set; }
 
-        public List<Score> Scores { get; set; } = new List<Score>();
+        private List<Score> _scores = new List<Score>();
+        public List<Score> Scores 
+        {
+            get { return _scores; }
+            set
+            {
+                _scores = value;
+                Couples = GetCouples();
+            } 
+        }
 
         public int TotalCouples => Couples?.Count ?? 0;
 

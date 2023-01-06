@@ -1,126 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using Dapper;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Impartial
 {
     public class SqlDatabaseProvider : IDatabaseProvider
     {
-        private MongoHelper _helper;
+        SqlHelper _helper;
 
-        static string COMPETITIONS_TABLE_STRING = "Competitions";
-        static string COMPETITORS_TABLE_STRING = "Competitors";
-        static string JUDGES_TABLE_STRING = "Judges";
-        static string SDCEVENTS_TABLE_STRING = "SdcEvents";
-
-        public SqlDatabaseProvider(string databaseString)
+        public SqlDatabaseProvider(string connectionString)
         {
-            _helper = new MongoHelper(databaseString);
+            _helper = new SqlHelper(connectionString);
         }
 
-        public void InsertSdcEvent(SdcEvent sdcEvent)
+        public async Task InsertCompetitionAsync(Competition competition)
         {
-            _helper.Insert(SDCEVENTS_TABLE_STRING, sdcEvent);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competition_Insert", competition);
         }
-        public void UpdateSdcEvent(Guid id, SdcEvent sdcEvent)
+        public async Task UpdateCompetitionAsync(Guid id, Competition competition)
         {
-            _helper.UpsertById(SDCEVENTS_TABLE_STRING, id, sdcEvent);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competition_Update", competition);
         }
-        public SdcEvent GetSdcEventById(Guid id)
+        public async Task<Competition> GetCompetitionByIdAsync(Guid id)
         {
-            return _helper.LoadById<SdcEvent>(SDCEVENTS_TABLE_STRING, id);
+            var results = await _helper.LoadDataAsync<Competition, dynamic>(storedProcedure: "dbo.Competition_GetById", new { Id = id });
+            return results.FirstOrDefault();
         }
-        public List<SdcEvent> GetAllSdcEvents()
+        public async Task<IEnumerable<Competition>> GetAllCompetitionsAsync()
         {
-            return _helper.LoadAll<SdcEvent>(SDCEVENTS_TABLE_STRING);
+            return await _helper.LoadDataAsync<Competition, dynamic>(storedProcedure: "dbo.Competitions_GetAll", new { });
         }
-        public void DeleteSdcEvent(SdcEvent sdcEvent)
+        public async Task DeleteCompetitionAsync(Competition competition)
         {
-            _helper.DeleteById<SdcEvent>(SDCEVENTS_TABLE_STRING, sdcEvent.Id);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitor_Delete", new { Id = competition.Id });
         }
-        public void DeleteAllSdcEvents()
+        public async Task DeleteAllCompetitionsAsync()
         {
-            _helper.DeleteAll<SdcEvent>(SDCEVENTS_TABLE_STRING);
-        }
-
-        public void InsertCompetition(Competition competition)
-        {
-            _helper.Insert(COMPETITIONS_TABLE_STRING, competition);
-        }
-        public void UpdateCompetition(Guid id, Competition competition)
-        {
-            _helper.UpsertById(COMPETITIONS_TABLE_STRING, id, competition);
-        }
-        public Competition GetCompetitionById(Guid id)
-        {
-            return _helper.LoadById<Competition>(COMPETITIONS_TABLE_STRING, id);
-        }
-        public List<Competition> GetAllCompetitions()
-        {
-            return _helper.LoadAll<Competition>(COMPETITIONS_TABLE_STRING);
-        }
-        public void DeleteCompetition(Competition competition)
-        {
-            _helper.DeleteById<Competition>(COMPETITIONS_TABLE_STRING, competition.Id);
-        }
-        public void DeleteAllCompetitions()
-        {
-            _helper.DeleteAll<Competition>(COMPETITIONS_TABLE_STRING);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitions_DeleteAll", new { });
         }
 
-        public void InsertCompetitor(Competitor competitor)
+        public async Task InsertCompetitorAsync(Competitor competitor)
         {
-            _helper.Insert(COMPETITORS_TABLE_STRING, competitor);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_Insert", competitor);
         }
-        public void UpdateCompetitor(Guid id, Competitor competitor)
+        public async Task UpdateCompetitorAsync(Guid id, Competitor competitor)
         {
-            _helper.UpsertById(COMPETITORS_TABLE_STRING, id, competitor);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_Update", competitor);
         }
-        public Competitor GetCompetitorById(Guid id)
+        public async Task<Competitor> GetCompetitorByIdAsync(Guid id)
         {
-            return _helper.LoadById<Competitor>(COMPETITORS_TABLE_STRING, id);
+            var results = await _helper.LoadDataAsync<Competitor, dynamic>(storedProcedure: "dbo.Competitors_GetById", new { Id = id });
+            return results.FirstOrDefault();
         }
-        public List<Competitor> GetAllCompetitors()
+        public async Task<Competitor> GetCompetitorByNameAsync(string firstName, string lastName)
         {
-            return _helper.LoadAll<Competitor>(COMPETITORS_TABLE_STRING);
+            var results = await _helper.LoadDataAsync<Competitor, dynamic>(storedProcedure: "dbo.Competitors_GetByName", new { FirstName = firstName, LastName = lastName });
+            return results.FirstOrDefault();
         }
-        public void DeleteCompetitor(Competitor competitor)
+        public async Task<IEnumerable<Competitor>> GetAllCompetitorsAsync()
         {
-            _helper.DeleteById<Competitor>(COMPETITORS_TABLE_STRING, competitor.Id);
+            return await _helper.LoadDataAsync<Competitor, dynamic>(storedProcedure: "dbo.Competitors_GetAll", new { });
         }
-        public void DeleteAllCompetitors()
+        public async Task DeleteCompetitorAsync(Competitor competitor)
         {
-            _helper.DeleteAll<Competitor>(COMPETITORS_TABLE_STRING);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_DeleteById", new { Id = competitor.Id });
+        }
+        public async Task DeleteAllCompetitorsAsync()
+        {
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_DeleteAll", new { });
         }
 
-        public void InsertJudge(Judge judge)
+        public async Task InsertJudgeAsync(Judge judge)
         {
-            _helper.Insert(JUDGES_TABLE_STRING, judge);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Judge_Insert", judge);
         }
-        public void UpdateJudge(Guid id, Judge judge)
+        public async Task UpdateJudgeAsync(Guid id, Judge judge)
         {
-            _helper.UpsertById(JUDGES_TABLE_STRING, id, judge);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Judge_Update", judge);
         }
-        public Judge GetJudgeById(Guid id)
+        public async Task<Judge> GetJudgeByIdAsync(Guid id)
         {
-            return _helper.LoadById<Judge>(JUDGES_TABLE_STRING, id);
+            var results = await _helper.LoadDataAsync<Judge, dynamic>(storedProcedure: "dbo.Judge_GetById", new { Id = id });
+            return results.FirstOrDefault();
         }
-        public Judge GetJudgeByName(string firstName, string lastName)
+        public async Task<Judge> GetJudgeByNameAsync(string firstName, string lastName)
         {
-            return _helper.LoadByString<Judge>(JUDGES_TABLE_STRING, firstName + " " + lastName);
+            var results = await _helper.LoadDataAsync<Judge, dynamic>(storedProcedure: "dbo.Judge_GetByName", new { FirstName = firstName, LastName = lastName });
+            return results.FirstOrDefault();
         }
-        public List<Judge> GetAllJudges()
+        public async Task<IEnumerable<Judge>> GetAllJudgesAsync()
         {
-            return _helper.LoadAll<Judge>(JUDGES_TABLE_STRING);
+            return await _helper.LoadDataAsync<Judge, dynamic>(storedProcedure: "dbo.Judges_GetAll", new { });
         }
-        public void DeleteJudge(Judge judge)
+        public async Task DeleteJudgeAsync(Judge judge)
         {
-            _helper.DeleteById<Judge>(JUDGES_TABLE_STRING, judge.Id);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Judge_Delete", new { Id = judge.Id });
         }
-        public void DeleteAllJudges()
+        public async Task DeleteAllJudgesAsync()
         {
-            _helper.DeleteAll<Judge>(JUDGES_TABLE_STRING);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Judges_DeleteAll", new { });
         }
     }
 }

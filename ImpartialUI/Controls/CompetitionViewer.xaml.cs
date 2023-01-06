@@ -35,9 +35,6 @@ namespace ImpartialUI.Controls
             {
                 if (score.Judge.Scores == null)
                     score.Judge.Scores = new List<Score>();
-
-                score.Judge.Accuracy = Math.Round(score.Judge.Scores.Sum(s => s.Accuracy) / score.Judge.Scores.Count, 2);
-                score.Judge.Top5Accuracy = Math.Round(score.Judge.Scores.FindAll(s => s.ActualPlacement <= 5).Sum(s => s.Accuracy) / 5, 2);
             }
 
             // judge names
