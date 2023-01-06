@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
@@ -21,7 +21,7 @@
     <Compile Update="Views\RatingsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\RankingsView.xaml.cs">
+    <Compile Update="Views\AddCompetitionView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\ParseScoreSheetsView.xaml.cs">
@@ -52,7 +52,7 @@
     <Page Update="Views\RatingsView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-    <Page Update="Views\RankingsView.xaml">
+    <Page Update="Views\AddCompetitionView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

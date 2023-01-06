@@ -121,8 +121,8 @@ namespace ImpartialUI.ViewModels
 
         private async void RefreshJudgesDatabase()
         {
-            JudgesDb = (await _databaseProvider.GetAllJudgesAsync()).ToList();
-            JudgesDb = JudgesDb.OrderBy(j => j.Accuracy).ToList();
+            //JudgesDb = (await _databaseProvider.GetAllJudgesAsync()).ToList();
+            //JudgesDb = JudgesDb.OrderBy(j => j.Accuracy).ToList();
             OnPropertyChanged(nameof(JudgesDb));
         }
 
@@ -139,20 +139,20 @@ namespace ImpartialUI.ViewModels
 
         private async void AddJudge()
         {
-            await _databaseProvider.InsertJudgeAsync(new Judge(FirstName, LastName));
-            RefreshJudgesDatabase();
+            //await _databaseProvider.InsertJudgeAsync(new Judge(FirstName, LastName));
+            //RefreshJudgesDatabase();
 
             // clear the name fields
             FirstName = ""; LastName = "";
         }
         private void DeleteJudge(object obj)
         {
-            _databaseProvider.DeleteJudgeAsync((Judge)obj);
+            //_databaseProvider.DeleteJudgeAsync((Judge)obj);
             RefreshJudgesDatabase();
         }
         private void ClearJudgesDatabase()
         {
-            _databaseProvider.DeleteAllJudgesAsync();
+            //_databaseProvider.DeleteAllJudgesAsync();
             RefreshJudgesDatabase();
         }
 
@@ -273,7 +273,7 @@ namespace ImpartialUI.ViewModels
                     if (score.Judge.Scores == null)
                         score.Judge.Scores = new List<Score>();
 
-                    _databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
+                    //_databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
                 }
             }
 

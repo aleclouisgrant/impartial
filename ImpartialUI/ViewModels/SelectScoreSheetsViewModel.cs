@@ -125,10 +125,10 @@ namespace ImpartialUI.ViewModels
             RefreshJudgesDatabase();
         }
 
-        private void RefreshJudgesDatabase()
+        private async void RefreshJudgesDatabase()
         {
-            JudgesDb = _databaseProvider.GetAllJudges();
-            JudgesDb = JudgesDb.OrderBy(j => j.Accuracy).ToList();
+            //JudgesDb = (await _databaseProvider.GetAllJudgesAsync()).ToList();
+            //JudgesDb = JudgesDb.OrderBy(j => j.Accuracy).ToList();
             OnPropertyChanged(nameof(JudgesDb));
         }
 
@@ -143,22 +143,22 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private void AddJudge()
+        private async void AddJudge()
         {
-            _databaseProvider.InsertJudge(new Judge(FirstName, LastName));
-            RefreshJudgesDatabase();
+            //await _databaseProvider.InsertJudgeAsync(new Judge(FirstName, LastName));
+            //RefreshJudgesDatabase();
 
             // clear the name fields
             FirstName = ""; LastName = "";
         }
-        private void DeleteJudge(object obj)
+        private async void DeleteJudge(object obj)
         {
-            _databaseProvider.DeleteJudge((Judge)obj);
+            //await _databaseProvider.DeleteJudgeAsync((Judge)obj);
             RefreshJudgesDatabase();
         }
-        private void ClearJudgesDatabase()
+        private async void ClearJudgesDatabase()
         {
-            _databaseProvider.DeleteAllJudges();
+            //await _databaseProvider.DeleteAllJudgesAsync();
             RefreshJudgesDatabase();
         }
 
@@ -230,7 +230,7 @@ namespace ImpartialUI.ViewModels
             OnPropertyChanged(nameof(SelectJudges));
         }
 
-        private void ParseScoreSheets()
+        private async void ParseScoreSheets()
         {
             // update judges list with the selected judges
             Judges = SelectJudges.Select(j => j.SelectedJudge).ToList();
@@ -243,7 +243,7 @@ namespace ImpartialUI.ViewModels
                 if (score.Judge.Scores == null)
                     score.Judge.Scores = new List<Score>();
 
-                _databaseProvider.UpdateJudge(score.Judge.Id, score.Judge);
+                //await _databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
             }
 
             MessageLog = "completed";

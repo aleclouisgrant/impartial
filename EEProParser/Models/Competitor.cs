@@ -7,11 +7,6 @@ namespace Impartial
 {
     public class RoleStats
     {
-        private int _numberOfCompetitions;
-        public int NumberOfCompetitions { get { return _numberOfCompetitions; } }
-
-        public List<int> Placements = new List<int>();
-
         private int _rating;
         public int Rating
         {
@@ -25,13 +20,12 @@ namespace Impartial
         }
 
         private double _variance;
-        public double Variance { get { return _rating; } }
+        public double Variance { get { return _variance; } }
 
-
-        public RoleStats(int rating = 1000, int variance = 500)
+        public RoleStats(int rating = 1000, double variance = 500)
         {
-            this._rating = rating;
-            _numberOfCompetitions = 0;
+            _rating = rating;
+            _variance = variance;
         }
 
         private void UpdateRating(int newRating)
@@ -39,7 +33,7 @@ namespace Impartial
             int oldRating = _rating;
             _rating = newRating;
 
-            //update variance
+            //TODO: update variance
             if (newRating > oldRating)
             {
 
@@ -59,15 +53,30 @@ namespace Impartial
 
         public Competitor(string firstName, string lastName)
         {
+            this.Id = Guid.NewGuid();
+
             this.FirstName = firstName;
             this.LastName = lastName;
         }
 
         public Competitor(string firstName, string lastName, int wsdcId)
         {
+            this.Id = Guid.NewGuid();
+
             this.FirstName = firstName;
             this.LastName = lastName;
             this.WsdcId = wsdcId;
+        }
+
+        public Competitor(Guid id, int wsdcId, string firstName, string lastName, int leaderRating, double leaderVariance, int followerRating, double followerVariance)
+        {
+            this.Id = id;
+            this.FirstName = firstName;
+            this.LastName = lastName;
+            this.WsdcId = wsdcId;
+
+            LeadStats = new RoleStats(leaderRating, leaderVariance);
+            FollowStats = new RoleStats(followerRating, followerVariance);
         }
     }
 }

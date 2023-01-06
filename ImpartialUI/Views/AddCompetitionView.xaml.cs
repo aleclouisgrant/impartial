@@ -3,12 +3,12 @@ using System.Windows.Controls;
 
 namespace ImpartialUI.Views
 {
-    public partial class RankingsView : UserControl
+    public partial class AddCompetitionView : UserControl
     {
-        public RankingsView()
+        public AddCompetitionView()
         {
             InitializeComponent();
-            DataContext = new RankingsViewModel();
+            DataContext = new AddCompetitionViewModel();
         }
     }
 }

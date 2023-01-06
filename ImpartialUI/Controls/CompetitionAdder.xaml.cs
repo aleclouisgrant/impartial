@@ -193,20 +193,24 @@ namespace ImpartialUI.Controls
 
         public CompetitionAdder()
         {
-            Competitors = App.DatabaseProvider.GetAllCompetitors();
-            Judges = App.DatabaseProvider.GetAllJudges();
-
             InitializeComponent();
 
             CompDatePicker.DisplayDateStart = DateTime.Now;
             CompDatePicker.DisplayDate = DateTime.Now;
 
             AddRow();
+            UpdateCompetitors();
+            UpdateJudges();
         }
 
-        private void UpdateCompetitors()
+        private async void UpdateCompetitors()
         {
-            Competitors = App.DatabaseProvider.GetAllCompetitors();
+            // TODO FIRST
+            //Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
+        }
+        private async void UpdateJudges()
+        {
+            //Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
         }
 
         private void AddRow()

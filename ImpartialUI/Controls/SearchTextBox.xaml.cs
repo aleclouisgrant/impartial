@@ -189,8 +189,8 @@ namespace ImpartialUI.Controls
             //else if (typeof(ComboBoxItems.SelectedItem) is Competitor)
             //    DatabaseProvider.InsertCompetitor(new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text));
 
-            App.DatabaseProvider.InsertJudge(new Judge(FirstNameTextBox.Text, LastNameTextBox.Text));
-            ItemsSource = App.DatabaseProvider.GetAllJudges();
+            //await App.DatabaseProvider.InsertJudgeAsync(new Judge(FirstNameTextBox.Text, LastNameTextBox.Text));
+            //ItemsSource = await App.DatabaseProvider.GetAllJudgesAsync();
 
             SelectPersonGrid.Visibility = Visibility.Visible;
             AddPersonGrid.Visibility = Visibility.Collapsed;

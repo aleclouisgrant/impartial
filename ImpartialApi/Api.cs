@@ -14,7 +14,7 @@ namespace ImpartialApi
         {
             try
             {
-                return Results.Ok(await db.GetAllCompetitors());
+                return Results.Ok(await db.GetAllCompetitorsAsync());
             }
             catch (Exception ex)
             {
@@ -26,8 +26,7 @@ namespace ImpartialApi
         {
             try
             {
-                var results = await db.GetAllCompetitors();
-                return Results.Ok(await data.GetUsers());
+                return Results.Ok(await db.GetAllCompetitorsAsync());
             }
             catch (Exception ex)
             {

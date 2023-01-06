@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace ImpartialUI.ViewModels
 {
-    public class RankingsViewModel : BaseViewModel
+    public class AddCompetitionViewModel : BaseViewModel
     {
         private IDatabaseProvider _databaseProvider;
 
@@ -68,7 +68,7 @@ namespace ImpartialUI.ViewModels
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand AddCompetitionCommand { get; set; }
 
-        public RankingsViewModel()
+        public AddCompetitionViewModel()
         {
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             AddCompetitionCommand = new DelegateCommand(AddCompetition);
@@ -77,11 +77,12 @@ namespace ImpartialUI.ViewModels
             Competition = new Competition(Division.AllStar);
         }
 
-        private void AddCompetitor()
+        private async void AddCompetitor()
         {
             if (int.TryParse(WsdcId, out int id)) {
                 var newCompetitor = new Competitor(FirstName, LastName, int.Parse(WsdcId));
-                _databaseProvider.InsertCompetitor(newCompetitor);
+
+                await _databaseProvider.InsertCompetitorAsync(newCompetitor);
 
                 FirstName = string.Empty;
                 LastName = string.Empty;
@@ -93,7 +94,7 @@ namespace ImpartialUI.ViewModels
         {
             //Trace.WriteLine(Competition.ToLongString());
 
-            _databaseProvider.InsertCompetition(Competition);
+            //_databaseProvider.InsertCompetitionAsync(Competition);
 
             Competition = new Competition(Division.AllStar);
         }

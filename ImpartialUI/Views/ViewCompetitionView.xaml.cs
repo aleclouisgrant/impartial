@@ -22,8 +22,6 @@ namespace ImpartialUI.Views
         public ViewCompetitionView()
         {
             InitializeComponent();
-
-            CompetitionComboBox.ItemsSource = App.DatabaseProvider.GetAllCompetitions();
         }
 
         private void CompetitionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -38,12 +36,11 @@ namespace ImpartialUI.Views
                 CompetitionViewerBox.Visibility = Visibility.Collapsed;
                 CompetitionViewerBox.Competition = null;
             }
-
         }
 
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            CompetitionComboBox.ItemsSource = App.DatabaseProvider.GetAllCompetitions();
+            //CompetitionComboBox.ItemsSource = await App.DatabaseProvider.GetAllCompetitionsAsync();
         }
     }
 }
