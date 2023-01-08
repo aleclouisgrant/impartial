@@ -30,8 +30,19 @@ namespace Impartial
 
         public Judge(string firstName, string lastName)
         {
+            Id = Guid.NewGuid();
+
             FirstName = firstName;
             LastName = lastName;
+        }
+
+        public Judge(Guid id, string firstName, string lastName, double accuracy, double top5accuracy)
+        {
+            Id = id;
+            FirstName = firstName;
+            LastName = lastName;
+
+            Scores = new List<Score>();
         }
 
         public override string ToString()

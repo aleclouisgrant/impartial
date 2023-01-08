@@ -22,13 +22,22 @@ namespace Impartial
             _helper = new SqlHelper(connectionString);
         }
 
-        public async Task InsertCompetitionAsync(Competition competition)
+        public async Task UpsertCompetitionAsync(Competition competition)
         {
-            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitions_Insert", competition);
-        }
-        public async Task UpdateCompetitionAsync(Guid id, Competition competition)
-        {
-            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitions_Update", competition);
+            var c = new
+            {
+                Id = competition.Id,
+                Name = competition.Name,
+                Date = competition.Date,
+                Division = competition.Division.ToString(),
+            };
+
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitions_Upsert", c);
+
+            foreach (Score score in competition.Scores)
+            {
+                await UpsertScoreAsync(score);
+            }
         }
         public async Task<Competition> GetCompetitionByIdAsync(Guid id)
         {
@@ -48,7 +57,7 @@ namespace Impartial
             await _helper.SaveDataAsync(storedProcedure: "dbo.Competitions_DeleteAll", new { });
         }
 
-        public async Task InsertCompetitorAsync(Competitor competitor)
+        public async Task UpsertCompetitorAsync(Competitor competitor)
         {
             var c = new
             {
@@ -62,11 +71,7 @@ namespace Impartial
                 FollowerVariance = competitor.FollowStats.Variance,
             };
 
-            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_Insert", c);
-        }
-        public async Task UpdateCompetitorAsync(Guid id, Competitor competitor)
-        {
-            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_Update", competitor);
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_Upsert", c);
         }
         public async Task<Competitor> GetCompetitorByIdAsync(Guid id)
         {
@@ -91,13 +96,26 @@ namespace Impartial
             await _helper.SaveDataAsync(storedProcedure: "dbo.Competitors_DeleteAll", new { });
         }
 
-        public async Task InsertJudgeAsync(Judge judge)
+        public async Task UpsertJudgeAsync(Judge judge)
         {
-            await _helper.SaveDataAsync(storedProcedure: "dbo.Judges_Insert", judge);
-        }
-        public async Task UpdateJudgeAsync(Guid id, Judge judge)
-        {
-            await _helper.SaveDataAsync(storedProcedure: "dbo.Judges_Update", judge);
+            var j = new
+            {
+                Id = judge.Id,
+                FirstName = judge.FirstName,
+                LastName = judge.LastName,
+                Accuracy = judge.Accuracy,
+                Top5Accuracy = judge.Top5Accuracy,
+            };
+
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Judges_Upsert", j);
+
+            if (judge.Scores?.Count > 0)
+            {
+                foreach (Score score in judge.Scores)
+                {
+                    await UpsertScoreAsync(score);
+                }
+            }
         }
         public async Task<Judge> GetJudgeByIdAsync(Guid id)
         {
@@ -120,6 +138,27 @@ namespace Impartial
         public async Task DeleteAllJudgesAsync()
         {
             await _helper.SaveDataAsync(storedProcedure: "dbo.Judges_DeleteAll", new { });
+        }
+
+        public async Task UpsertScoreAsync(Score score)
+        {
+            var s = new
+            {
+                Id = score.Id,
+                CompetitionId = score.Competition.Id,
+                JudgeId = score.Judge.Id,
+                LeaderId = score.Leader.Id,
+                FollowerId = score.Follower.Id,
+                JudgePlacement = score.Placement,
+                ActualPlacement = score.ActualPlacement,
+            };
+
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Scores_Upsert", s);
+        }
+        public async Task<Score> GetScoreByIdAsync(Guid id)
+        {
+            var results = await _helper.LoadDataAsync<Score, dynamic>(storedProcedure: "dbo.Scores_GetById", new { Id = id });
+            return results.FirstOrDefault();
         }
     }
 }

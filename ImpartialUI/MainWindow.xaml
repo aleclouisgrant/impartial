@@ -11,17 +11,17 @@
         Title="Impartial" Height="800" Width="1600">
     <Grid>
         <TabControl Margin="0 20 0 0" BorderThickness="0 2 0 0">
-            <TabItem Header="Ratings" IsSelected="True">
+            <TabItem Header="Ratings">
                 <v:RatingsView/>
             </TabItem>
-            <TabItem Header="View Competition">
-                <v:ViewCompetitionView Margin="30"/>
-            </TabItem>
-            <TabItem Header="Add Competition">
+            <TabItem Header="Add Competition" IsSelected="True">
                 <v:AddCompetitionView Margin="20" d:DataContext="{d:DesignInstance Type=vm:AddCompetitionViewModel, IsDesignTimeCreatable=True}"/>
             </TabItem>
             <TabItem Header="Judge">
                 <v:ParseScoreSheetsView/>
+            </TabItem>
+            <TabItem Header="View Competition">
+                <v:ViewCompetitionView Margin="30"/>
             </TabItem>
         </TabControl>
     </Grid>

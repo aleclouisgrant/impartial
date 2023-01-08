@@ -21,13 +21,12 @@ namespace Impartial
             set
             {
                 _scores = value;
-                Couples = GetCouples();
             } 
         }
 
         public int TotalCouples => Couples?.Count ?? 0;
 
-        public List<Couple> Couples { get; set; } = new List<Couple>(); //temporary until GetCouples works
+        public List<Couple> Couples => GetCouples(); //temporary until GetCouples works
 
         public List<Judge> Judges => GetJudges();
 
@@ -38,25 +37,33 @@ namespace Impartial
 
         public Competition(string name, DateTime date)
         {
-            Name = name;
-
             Id = Guid.NewGuid();
+            
+            Name = name;
             Date = date;
         }
 
         public Competition(Division division)
         {
-            Division = division;
-
             Id = Guid.NewGuid();
+
+            Division = division;
         }
 
         public Competition(string name, Division division)
         {
+            Id = Guid.NewGuid();
+
             Name = name;
             Division = division;
+        }
 
-            Id = Guid.NewGuid();
+        public Competition(Guid id, string name, DateTime date, Division division)
+        {
+            Id = id;
+            Name = name;
+            Date = date;
+            Division = division;
         }
 
         private List<Judge> GetJudges()
@@ -116,6 +123,9 @@ namespace Impartial
             for (int placement = 1; placement <= TotalCouples; placement++)
             {
                 var couple = Couples[placement - 1];
+
+                if (couple.Leader is null || couple.Follower is null)
+                    return str;
 
                 str += System.Environment.NewLine + placement + ": " +
                     couple.Leader.FullName + " & " +

@@ -18,35 +18,64 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Vertical" Grid.Row="0" Width="400" Margin="20">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="First Name:" Margin="0 0 5 0"/>
-                    <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Vertical" Grid.Column="0" Width="400" Margin="20">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="First Name:" Margin="0 0 5 0"/>
+                        <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
+                        <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="WSDC Id:" Margin="0 0 5 0"/>
+                        <TextBox Text="{Binding WsdcId, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                    </StackPanel>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
-                    <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="WSDC Id:" Margin="0 0 5 0"/>
-                    <TextBox Text="{Binding WsdcId, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
-                </StackPanel>
-
+                <Button 
+                    Grid.Row="1"
+                    Content="Add Competitor To Database"
+                    Width="200" Height="20"
+                    FontWeight="Bold"
+                    Command="{Binding AddCompetitorCommand}"
+                    IsDefault="True"
+                    Margin="20"/>
             </StackPanel>
-            
-            <Button 
-                Grid.Row="1"
-                Content="Add Competitor To Database"
-                Width="200" Height="20"
-                FontWeight="Bold"
-                Command="{Binding AddCompetitorCommand}"
-                IsDefault="True"
-                Margin="20"/>
 
-        </StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Column="1" Width="400" Margin="20">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="First Name:" Margin="0 0 5 0"/>
+                        <TextBox Text="{Binding JudgeFirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
+                        <TextBox Text="{Binding JudgeLastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                    </StackPanel>
+
+                </StackPanel>
+
+                <Button 
+                    Grid.Row="1"
+                    Content="Add Judge To Database"
+                    Width="200" Height="20"
+                    FontWeight="Bold"
+                    Command="{Binding AddJudgeCommand}"
+                    IsDefault="True"
+                    Margin="20"/>
+            </StackPanel>
+        </Grid>
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
@@ -57,7 +86,7 @@
             <Grid Grid.Row="0">
                 <c:CompetitionAdder Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
-            
+
             <Button 
                 Grid.Row="1"
                 Content="Add Competition To Database"
@@ -67,8 +96,7 @@
                 IsDefault="True"
                 Margin="20"
                 VerticalAlignment="Bottom"/>
-            
-        </Grid>
 
+        </Grid>
     </Grid>
 </UserControl>

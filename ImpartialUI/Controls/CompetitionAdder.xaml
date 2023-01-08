@@ -20,6 +20,7 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
                 <TextBox Margin="2" MinWidth="10" Grid.Column="0" x:Name="NameTextBox" Background="Transparent" Text="{Binding Competition.Name, Mode=OneWay}"/>
@@ -31,7 +32,8 @@
                 </TextBlock>
 
                 <DatePicker x:Name="CompDatePicker" Grid.Column="2" HorizontalAlignment="Right" DisplayDate="{Binding Competition.Date, Mode=OneWay}"/>
-                <Button Grid.Column="3" Content="Update" Click="Button_Click" HorizontalAlignment="Right"/>
+                <Button Grid.Column="3" Content="Refresh" Click="RefreshButton_Click" HorizontalAlignment="Right" Margin="0 0 2 0"/>
+                <Button Grid.Column="4" Content="Update" Click="Button_Click" HorizontalAlignment="Right"/>
             </Grid>
         </Border>
 

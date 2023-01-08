@@ -89,7 +89,7 @@ namespace ImpartialUI.ViewModels
             {
                 var newCompetitor = new Competitor(FirstName, LastName, int.Parse(WsdcId));
 
-                await _databaseProvider.InsertCompetitorAsync(newCompetitor);
+                await _databaseProvider.UpsertCompetitorAsync(newCompetitor);
 
                 FirstName = string.Empty;
                 LastName = string.Empty;
