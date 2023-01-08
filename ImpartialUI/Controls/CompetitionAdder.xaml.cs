@@ -37,6 +37,8 @@ namespace ImpartialUI.Controls
             var judges = competition.Judges;
             var couples = competition.Couples;
 
+            viewer.Clear();
+
             foreach (var judge in judges)
             {
                 viewer.AddJudge(judge);
@@ -75,6 +77,9 @@ namespace ImpartialUI.Controls
         private List<SearchTextBox> _judgeBoxes = new List<SearchTextBox>();
 
         public ObservableCollection<Couple> Couples { get; set; } = new ObservableCollection<Couple>();
+
+        private Border _addRowBorder;
+        private Button _addColumnButton;
 
         public CompetitionAdder()
         {
@@ -214,7 +219,7 @@ namespace ImpartialUI.Controls
                 Grid.SetColumn(scoreBorder, i + 2);
             }
 
-            Grid.SetRow(AddRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
+            Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
 
             Couples.Add(new Couple(
                 (Competitor)leaderSearchBox.SelectedPerson, 
@@ -271,7 +276,108 @@ namespace ImpartialUI.Controls
                 Grid.SetColumn(scoreBorder, ScoreGrid.ColumnDefinitions.Count() - 2);
             }
 
-            Grid.SetColumn(AddColumnButton, ScoreGrid.ColumnDefinitions.Count() - 1);
+            Grid.SetColumn(_addColumnButton, ScoreGrid.ColumnDefinitions.Count() - 1);
+        }
+
+        private void Clear()
+        {
+            ScoreGrid.Children.Clear();
+
+            CompDatePicker.SelectedDate = DateTime.Now;
+
+            var placeBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1)
+            };
+
+            var placeTextBlock = new TextBlock()
+            {
+                Text = "Place",
+                FontWeight = FontWeights.Bold,
+                FontStyle = FontStyles.Italic,
+                Margin = new Thickness(1)
+            };
+            placeBorder.Child = placeTextBlock;
+
+            ScoreGrid.Children.Add(placeBorder);
+            Grid.SetRow(placeBorder, 0);
+            Grid.SetColumn(placeBorder, 0);
+
+            var leaderBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1)
+            };
+
+            var leaderTextBlock = new TextBlock()
+            {
+                Text = "Competitor (Leader)",
+                FontWeight = FontWeights.Bold,
+                FontStyle = FontStyles.Italic,
+                Margin = new Thickness(1)
+            };
+            leaderBorder.Child = leaderTextBlock;
+
+            ScoreGrid.Children.Add(leaderBorder);
+            Grid.SetRow(leaderBorder, 0);
+            Grid.SetColumn(leaderBorder, 1);
+
+            var followerBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1)
+            };
+
+            var followerTextBlock = new TextBlock()
+            {
+                Text = "Competitor (Follower)",
+                FontWeight = FontWeights.Bold,
+                FontStyle = FontStyles.Italic,
+                Margin = new Thickness(1)
+            };
+            followerBorder.Child = followerTextBlock;
+
+            ScoreGrid.Children.Add(followerBorder);
+            Grid.SetRow(followerBorder, 0);
+            Grid.SetColumn(followerBorder, 2);
+
+            var addColumnButton = new Button()
+            {
+                Content = "+",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Width = 20,
+                Margin = new Thickness(1)
+            };
+            addColumnButton.Click += AddColumn_Click;
+
+            ScoreGrid.Children.Add(addColumnButton);
+            Grid.SetRow(addColumnButton, 0);
+            Grid.SetColumn(addColumnButton, 3);
+
+            var addRowBorder = new Border()
+            {
+                BorderThickness = new Thickness(0),
+                BorderBrush = Brushes.Gray,
+                Margin = new Thickness(1)
+            };
+
+            var addRowButton = new Button()
+            {
+                Content = "+"
+            };
+            addRowButton.Click += AddRow_Click;
+            addRowBorder.Child = addRowButton;
+
+            ScoreGrid.Children.Add(addRowBorder);
+            Grid.SetRow(addRowBorder, 1);
+            Grid.SetColumn(addRowBorder, 0);
+
+            _addColumnButton = addColumnButton;
+            _addRowBorder = addRowBorder;
         }
 
         private void UpdateCompetition()
