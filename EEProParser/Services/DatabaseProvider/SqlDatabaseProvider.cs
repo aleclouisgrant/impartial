@@ -42,11 +42,25 @@ namespace Impartial
         public async Task<Competition> GetCompetitionByIdAsync(Guid id)
         {
             var results = await _helper.LoadDataAsync<Competition, dynamic>(storedProcedure: "dbo.Competitions_GetById", new { Id = id });
-            return results.FirstOrDefault();
+            var result = results.FirstOrDefault();
+
+            if (result != null)
+            {
+                result.Scores = (await GetScoresByCompAsync(result.Id, result.Division)).ToList();
+            }
+
+            return result;
         }
         public async Task<IEnumerable<Competition>> GetAllCompetitionsAsync()
         {
-            return await _helper.LoadDataAsync<Competition, dynamic>(storedProcedure: "dbo.Competitions_GetAll", new { });
+            IEnumerable<Competition> comps = await _helper.LoadDataAsync<Competition, dynamic>(storedProcedure: "dbo.Competitions_GetAll", new { });
+
+            foreach (var comp in comps)
+            {
+                comp.Scores = (await GetScoresByCompAsync(comp.Id, comp.Division)).ToList();
+            }
+
+            return comps;
         }
         public async Task DeleteCompetitionAsync(Competition competition)
         {
@@ -85,7 +99,7 @@ namespace Impartial
         }
         public async Task<IEnumerable<Competitor>> GetAllCompetitorsAsync()
         {
-            return await _helper.LoadDataAsync<Competitor, dynamic>(storedProcedure: "dbo.Competitors_GetAll", new { });
+            return (await _helper.LoadDataAsync<Competitor, dynamic>(storedProcedure: "dbo.Competitors_GetAll", new { })).OrderBy(c => c.FullName);
         }
         public async Task DeleteCompetitorAsync(Competitor competitor)
         {
@@ -159,6 +173,11 @@ namespace Impartial
         {
             var results = await _helper.LoadDataAsync<Score, dynamic>(storedProcedure: "dbo.Scores_GetById", new { Id = id });
             return results.FirstOrDefault();
+        }
+        public async Task<IEnumerable<Score>> GetScoresByCompAsync(Guid competitionId, Division division)
+        {
+            //not using Division right now but will need to update stored procedure to do so
+            return await _helper.LoadDataAsync<Score, dynamic>(storedProcedure: "dbo.Scores_GetByCompId", new { Id = competitionId, Division = division });
         }
     }
 }

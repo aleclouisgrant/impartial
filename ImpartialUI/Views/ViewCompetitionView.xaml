@@ -4,21 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:c="clr-namespace:ImpartialUI.Controls"
+             xmlns:vm="clr-namespace:ImpartialUI.ViewModels"
              xmlns:local="clr-namespace:ImpartialUI.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="White">
+             Background="White"
+             d:DataContext="{d:DesignInstance Type=vm:ViewCompetitionViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
-            <ComboBox x:Name="CompetitionComboBox" Width="200" Margin="5" SelectionChanged="CompetitionComboBox_SelectionChanged"/>
+            <ComboBox x:Name="CompetitionComboBox" Width="500" Margin="5" SelectionChanged="CompetitionComboBox_SelectionChanged" SelectedItem="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click" Width="70" Height="30"/>
         </StackPanel>
 
         <c:CompetitionViewer x:Name="CompetitionViewerBox" Grid.Row="1" Visibility="Collapsed"/>
+
+        <Grid Grid.Row="2">
+            
+        </Grid>
     </Grid>
 </UserControl>

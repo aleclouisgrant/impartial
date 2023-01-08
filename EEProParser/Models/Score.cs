@@ -33,15 +33,22 @@ namespace Impartial
             Placement = placement; ActualPlacement = actualPlacement;
         }
 
-        public Score(Guid id, Competition competition, Judge judge, Competitor leader, Competitor follower, int placement, int actualPlacement)
+        public Score
+            (Guid id, 
+            Guid competitionId, string competitionName, DateTime competitionDate, string division,
+            Guid judgeId, string judgeFirstName, string judgeLastName, double judgeAccuracy, double judgeTop5Accuracy,
+            Guid leaderId, int leaderWsdcId, string leaderFirstName, string leaderLastName, int leaderRating, double leaderVariance, int leaderFollowerRating, double leaderFollowerVariance,
+            Guid followerId, int followerWsdcId, string followerFirstName, string followerLastName, int followerLeaderRating, double followerLeaderVariance, int followerRating, double followerVariance,
+            int placement, int actualPlacement)
         { 
             Id = id; 
-            Competition = competition;
-            Judge = judge;
-            Leader = leader;
-            Follower = follower;
             Placement = placement;
             ActualPlacement = actualPlacement;
+
+            Competition = new Competition(competitionId, competitionName, competitionDate, Division.AllStar);
+            Judge = new Judge(judgeId, judgeFirstName, judgeLastName, judgeAccuracy, judgeTop5Accuracy);
+            Leader = new Competitor(leaderId, leaderWsdcId, leaderFirstName, leaderLastName, leaderRating, leaderVariance, leaderFollowerRating, leaderFollowerVariance);
+            Follower = new Competitor(followerId, followerWsdcId, followerFirstName, followerLastName, followerLeaderRating, followerLeaderVariance, followerRating, followerVariance);
         }
     }
 }

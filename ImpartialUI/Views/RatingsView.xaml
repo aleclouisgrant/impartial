@@ -35,7 +35,6 @@
                     <TextBlock Text="WSDC Id:" Margin="0 0 5 0"/>
                     <TextBox Text="{Binding WsdcId, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
                 </StackPanel>
-
             </StackPanel>
 
             <Button 
@@ -46,7 +45,6 @@
                 Command="{Binding AddCompetitorCommand}"
                 IsDefault="True"
                 Margin="20"/>
-
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
@@ -55,52 +53,64 @@
         </StackPanel>
 
         <Grid Grid.Row="2" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
             <Border HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" >
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Background="LightGray">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="90"/>
-                            <ColumnDefinition Width="100"/>
-                        </Grid.ColumnDefinitions>
+                <ScrollViewer>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Background="LightGray">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="1" Text="WSDC ID" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="2" Text="Leader Rating" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="3" Text="Follower Rating" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="1" Text="WSDC ID" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="2" Text="Leader Rating" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="3" Text="Follower Rating" FontWeight="Bold"/>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding WsdcId, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding LeadStats.Rating, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding FollowStats.Rating, Mode=OneWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
                     </Grid>
-
-                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150"/>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="90"/>
-                                        <ColumnDefinition Width="100"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding WsdcId, Mode=OneWay}"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding LeadStats.Rating, Mode=OneWay}"/>
-                                    <TextBlock Grid.Column="3" Text="{Binding FollowStats.Rating, Mode=OneWay}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                </Grid>
+                </ScrollViewer>
             </Border>
+
+            <!-- Data Visualization -->
+            <Grid Grid.Row="1">
+                
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

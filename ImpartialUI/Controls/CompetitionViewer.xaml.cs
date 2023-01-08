@@ -26,20 +26,60 @@ namespace ImpartialUI.Controls
         private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var viewer = (CompetitionViewer)source;
+            viewer.ScoreGrid.Children.Clear();
+
+            var placeBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1)
+            };
+
+            var placeTextBlock = new TextBlock()
+            {
+                Text = "Place",
+                FontWeight = FontWeights.Bold,
+                FontStyle = FontStyles.Italic,
+                Margin = new Thickness(1)
+            };
+            placeBorder.Child = placeTextBlock;
+
+            viewer.ScoreGrid.Children.Add(placeBorder);
+            Grid.SetRow(placeBorder, 0);
+            Grid.SetColumn(placeBorder, 0);
+
+            var competitorBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1)
+            };
+
+            var competitorTextBlock = new TextBlock()
+            {
+                Text = "Competitor",
+                FontWeight = FontWeights.Bold,
+                FontStyle = FontStyles.Italic,
+                Margin = new Thickness(1)
+            };
+            competitorBorder.Child = competitorTextBlock;
+
+            viewer.ScoreGrid.Children.Add(competitorBorder);
+            Grid.SetRow(competitorBorder, 0);
+            Grid.SetColumn(competitorBorder, 1);
+
             var competition = (Competition)e.NewValue;
 
-            var judges = competition.Judges;
+            var judges = competition.Judges.OrderBy(j => j.FullName);
             var couples = competition.Couples;
 
-            foreach (var score in competition.Scores)
-            {
-                if (score.Judge.Scores == null)
-                    score.Judge.Scores = new List<Score>();
-            }
+            //competition.Scores = competition.Scores.OrderBy(s => s.ActualPlacement).ThenBy(s => s.Judge.FullName).ToList();
 
             // judge names
             foreach (var judge in judges)
             {
+                judge.Scores = competition.Scores.Where(s => s.Judge.Id == judge.Id).ToList();
+
                 viewer.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
                 var border = new Border()
@@ -58,15 +98,6 @@ namespace ImpartialUI.Controls
                 };
                 border.Child = textBlock;
 
-                //var searchText = new SearchTextBox()
-                //{
-                //    Margin = new Thickness(2, 0, 2, 0),
-                //    DatabaseProvider = App.DatabaseProvider, //TODO: shouldn't do this
-                //    Text = judge.FullName,
-                //    ItemsSource = App.DatabaseProvider.GetAllJudges() //TODO: also shouldnt do this
-                //};
-                //border.Child = searchText;
-
                 viewer.ScoreGrid.Children.Add(border);
                 Grid.SetColumn(border, viewer.ScoreGrid.Children.Count - 1);
                 Grid.SetRow(border, 0);
@@ -74,6 +105,8 @@ namespace ImpartialUI.Controls
 
             foreach (var couple in couples)
             {
+                couple.Scores = couple.Scores.OrderBy(s => s.Judge.FullName).ToList();
+
                 viewer.ScoreGrid.RowDefinitions.Add(new RowDefinition());
 
                 // placement

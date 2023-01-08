@@ -14,13 +14,13 @@
             <TabItem Header="Ratings">
                 <v:RatingsView/>
             </TabItem>
-            <TabItem Header="Add Competition" IsSelected="True">
+            <TabItem Header="Add Competition">
                 <v:AddCompetitionView Margin="20" d:DataContext="{d:DesignInstance Type=vm:AddCompetitionViewModel, IsDesignTimeCreatable=True}"/>
             </TabItem>
             <TabItem Header="Judge">
                 <v:ParseScoreSheetsView/>
             </TabItem>
-            <TabItem Header="View Competition">
+            <TabItem Header="View Competition" IsSelected="True">
                 <v:ViewCompetitionView Margin="30"/>
             </TabItem>
         </TabControl>

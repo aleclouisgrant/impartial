@@ -127,7 +127,7 @@
                                     <ColumnDefinition Width="150"/>
                                     <ColumnDefinition Width="50"/>
                                     <ColumnDefinition Width="60"/>
-                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="70"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
@@ -144,7 +144,7 @@
                                                 <ColumnDefinition Width="150"/>
                                                 <ColumnDefinition Width="50"/>
                                                 <ColumnDefinition Width="60"/>
-                                                <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="70"/>
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>

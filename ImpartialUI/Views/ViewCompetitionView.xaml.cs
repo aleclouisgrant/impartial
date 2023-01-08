@@ -1,16 +1,6 @@
 ﻿using Impartial;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ImpartialUI.Views
 {
@@ -22,6 +12,13 @@ namespace ImpartialUI.Views
         public ViewCompetitionView()
         {
             InitializeComponent();
+
+            RefreshCompetitions();
+        }
+
+        private async void RefreshCompetitions()
+        {
+            CompetitionComboBox.ItemsSource = await App.DatabaseProvider.GetAllCompetitionsAsync();
         }
 
         private void CompetitionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -38,9 +35,9 @@ namespace ImpartialUI.Views
             }
         }
 
-        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            //CompetitionComboBox.ItemsSource = await App.DatabaseProvider.GetAllCompetitionsAsync();
+            RefreshCompetitions();
         }
     }
 }

@@ -72,7 +72,7 @@ namespace Impartial
 
             foreach (var score in Scores)
             {
-                if (!judges.Contains(score.Judge))
+                if (!judges.Any(j => j.Id == score.Judge.Id))
                     judges.Add(score.Judge);
             }
 
