@@ -96,7 +96,11 @@ namespace ImpartialUI.Controls
             Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
+                var selectedId = searchTextBox.SelectedPerson?.Id;
                 searchTextBox.ItemsSource = Competitors;
+
+                if (selectedId != null)
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
             }
         }
         private async void UpdateJudges()
@@ -104,7 +108,11 @@ namespace ImpartialUI.Controls
             Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
+                var selectedId = searchTextBox.SelectedPerson?.Id;
                 searchTextBox.ItemsSource = Judges;
+
+                if (selectedId != null)
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault(); ;
             }
         }
 
@@ -149,6 +157,11 @@ namespace ImpartialUI.Controls
             if (couple?.Leader != null)
             {
                 leaderSearchBox.SelectedPerson = leaderSearchBox.ItemsSource.Where(c => c.Id == couple.Leader.Id).FirstOrDefault();
+                
+                if (leaderSearchBox.SelectedPerson == null)
+                {
+                    leaderSearchBox.AddMode(couple.Leader.FirstName, couple.Leader.LastName, couple.Leader.WsdcId);
+                }
             }
 
             leaderBorder.Child = leaderSearchBox;
@@ -177,6 +190,11 @@ namespace ImpartialUI.Controls
             if (couple?.Follower != null)
             {
                 followerSearchBox.SelectedPerson = followerSearchBox.ItemsSource.Where(c => c.Id == couple.Follower.Id).FirstOrDefault();
+
+                if (followerSearchBox.SelectedPerson == null)
+                {
+                    followerSearchBox.AddMode(couple.Follower.FirstName, couple.Follower.LastName, couple.Follower.WsdcId);
+                }
             }
 
             followerBorder.Child = followerSearchBox;

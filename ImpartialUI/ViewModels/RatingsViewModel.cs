@@ -1,13 +1,22 @@
 ﻿using Impartial;
 using ImpartialUI.Commands;
+using iText.StyledXmlParser.Jsoup.Parser;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 
 namespace ImpartialUI.ViewModels
 {
     public class RatingsViewModel : BaseViewModel
     {
+        private HttpClient _client;
+
         private string _firstName;
         public string FirstName
         {
@@ -26,6 +35,8 @@ namespace ImpartialUI.ViewModels
             {
                 _lastName = value;
                 OnPropertyChanged();
+
+                GuessWsdcId();
             }
         }
 
@@ -60,6 +71,8 @@ namespace ImpartialUI.ViewModels
         public RatingsViewModel()
         {
             _databaseProvider = App.DatabaseProvider;
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             RefreshCompetitorsCommand = new DelegateCommand(RefreshCompetitors);
@@ -102,6 +115,18 @@ namespace ImpartialUI.ViewModels
         private async void RefreshCompetitors()
         {
             Competitors = (await _databaseProvider.GetAllCompetitorsAsync()).ToList();
+        }
+
+        private async void GuessWsdcId()
+        {
+            var response = await _client.PostAsync("/lookup/find?q=" + FirstName + "%20" + LastName, null);
+            string sheet = await response.Content.ReadAsStringAsync();
+            string idString = Regex.Match(sheet.Substring(sheet.IndexOf("wscid"), 20), @"\d+").Value;
+
+            if (Int32.TryParse(idString, out int id))
+            {
+                WsdcId = id.ToString();
+            }
         }
     }
 }

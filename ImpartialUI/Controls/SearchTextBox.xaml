@@ -73,7 +73,9 @@
                 <TextBox x:Name="FirstNameTextBox" Margin="5 0" MinWidth="100"/>
                 <TextBlock Text="Last Name: "/>
                 <TextBox x:Name="LastNameTextBox" Margin="5 0" MinWidth="100"/>
-
+                <TextBlock Text="WSDC ID: "/>
+                <TextBox x:Name="WsdcIdTextBox" Margin="5 0" MinWidth="60"/>
+                
                 <Button
                     x:Name="AddToDatabaseButton"
                     Content="Add"

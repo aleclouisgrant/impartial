@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Impartial
 {
@@ -138,6 +142,75 @@ namespace Impartial
             return Math.Abs(
                 placement * GetAwardedPoints(totalCouples, placement) - 
                 actualPlacement * GetAwardedPoints(totalCouples, actualPlacement));
+        }
+
+        public static int GetEditDistance(string s, string t)
+        {
+            int n = s.Length;
+            int m = t.Length;
+            int[,] d = new int[n + 1, m + 1];
+
+            if (n == 0)
+                return m;
+
+            if (m == 0)
+                return n;
+
+            for (int i = 0; i <= n; d[i, 0] = i++) { }
+            for (int j = 0; j <= m; d[0, j] = j++) { }
+
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= m; j++)
+                {
+                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+
+                    d[i, j] = Math.Min(
+                        Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
+                        d[i - 1, j - 1] + cost);
+                }
+            }
+            return d[n, m];
+        }
+        public static string GetClosestString(string input, IEnumerable<string> list)
+        {
+            int leastDistance = 10000;
+            string match = "";
+
+            foreach (string s in list)
+            {
+                int d = GetEditDistance(input, s);
+                if (d == 0)
+                    return s;
+
+                if (d < leastDistance)
+                {
+                    leastDistance = d;
+                    match = s;
+                }
+            }
+
+            return match;
+        }
+        public static IPersonModel GetClosestPersonByFirstName(string input, IEnumerable<IPersonModel> list)
+        {
+            int leastDistance = 10000;
+            IPersonModel match = null;
+
+            foreach (IPersonModel p in list)
+            {
+                int d = GetEditDistance(input, p.FirstName);
+                if (d == 0)
+                    return p;
+
+                if (d < leastDistance)
+                {
+                    leastDistance = d;
+                    match = p;
+                }
+            }
+
+            return match;
         }
     }
 }

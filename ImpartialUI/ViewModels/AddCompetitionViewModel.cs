@@ -1,9 +1,15 @@
 ﻿using Impartial;
 using ImpartialUI.Commands;
+using Microsoft.Win32;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ImpartialUI.ViewModels
@@ -11,6 +17,8 @@ namespace ImpartialUI.ViewModels
     public class AddCompetitionViewModel : BaseViewModel
     {
         private IDatabaseProvider _databaseProvider;
+        private IScoresheetParser _scoresheetParser;
+        private HttpClient _client;
 
         private List<Competitor> _competitors = new List<Competitor>();
         public List<Competitor> Competitors
@@ -19,6 +27,32 @@ namespace ImpartialUI.ViewModels
             set { 
                 _competitors = value; 
                 OnPropertyChanged(); 
+            }
+        }
+
+        private string prelimsPath;
+        public string PrelimsPath
+        {
+            get { return prelimsPath; }
+            set
+            {
+                if (prelimsPath == value)
+                    return;
+                prelimsPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string finalsPath;
+        public string FinalsPath
+        {
+            get { return finalsPath; }
+            set
+            {
+                if (finalsPath == value)
+                    return;
+                finalsPath = value;
+                OnPropertyChanged();
             }
         }
 
@@ -89,14 +123,22 @@ namespace ImpartialUI.ViewModels
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand AddJudgeCommand { get; set; }
         public ICommand AddCompetitionCommand { get; set; }
+        public ICommand ParseScoreSheetsCommand { get; set; }
+        public ICommand SelectPrelimsPathCommand { get; set; }
+        public ICommand SelectFinalsPathCommand { get; set; }
 
         public AddCompetitionViewModel()
         {
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             AddJudgeCommand = new DelegateCommand(AddJudge);
             AddCompetitionCommand = new DelegateCommand(AddCompetition);
-            
+            SelectPrelimsPathCommand = new DelegateCommand(SelectPrelimsPath);
+            SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
+            ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
+
             _databaseProvider = App.DatabaseProvider;
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
             Competition = new Competition(Division.AllStar);
 
@@ -242,6 +284,135 @@ namespace ImpartialUI.ViewModels
             _databaseProvider.UpsertCompetitionAsync(Competition);
 
             Competition = new Competition(Division.AllStar);
+        }
+
+        private void SelectPrelimsPath()
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Multiselect = false,
+                Title = "Select Prelims Score Sheet",
+
+            };
+            openFileDialog.ShowDialog();
+
+            PrelimsPath = openFileDialog.FileName;
+        }
+        private void SelectFinalsPath()
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Multiselect = false,
+                Title = "Select Finals Score Sheet",
+
+            };
+            openFileDialog.ShowDialog();
+
+            FinalsPath = openFileDialog.FileName;
+        }
+
+        private async void ParseScoreSheets()
+        {
+            _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
+            var divisions = _scoresheetParser.GetDivisions();
+
+            if (!divisions.Contains(Division.AllStar))
+                return;
+
+            var comp = _scoresheetParser.GetCompetition(Division.AllStar);
+
+            foreach (var judge in comp.Judges)
+            {
+                var serverJudge = await _databaseProvider.GetJudgeByNameAsync(judge.FirstName, judge.LastName);
+
+                if (serverJudge != null)
+                {
+                    serverJudge = new Judge(serverJudge.Id, serverJudge.FirstName, serverJudge.LastName, serverJudge.Accuracy, serverJudge.Top5Accuracy)
+                    {
+                        Scores = judge.Scores
+                    };
+
+                    var scores = comp.Scores.Where(s => s.Judge.FullName == serverJudge.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Judge = serverJudge;
+                    }
+                }
+            }
+
+            foreach (var couple in comp.Couples)
+            {
+                var serverLeader = await _databaseProvider.GetCompetitorByNameAsync(couple.Leader.FirstName, couple.Leader.LastName);
+
+                if (serverLeader != null)
+                {
+                    serverLeader = new Competitor(
+                        serverLeader.Id, serverLeader.WsdcId,
+                        serverLeader.FirstName, serverLeader.LastName,
+                        serverLeader.LeadStats.Rating, serverLeader.LeadStats.Variance,
+                        serverLeader.FollowStats.Rating, serverLeader.FollowStats.Variance);
+
+                    var scores = comp.Scores.Where(s => s.Leader.FullName == serverLeader.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Leader = serverLeader;
+                    }
+                }
+                else
+                {
+                    int wsdcId = await GuessWsdcId(couple.Leader.FirstName, couple.Leader.LastName);
+
+                    var scores = comp.Scores.Where(s => s.Leader.FullName == couple.Leader.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Leader.WsdcId = wsdcId;
+                    }
+                }
+
+                var serverFollower = await _databaseProvider.GetCompetitorByNameAsync(couple.Follower.FirstName, couple.Follower.LastName);
+
+                if (serverFollower != null)
+                {
+                    serverFollower = new Competitor(
+                        serverFollower.Id, serverFollower.WsdcId,
+                        serverFollower.FirstName, serverFollower.LastName,
+                        serverFollower.LeadStats.Rating, serverFollower.LeadStats.Variance,
+                        serverFollower.FollowStats.Rating, serverFollower.FollowStats.Variance);
+
+                    var scores = comp.Scores.Where(s => s.Follower.FullName == serverFollower.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Follower = serverFollower;
+                    }
+                }
+                else
+                {
+                    int wsdcId = await GuessWsdcId(couple.Follower.FirstName, couple.Follower.LastName);
+
+                    var scores = comp.Scores.Where(s => s.Follower.FullName == couple.Follower.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Follower.WsdcId = wsdcId;
+                    }
+                }
+            }
+
+            Competition = comp;
+        }
+        private async Task<int> GuessWsdcId(string firstName, string LastName)
+        {
+            try
+            {
+                var response = await _client.PostAsync("/lookup/find?q=" + FirstName + "%20" + LastName, null);
+                string sheet = await response.Content.ReadAsStringAsync();
+                string idString = Regex.Match(sheet.Substring(sheet.IndexOf("wscid"), 20), @"\d+").Value;
+                return Int32.TryParse(idString, out int id) ? id : -1;
+            } 
+            catch
+            {
+                return -1;
+            }
+
         }
     }
 }

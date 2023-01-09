@@ -133,21 +133,21 @@ namespace ImpartialUI.ViewModels
 
             foreach (var judge in SelectJudges)
             {
-                judge.SelectedJudge = GetClosestJudgeByFirstName(judge.Judge.FirstName, JudgesDb);
+                judge.SelectedJudge = (Judge)Util.GetClosestPersonByFirstName(judge.Judge.FirstName, JudgesDb);
             }
         }
 
         private async void AddJudge()
         {
-            //await _databaseProvider.InsertJudgeAsync(new Judge(FirstName, LastName));
-            //RefreshJudgesDatabase();
+            await _databaseProvider.UpsertJudgeAsync(new Judge(FirstName, LastName));
+            RefreshJudgesDatabase();
 
             // clear the name fields
             FirstName = ""; LastName = "";
         }
         private void DeleteJudge(object obj)
         {
-            //_databaseProvider.DeleteJudgeAsync((Judge)obj);
+            _databaseProvider.DeleteJudgeAsync((Judge)obj);
             RefreshJudgesDatabase();
         }
         private void ClearJudgesDatabase()
@@ -205,7 +205,7 @@ namespace ImpartialUI.ViewModels
         private void GetJudges()
         {
             //temp this is gonna be in a loop
-            var division = Division.Advanced;
+            var division = Division.AllStar;
 
             _scoresheetParser = new EEProParser(PrelimsPath, FinalsPath);
             Judges = _scoresheetParser.GetJudgesByDivision(division);
@@ -214,7 +214,7 @@ namespace ImpartialUI.ViewModels
             var selectJudges = new List<SelectJudgeViewModel>();
             foreach (var judge in Judges)
             {
-                selectJudges.Add(new SelectJudgeViewModel(judge) { SelectedJudge = GetClosestJudgeByFirstName(judge.FirstName, JudgesDb) });
+                selectJudges.Add(new SelectJudgeViewModel(judge) { SelectedJudge = (Judge)Util.GetClosestPersonByFirstName(judge.FirstName, JudgesDb) });
             }
 
             SelectJudges = selectJudges;
@@ -288,75 +288,6 @@ namespace ImpartialUI.ViewModels
         private void Cancel()
         {
             //close window
-        }
-
-        private Judge GetClosestJudgeByFirstName(string input, List<Judge> list)
-        {
-            int leastDistance = 10000;
-            Judge match = null;
-
-            foreach (Judge j in list)
-            {
-                int d = GetEditDistance(input, j.FirstName);
-                if (d == 0)
-                    return j;
-
-                if (d < leastDistance)
-                {
-                    leastDistance = d;
-                    match = j;
-                }
-            }
-
-            return match;
-        }
-        private string GetClosestString(string input, List<string> list)
-        {
-            int leastDistance = 10000;
-            string match = "";
-
-            foreach (string s in list)
-            {
-                int d = GetEditDistance(input, s);
-                if (d == 0)
-                    return s;
-
-                if (d < leastDistance)
-                {
-                    leastDistance = d;
-                    match = s;
-                }
-            }
-
-            return match;
-        }
-        public int GetEditDistance(string s, string t)
-        {
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
-
-            if (n == 0)
-                return m;
-
-            if (m == 0)
-                return n;
-
-            for (int i = 0; i <= n; d[i, 0] = i++) { }
-            for (int j = 0; j <= m; d[0, j] = j++) { }
-
-            for (int i = 1; i <= n; i++)
-            {
-                for (int j = 1; j <= m; j++)
-                {
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
-
-                    d[i, j] = Math.Min(
-                        Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
-                        d[i - 1, j - 1] + cost);
-                }
-            }
-            return d[n, m];
         }
     }
 }

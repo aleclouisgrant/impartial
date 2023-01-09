@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static ImpartialUI.Controls.ModeEnum;
 
 namespace ImpartialUI.Controls
 {
@@ -82,8 +83,34 @@ namespace ImpartialUI.Controls
             var control = (SearchTextBox)source;
         }
 
-        #endregion
+        public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(
+            nameof(Mode),
+            typeof(Mode),
+            typeof(SearchTextBox),
+            new FrameworkPropertyMetadata(Mode.Search, OnModePropertyChanged));
+        public Mode Mode
+        {
+            get { return (Mode)GetValue(ModeProperty); }
+            set { SetValue(ModeProperty, value); }
+        }
+        private static void OnModePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (SearchTextBox)source;
+            var mode = (Mode)e.NewValue;
+            
+            switch (mode)
+            {
+                case Mode.Add:
+                    control.AddMode();
+                    break;
+                default:
+                case Mode.Search:
+                    control.SearchMode();
+                    break;
+            }
+        }
 
+        #endregion
 
         public static readonly RoutedEvent SelectionChangedEvent =
            EventManager.RegisterRoutedEvent("SelectionChanged", RoutingStrategy.Bubble,
@@ -103,6 +130,15 @@ namespace ImpartialUI.Controls
         public SearchTextBox()
         {
             InitializeComponent();
+        }
+
+        public void AddMode(string firstName, string lastName, int wsdcId)
+        {
+            AddMode();
+
+            FirstNameTextBox.Text = firstName;
+            LastNameTextBox.Text = lastName;
+            WsdcIdTextBox.Text = wsdcId.ToString();
         }
 
         private void GuessPerson()
@@ -182,28 +218,41 @@ namespace ImpartialUI.Controls
             return d[n, m];
         }
 
-        private void AddToDatabaseButton_Click(object sender, RoutedEventArgs e)
+        private void AddMode()
+        {
+            Mode = Mode.Add;
+            AddPersonGrid.Visibility = Visibility.Visible;
+            SelectPersonGrid.Visibility = Visibility.Collapsed;
+        }
+
+        private void SearchMode()
+        {
+            Mode = Mode.Search;
+            SelectPersonGrid.Visibility = Visibility.Visible;
+            AddPersonGrid.Visibility = Visibility.Collapsed;
+        }
+
+        private async void AddToDatabaseButton_Click(object sender, RoutedEventArgs e)
         {
             //if (typeof(ComboBoxItems.SelectedItem) is Judge)
             //    DatabaseProvider.InsertJudge(new Judge(FirstNameTextBox.Text, LastNameTextBox.Text));
             //else if (typeof(ComboBoxItems.SelectedItem) is Competitor)
             //    DatabaseProvider.InsertCompetitor(new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text));
 
-            //await App.DatabaseProvider.InsertJudgeAsync(new Judge(FirstNameTextBox.Text, LastNameTextBox.Text));
-            //ItemsSource = await App.DatabaseProvider.GetAllJudgesAsync();
+            var competitor = new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text, Int32.Parse(WsdcIdTextBox.Text));
+            await App.DatabaseProvider.UpsertCompetitorAsync(competitor);
+            ItemsSource = await App.DatabaseProvider.GetAllCompetitorsAsync();
 
-            SelectPersonGrid.Visibility = Visibility.Visible;
-            AddPersonGrid.Visibility = Visibility.Collapsed;
+            SearchMode();
+            ComboBoxItems.SelectedValue = ItemsSource.Where(c => c.Id == competitor.Id).FirstOrDefault();
         }
         private void ShowAddPersonButton_Click(object sender, RoutedEventArgs e)
         {
-            AddPersonGrid.Visibility = Visibility.Visible;
-            SelectPersonGrid.Visibility = Visibility.Collapsed;
+            AddMode();
         }
         private void HideAddPersonButton_Click(object sender, RoutedEventArgs e)
         {
-            SelectPersonGrid.Visibility = Visibility.Visible;
-            AddPersonGrid.Visibility = Visibility.Collapsed;
+            SearchMode();   
         }
         private void GuessButton_Click(object sender, RoutedEventArgs e)
         {

@@ -13,14 +13,16 @@ namespace Impartial
         public List<Judge> Judges { get; set; }
         public List<Score> Scores { get; set; }
 
+        public EEProParser() { }
+
         public EEProParser(string prelimsSheetPath, string finalsSheetPath)
         {
-            if (prelimsSheetPath == null || prelimsSheetPath == String.Empty)
-                return;
+            //if (prelimsSheetPath == null || prelimsSheetPath == String.Empty)
+            //    return;
             if (finalsSheetPath == null || finalsSheetPath == String.Empty)
                 return;
 
-            _prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
+            //_prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
             _finalsSheetDoc = File.ReadAllText(finalsSheetPath).Replace("\n", "").Replace("\r", "");
         }
 
@@ -89,24 +91,27 @@ namespace Impartial
     
             foreach (var node in nodes)
             {
-                judges.Add(new Judge(node.InnerText.Replace("&nbsp;", ""), string.Empty));
+                string name = node.InnerText.Replace("&nbsp;", "");
+                int pos = name.IndexOf(' ');
+
+                judges.Add(new Judge(name.Substring(0, pos), name.Substring(pos + 1)));
             }
 
             return judges;
         }
         public Competition GetCompetition(Division division)
         {
-            var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader);
-            HtmlDocument leadsDoc = new HtmlDocument();
-            leadsDoc.LoadHtml(leadsPrelims);
-            var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
-            leadNodes.RemoveAt(0);
+            //var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader);
+            //HtmlDocument leadsDoc = new HtmlDocument();
+            //leadsDoc.LoadHtml(leadsPrelims);
+            //var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
+            //leadNodes.RemoveAt(0);
 
-            var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower);
-            HtmlDocument followsDoc = new HtmlDocument();
-            followsDoc.LoadHtml(followsPrelims);
-            var followNodes = followsDoc.DocumentNode.SelectNodes("tr");
-            followNodes.RemoveAt(0);
+            //var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower);
+            //HtmlDocument followsDoc = new HtmlDocument();
+            //followsDoc.LoadHtml(followsPrelims);
+            //var followNodes = followsDoc.DocumentNode.SelectNodes("tr");
+            //followNodes.RemoveAt(0);
 
             var sub = GetFinalsDocByDivision(division);
             var judges = GetJudgesByDivision(division);
@@ -119,7 +124,7 @@ namespace Impartial
             var scores = new List<Score>();
 
             //used for weighted ranking with points
-            int totalCouples = leadNodes.Count > followNodes.Count ? leadNodes.Count : followNodes.Count;
+            //int totalCouples = leadNodes.Count > followNodes.Count ? leadNodes.Count : followNodes.Count;
 
             for (int i = 1; i < nodes.Count; i++)
             {
@@ -138,11 +143,17 @@ namespace Impartial
                     {
                         placement = Int32.Parse(node[j].InnerText.Substring(0, 1));
                     }
-                    
+
+                    string leaderName = node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and "));
+                    int leadPos = leaderName.IndexOf(' ');
+
+                    string followerName = node[1].InnerText.Substring(node[1].InnerText.IndexOf(" and ") + " and ".Length);
+                    int followPos = followerName.IndexOf(' ');
+
                     var score = new Score(judges[j - 2], placement, actualPlacement)
                     {
-                        Leader = new Competitor(node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and ")), string.Empty),
-                        Follower = new Competitor(node[1].InnerText.Substring(node[1].InnerText.IndexOf(" and ") + " and ".Length), string.Empty),
+                        Leader = new Competitor(leaderName.Substring(0, leadPos), leaderName.Substring(leadPos + 1)),
+                        Follower = new Competitor(followerName.Substring(0, followPos), followerName.Substring(followPos + 1)),
                     };
 
                     scores.Add(score);
@@ -169,7 +180,7 @@ namespace Impartial
                     score.ActualPlacement,
                     score.Leader.FirstName,
                     score.Follower.FirstName,
-                    score.Judge.FirstName,
+                    score.Judge.FullName,
                     score.Placement,
                     score.Accuracy * 100);
             }
