@@ -300,6 +300,16 @@ namespace ImpartialUI.Controls
         private void Clear()
         {
             ScoreGrid.Children.Clear();
+            ScoreGrid.RowDefinitions.Clear();
+            ScoreGrid.ColumnDefinitions.Clear();
+
+            ScoreGrid.RowDefinitions.Add(new RowDefinition());
+            ScoreGrid.RowDefinitions.Add(new RowDefinition());
+
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
             CompDatePicker.SelectedDate = DateTime.Now;
 

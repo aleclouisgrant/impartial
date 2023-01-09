@@ -88,13 +88,22 @@ namespace Impartial
 
             if (nodes == null) //division may not exist
                 return judges;
-    
+
             foreach (var node in nodes)
             {
                 string name = node.InnerText.Replace("&nbsp;", "");
                 int pos = name.IndexOf(' ');
-
-                judges.Add(new Judge(name.Substring(0, pos), name.Substring(pos + 1)));
+                
+                //no last name was recorded
+                if (pos == -1)
+                {
+                    judges.Add(new Judge(name, string.Empty));
+                }
+                else
+                {
+                    judges.Add(new Judge(name.Substring(0, pos), name.Substring(pos + 1)));
+                }
+                
             }
 
             return judges;
