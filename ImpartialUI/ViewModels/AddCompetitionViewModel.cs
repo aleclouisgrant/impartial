@@ -1,5 +1,7 @@
 ﻿using Impartial;
+using Impartial.Services.ScoresheetParser;
 using ImpartialUI.Commands;
+using ImpartialUI.Enums;
 using Microsoft.Win32;
 using MongoDB.Driver;
 using System;
@@ -88,17 +90,6 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private Competition _competition;
-        public Competition Competition
-        {
-            get { return _competition; }
-            set
-            {
-                _competition = value;
-                OnPropertyChanged();
-            }
-        }
-
         private string _judgeFirstName;
         public string JudgeFirstName
         {
@@ -116,6 +107,28 @@ namespace ImpartialUI.ViewModels
             set
             {
                 _judgeLastName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ScoresheetSelector _scoresheetSelector;
+        public ScoresheetSelector ScoresheetSelector
+        {
+            get { return _scoresheetSelector; }
+            set
+            {
+                _scoresheetSelector = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Competition _competition;
+        public Competition Competition
+        {
+            get { return _competition; }
+            set
+            {
+                _competition = value;
                 OnPropertyChanged();
             }
         }
@@ -141,8 +154,12 @@ namespace ImpartialUI.ViewModels
             _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
             Competition = new Competition(Division.AllStar);
+            ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
 
             //TestData();
+
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-02-26 rose city swing\finals.html";
+            ParseScoreSheets();
         }
 
         private async void TestData()
@@ -313,7 +330,24 @@ namespace ImpartialUI.ViewModels
 
         private async void ParseScoreSheets()
         {
-            _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
+            switch (ScoresheetSelector)
+            {
+                case ScoresheetSelector.EEPro:
+                    _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
+                    break;
+                case ScoresheetSelector.DanceConvention:
+                    _scoresheetParser = new DanceConventionParser(finalsPath);
+                    break;
+                case ScoresheetSelector.StepRightSolutions:
+                    _scoresheetParser = new StepRightSolutionsParser(finalsPath);
+                    break;
+                case ScoresheetSelector.WorldDanceRegistry:
+                    _scoresheetParser = new WorldDanceRegistryParser(finalsPath);
+                    break;
+                default:
+                    return;
+            }
+
             var divisions = _scoresheetParser.GetDivisions();
 
             if (!divisions.Contains(Division.AllStar))

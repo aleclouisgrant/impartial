@@ -212,5 +212,55 @@ namespace Impartial
 
             return match;
         }
+
+        public static string GetSubString(string s, string from, string to)
+        {
+            int fromIndex = s.IndexOf(from) + from.Length;
+            int toIndex = s.IndexOf(to);
+            string sub = "";
+
+            try
+            {
+                sub = s.Substring(fromIndex, toIndex - fromIndex);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
+
+            return sub;
+        }
+        public static string GetSubStringN(string s, string from, string to, int n)
+        {
+            int fromIndex = IndexOfN(s, from, n) + from.Length;
+            int toIndex = IndexOfN(s, to, n);
+            string sub = "";
+
+            try
+            {
+                sub = s.Substring(fromIndex, toIndex - fromIndex);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
+
+            return sub;
+        }
+        public static int IndexOfN(string s, string match, int n)
+        {
+            int i = 1;
+            int index = -1;
+
+            while (i <= n && (index = s.IndexOf(match, index + 1)) != -1)
+            {
+                if (i == n)
+                    return index;
+
+                i++;
+            }
+
+            return -1;
+        }
     }
 }

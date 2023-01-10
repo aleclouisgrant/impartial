@@ -105,7 +105,11 @@ namespace ImpartialUI.Controls
         }
         private async void UpdateJudges()
         {
-            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
+            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).OrderBy(j => j.FirstName).ToList();
+            
+            // filter out anonymous judges
+            //Judges = Judges.RemoveAll(j => Int32.TryParse(j.LastName, out int res) == true);
+
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;

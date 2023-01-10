@@ -1,18 +1,10 @@
 ﻿using Impartial;
+using ImpartialUI.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using static ImpartialUI.Controls.ModeEnum;
 
 namespace ImpartialUI.Controls
 {
@@ -85,26 +77,26 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(
             nameof(Mode),
-            typeof(Mode),
+            typeof(SearchBoxMode),
             typeof(SearchTextBox),
-            new FrameworkPropertyMetadata(Mode.Search, OnModePropertyChanged));
-        public Mode Mode
+            new FrameworkPropertyMetadata(SearchBoxMode.Search, OnModePropertyChanged));
+        public SearchBoxMode Mode
         {
-            get { return (Mode)GetValue(ModeProperty); }
+            get { return (SearchBoxMode)GetValue(ModeProperty); }
             set { SetValue(ModeProperty, value); }
         }
         private static void OnModePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var control = (SearchTextBox)source;
-            var mode = (Mode)e.NewValue;
+            var mode = (SearchBoxMode)e.NewValue;
             
             switch (mode)
             {
-                case Mode.Add:
+                case SearchBoxMode.Add:
                     control.AddMode();
                     break;
                 default:
-                case Mode.Search:
+                case SearchBoxMode.Search:
                     control.SearchMode();
                     break;
             }
@@ -220,14 +212,14 @@ namespace ImpartialUI.Controls
 
         private void AddMode()
         {
-            Mode = Mode.Add;
+            Mode = SearchBoxMode.Add;
             AddPersonGrid.Visibility = Visibility.Visible;
             SelectPersonGrid.Visibility = Visibility.Collapsed;
         }
 
         private void SearchMode()
         {
-            Mode = Mode.Search;
+            Mode = SearchBoxMode.Search;
             SelectPersonGrid.Visibility = Visibility.Visible;
             AddPersonGrid.Visibility = Visibility.Collapsed;
         }

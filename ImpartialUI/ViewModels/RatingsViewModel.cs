@@ -80,20 +80,19 @@ namespace ImpartialUI.ViewModels
         }
         private async void CrunchRatings()
         {
+            IEnumerable<Competition> competitions = await _databaseProvider.GetAllCompetitionsAsync();
+            competitions = competitions.OrderBy(c => c.Date).ToList();
 
-            //IEnumerable<Competition> competitions = await _databaseProvider.GetAllCompetitionsAsync();
-            //competitions = competitions.OrderBy(c => c.Date).ToList();
-            
-            //foreach (Competition competition in competitions)
-            //{
-            //    var couples = EloRatingService.CalculateRatings(competition.Couples);
+            foreach (Competition competition in competitions)
+            {
+                var couples = EloRatingService.CalculateRatings(competition.Couples);
 
-            //    foreach (Couple couple in couples)
-            //    {
-            //        await App.DatabaseProvider.UpdateCompetitorAsync(couple.Leader.Id, couple.Leader);
-            //        await App.DatabaseProvider.UpdateCompetitorAsync(couple.Follower.Id, couple.Follower);
-            //    }
-            //}
+                foreach (Couple couple in couples)
+                {
+                    await App.DatabaseProvider.UpsertCompetitorAsync(couple.Leader);
+                    await App.DatabaseProvider.UpsertCompetitorAsync(couple.Follower);
+                }
+            }
         }
 
         private async void AddCompetitor()

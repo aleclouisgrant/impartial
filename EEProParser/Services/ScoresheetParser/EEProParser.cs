@@ -7,8 +7,8 @@ namespace Impartial
 {
     public class EEProParser : IScoresheetParser
     {
-        string _prelimsSheetDoc { get; set; }
-        string _finalsSheetDoc { get; set; }
+        private string _prelimsSheetDoc { get; set; }
+        private string _finalsSheetDoc { get; set; }
 
         public List<Judge> Judges { get; set; }
         public List<Score> Scores { get; set; }
@@ -35,13 +35,13 @@ namespace Impartial
             while (c < 21)
             {
                 Division div;
-                var finals = GetSubStringN(
+                var finals = Util.GetSubStringN(
                     s: _finalsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c++);
 
-                var divisionString = GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+                var divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
 
                 if (divisionString.Contains("Masters"))
                     continue;
@@ -76,7 +76,7 @@ namespace Impartial
             var judges = new List<Judge>();
             
             string sheet = GetFinalsDocByDivision(division);
-            string sub = GetSubString(
+            string sub = Util.GetSubString(
                 s: sheet,
                 from: "<td><em><strong>Competitor</strong></em></td>",
                 to: "<td><em><strong>BIB</strong></em></td>");
@@ -103,7 +103,6 @@ namespace Impartial
                 {
                     judges.Add(new Judge(name.Substring(0, pos), name.Substring(pos + 1)));
                 }
-                
             }
 
             return judges;
@@ -209,13 +208,13 @@ namespace Impartial
             while (true)
             {
                 Division div;
-                var prelims = GetSubStringN(
+                var prelims = Util.GetSubStringN(
                     s: _prelimsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c++);
 
-                var divisionString = GetSubString(prelims, "<td colspan=\"11\">", "</td></tr><tr>");
+                var divisionString = Util.GetSubString(prelims, "<td colspan=\"11\">", "</td></tr><tr>");
 
                 if (divisionString.Contains("Newcomer"))
                     div = Division.Newcomer;
@@ -256,13 +255,13 @@ namespace Impartial
             while (true)
             {
                 Division div;
-                var finals = GetSubStringN(
+                var finals = Util.GetSubStringN(
                     s: _finalsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c++);
 
-                var divisionString = GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+                var divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
 
                 if (divisionString.Contains("Masters"))
                     continue;
@@ -293,56 +292,5 @@ namespace Impartial
                     return "";
             }
         }
-
-        private static string GetSubString(string s, string from, string to)
-        {
-            int fromIndex = s.IndexOf(from) + from.Length;
-            int toIndex = s.IndexOf(to);
-            string sub = "";
-
-            try
-            {
-                sub = s.Substring(fromIndex, toIndex - fromIndex);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                
-            }
-
-            return sub;
-        }
-        private static string GetSubStringN(string s, string from, string to, int n)
-        {
-            int fromIndex = IndexOfN(s, from, n) + from.Length;
-            int toIndex = IndexOfN(s, to, n);
-            string sub = "";
-
-            try
-            {
-                sub = s.Substring(fromIndex, toIndex - fromIndex);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-
-            }
-
-            return sub;
-        }
-        private static int IndexOfN(string s, string match, int n)
-        {
-            int i = 1;
-            int index = -1;
-
-            while (i <= n && (index = s.IndexOf(match, index + 1)) != -1)
-            {
-                if (i == n)
-                    return index;
-
-                i++;
-            }
-
-            return -1;
-        }
-
     }
 }

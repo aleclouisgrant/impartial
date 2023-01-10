@@ -69,6 +69,8 @@ namespace ImpartialUI.Controls
             Grid.SetColumn(competitorBorder, 1);
 
             var competition = (Competition)e.NewValue;
+            if (competition == null)
+                return;
 
             var judges = competition.Judges.OrderBy(j => j.FullName);
             var couples = competition.Couples;

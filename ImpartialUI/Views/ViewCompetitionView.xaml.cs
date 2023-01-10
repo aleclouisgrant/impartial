@@ -1,4 +1,5 @@
 ﻿using Impartial;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -18,7 +19,7 @@ namespace ImpartialUI.Views
 
         private async void RefreshCompetitions()
         {
-            CompetitionComboBox.ItemsSource = await App.DatabaseProvider.GetAllCompetitionsAsync();
+            CompetitionComboBox.ItemsSource = (await App.DatabaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date);
         }
 
         private void CompetitionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
