@@ -53,6 +53,7 @@
                     <StackPanel.Resources>
                         <converters:BoolToEnumConverter x:Key="BoolToEnumConverter"/>
                     </StackPanel.Resources>
+                    <RadioButton Content="Auto" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.Auto}}"/>
                     <RadioButton Content="EEPro" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.EEPro}}"/>
                     <RadioButton Content="Step Right Solutions" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.StepRightSolutions}}"/>
                     <RadioButton Content="World Dance Registry" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.WorldDanceRegistry}}"/>

@@ -1,4 +1,5 @@
-﻿using Impartial;
+﻿using HtmlAgilityPack;
+using Impartial;
 using Impartial.Services.ScoresheetParser;
 using ImpartialUI.Commands;
 using ImpartialUI.Enums;
@@ -7,6 +8,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -156,12 +158,13 @@ namespace ImpartialUI.ViewModels
             _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
             Competition = new Competition(Division.AllStar);
+            ScoresheetSelector = ScoresheetSelector.Auto;
 
             //TestData();
 
-            ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2021-12-31 floorplay\finals.html";
-            ParseScoreSheets();
+            //ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2021-12-31 floorplay\finals.html";
+            //ParseScoreSheets();
         }
 
         private async void TestData()
@@ -277,6 +280,7 @@ namespace ImpartialUI.ViewModels
         {
             Competition = new Competition(Division.AllStar);
             FinalsPath = string.Empty;
+            ScoresheetSelector = ScoresheetSelector.Auto;
         }
 
         private async void AddCompetitor()
@@ -338,6 +342,11 @@ namespace ImpartialUI.ViewModels
 
         private async void ParseScoreSheets()
         {
+            if (ScoresheetSelector == ScoresheetSelector.Auto)
+            {
+                ScoresheetSelector = SelectScoresheetParser(finalsPath);
+            }
+
             switch (ScoresheetSelector)
             {
                 case ScoresheetSelector.EEPro:
@@ -352,6 +361,7 @@ namespace ImpartialUI.ViewModels
                 case ScoresheetSelector.WorldDanceRegistry:
                     _scoresheetParser = new WorldDanceRegistryParser(finalsPath);
                     break;
+                case ScoresheetSelector.Other:
                 default:
                     return;
             }
@@ -456,6 +466,21 @@ namespace ImpartialUI.ViewModels
                 return -1;
             }
 
+        }
+
+        public ScoresheetSelector SelectScoresheetParser(string finalsPath)
+        {
+            var finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
+            var parserString = Util.GetSubString(finalsSheetDoc, "<!-- saved from", " -->");
+
+            if (parserString.Contains("worlddanceregistry"))
+                return ScoresheetSelector.WorldDanceRegistry;
+            else if (parserString.Contains("steprightsolutions"))
+                return ScoresheetSelector.StepRightSolutions;
+            else if (parserString.Contains("eepro"))
+                return ScoresheetSelector.EEPro;
+            else
+                return ScoresheetSelector.Other;
         }
     }
 }

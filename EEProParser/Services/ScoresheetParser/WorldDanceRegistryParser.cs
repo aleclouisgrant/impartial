@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Impartial.Services.ScoresheetParser
 {
@@ -15,7 +14,7 @@ namespace Impartial.Services.ScoresheetParser
 
         public WorldDanceRegistryParser(string finalsPath)
         {
-            if (finalsPath == null || finalsPath == String.Empty)
+            if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
                 return;
 
             _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");

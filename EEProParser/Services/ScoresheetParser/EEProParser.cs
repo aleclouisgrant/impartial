@@ -15,15 +15,15 @@ namespace Impartial
 
         public EEProParser() { }
 
-        public EEProParser(string prelimsSheetPath, string finalsSheetPath)
+        public EEProParser(string prelimsSheetPath, string finalsPath)
         {
             //if (prelimsSheetPath == null || prelimsSheetPath == String.Empty)
             //    return;
-            if (finalsSheetPath == null || finalsSheetPath == String.Empty)
+            if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
                 return;
 
             //_prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
-            _finalsSheetDoc = File.ReadAllText(finalsSheetPath).Replace("\n", "").Replace("\r", "");
+            _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
         }
 
         public List<Division> GetDivisions()
