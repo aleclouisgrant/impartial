@@ -137,6 +137,7 @@ namespace ImpartialUI.ViewModels
         public ICommand AddJudgeCommand { get; set; }
         public ICommand AddCompetitionCommand { get; set; }
         public ICommand ParseScoreSheetsCommand { get; set; }
+        public ICommand CancelCommand { get; set; }
         public ICommand SelectPrelimsPathCommand { get; set; }
         public ICommand SelectFinalsPathCommand { get; set; }
 
@@ -148,17 +149,18 @@ namespace ImpartialUI.ViewModels
             SelectPrelimsPathCommand = new DelegateCommand(SelectPrelimsPath);
             SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
             ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
+            CancelCommand = new DelegateCommand(Clear);
 
             _databaseProvider = App.DatabaseProvider;
             _client = new HttpClient();
             _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
             Competition = new Competition(Division.AllStar);
-            ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
 
             //TestData();
 
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-02-26 rose city swing\finals.html";
+            ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2021-12-31 floorplay\finals.html";
             ParseScoreSheets();
         }
 
@@ -271,6 +273,12 @@ namespace ImpartialUI.ViewModels
             Competition = competition;
         }
 
+        private void Clear()
+        {
+            Competition = new Competition(Division.AllStar);
+            FinalsPath = string.Empty;
+        }
+
         private async void AddCompetitor()
         {
             if (int.TryParse(WsdcId, out int id)) {
@@ -300,7 +308,7 @@ namespace ImpartialUI.ViewModels
 
             _databaseProvider.UpsertCompetitionAsync(Competition);
 
-            Competition = new Competition(Division.AllStar);
+            Clear();
         }
 
         private void SelectPrelimsPath()
@@ -433,6 +441,7 @@ namespace ImpartialUI.ViewModels
 
             Competition = comp;
         }
+
         private async Task<int> GuessWsdcId(string firstName, string LastName)
         {
             try

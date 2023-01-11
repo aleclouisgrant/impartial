@@ -173,28 +173,6 @@ namespace Impartial
                 }
             }
 
-            #region Output
-            Console.WriteLine("Division: " + division);
-            Console.WriteLine("Judges: ");
-            foreach (var j in judges)
-            {
-                Console.WriteLine(j.FirstName);
-            }
-            Console.WriteLine("");
-            Console.WriteLine("Scores: ");
-            foreach (var score in scores)
-            {
-                Console.WriteLine("{0}: {1} & {2} ({3}: {4} ({5}%))",
-                    score.ActualPlacement,
-                    score.Leader.FirstName,
-                    score.Follower.FirstName,
-                    score.Judge.FullName,
-                    score.Placement,
-                    score.Accuracy * 100);
-            }
-            Console.WriteLine("");
-            #endregion
-
             return new Competition(division)
             {
                 Scores = scores
