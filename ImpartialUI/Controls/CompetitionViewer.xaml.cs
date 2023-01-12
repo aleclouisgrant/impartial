@@ -72,7 +72,7 @@ namespace ImpartialUI.Controls
             if (competition == null)
                 return;
 
-            var judges = competition.Judges.OrderBy(j => j.FullName);
+            var judges = competition.Judges?.OrderBy(j => j.FullName);
             var couples = competition.Couples;
 
             //competition.Scores = competition.Scores.OrderBy(s => s.ActualPlacement).ThenBy(s => s.Judge.FullName).ToList();

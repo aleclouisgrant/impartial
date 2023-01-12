@@ -160,11 +160,10 @@ namespace ImpartialUI.ViewModels
             Competition = new Competition(Division.AllStar);
             ScoresheetSelector = ScoresheetSelector.Auto;
 
-            //TestData();
-
-            //ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2021-12-31 floorplay\finals.html";
-            //ParseScoreSheets();
+            ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\prelims.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\finals.html";
+            ParseScoreSheets();
         }
 
         private async void TestData()
@@ -279,6 +278,7 @@ namespace ImpartialUI.ViewModels
         private void Clear()
         {
             Competition = new Competition(Division.AllStar);
+            PrelimsPath = string.Empty;
             FinalsPath = string.Empty;
             ScoresheetSelector = ScoresheetSelector.Auto;
         }
@@ -353,25 +353,83 @@ namespace ImpartialUI.ViewModels
                     _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.DanceConvention:
-                    _scoresheetParser = new DanceConventionParser(finalsPath);
+                    _scoresheetParser = new DanceConventionParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.StepRightSolutions:
-                    _scoresheetParser = new StepRightSolutionsParser(finalsPath);
+                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.WorldDanceRegistry:
-                    _scoresheetParser = new WorldDanceRegistryParser(finalsPath);
+                    _scoresheetParser = new WorldDanceRegistryParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.Other:
                 default:
                     return;
             }
 
-            var divisions = _scoresheetParser.GetDivisions();
-
-            if (!divisions.Contains(Division.AllStar))
+            if (!_scoresheetParser.GetDivisions().Contains(Division.AllStar))
                 return;
 
             var comp = _scoresheetParser.GetCompetition(Division.AllStar);
+
+            foreach (var competitor in comp.PrelimLeaders)
+            {
+                var serverCompetitor = await _databaseProvider.GetCompetitorByNameAsync(competitor.FirstName, competitor.LastName);
+
+                if (serverCompetitor != null)
+                {
+                    serverCompetitor = new Competitor(
+                        serverCompetitor.Id, serverCompetitor.WsdcId,
+                        serverCompetitor.FirstName, serverCompetitor.LastName,
+                        serverCompetitor.LeadStats.Rating, serverCompetitor.LeadStats.Variance,
+                        serverCompetitor.FollowStats.Rating, serverCompetitor.FollowStats.Variance);
+
+                    var scores = comp.LeaderPrelimScores.Where(s => s.Competitor.FullName == serverCompetitor.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Competitor = serverCompetitor;
+                    }
+                }
+                else
+                {
+                    int wsdcId = await GuessWsdcId(competitor.FirstName, competitor.LastName);
+
+                    var scores = comp.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Competitor.WsdcId = wsdcId;
+                    }
+                }
+            }
+
+            foreach (var competitor in comp.PrelimFollowers)
+            {
+                var serverCompetitor = await _databaseProvider.GetCompetitorByNameAsync(competitor.FirstName, competitor.LastName);
+
+                if (serverCompetitor != null)
+                {
+                    serverCompetitor = new Competitor(
+                        serverCompetitor.Id, serverCompetitor.WsdcId,
+                        serverCompetitor.FirstName, serverCompetitor.LastName,
+                        serverCompetitor.LeadStats.Rating, serverCompetitor.LeadStats.Variance,
+                        serverCompetitor.FollowStats.Rating, serverCompetitor.FollowStats.Variance);
+
+                    var scores = comp.FollowerPrelimScores.Where(s => s.Competitor.FullName == serverCompetitor.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Competitor = serverCompetitor;
+                    }
+                }
+                else
+                {
+                    int wsdcId = await GuessWsdcId(competitor.FirstName, competitor.LastName);
+
+                    var scores = comp.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
+                    foreach (var score in scores)
+                    {
+                        score.Competitor.WsdcId = wsdcId;
+                    }
+                }
+            }
 
             foreach (var judge in comp.Judges)
             {

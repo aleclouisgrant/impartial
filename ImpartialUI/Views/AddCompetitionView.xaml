@@ -18,7 +18,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -26,9 +25,24 @@
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Vertical" VerticalAlignment="Top" Margin="20,20,20,0" Visibility="Visible" Grid.ColumnSpan="2">
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Top" Margin="20,20,20,0" Visibility="Visible">
+                <StackPanel Orientation="Horizontal" Margin="0 5">
+                    <Button 
+                        Content="Select Prelims Score Sheet"
+                        Width="200" Height="20"
+                        Margin="0 0 20 0"
+                        Command="{Binding SelectPrelimsPathCommand}"/>
+                    <TextBox
+                        Width="500" Height="20"
+                        Text="{Binding PrelimsPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0 5" Visibility="Collapsed">
                     <Button 
                             Content="Select Prelims Score Sheet"
@@ -60,7 +74,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
                 <Button 
                         Content="Open Scoresheet"
                         Width="150" Height="20"
@@ -74,37 +88,32 @@
                         Command="{Binding CancelCommand}"
                         Margin="20"/>
             </StackPanel>
-        </Grid>
 
-        <Grid Grid.Row="1">
-            <c:CompetitionViewer Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        </Grid>
-        
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Vertical" Grid.Column="0" Width="400" Margin="20">
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="First Name:" Margin="0 0 5 0"/>
-                        <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                <StackPanel Orientation="Vertical" Grid.Column="0" Width="400" Margin="20">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="First Name:" Margin="0 0 5 0"/>
+                            <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
+                            <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="WSDC Id:" Margin="0 0 5 0"/>
+                            <TextBox Text="{Binding WsdcId, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                        </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
-                        <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="WSDC Id:" Margin="0 0 5 0"/>
-                        <TextBox Text="{Binding WsdcId, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <Button 
+                    <Button 
                     Grid.Row="1"
                     Content="Add Competitor To Database"
                     Width="200" Height="20"
@@ -112,22 +121,22 @@
                     Command="{Binding AddCompetitorCommand}"
                     IsDefault="True"
                     Margin="20"/>
-            </StackPanel>
-
-            <StackPanel Orientation="Vertical" Grid.Column="1" Width="400" Margin="20">
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="First Name:" Margin="0 0 5 0"/>
-                        <TextBox Text="{Binding JudgeFirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
-                        <TextBox Text="{Binding JudgeLastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
-                    </StackPanel>
                 </StackPanel>
 
-                <Button 
+                <StackPanel Orientation="Vertical" Grid.Column="1" Width="400" Margin="20">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="First Name:" Margin="0 0 5 0"/>
+                            <TextBox Text="{Binding JudgeFirstName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Last Name:" Margin="0 0 5 0"/>
+                            <TextBox Text="{Binding JudgeLastName, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button 
                     Grid.Row="1"
                     Content="Add Judge To Database"
                     Width="200" Height="20"
@@ -135,29 +144,48 @@
                     Command="{Binding AddJudgeCommand}"
                     IsDefault="True"
                     Margin="20"/>
-            </StackPanel>
-        </Grid>
-
-        <Grid Grid.Row="3">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-
-            <Grid Grid.Row="0">
-                <c:CompetitionAdder Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
             </Grid>
-
-            <Button 
-                Grid.Row="1"
-                Content="Add Competition To Database"
-                Width="200" Height="20"
-                FontWeight="Bold"
-                Command="{Binding AddCompetitionCommand}"
-                IsDefault="True"
-                Margin="20"
-                VerticalAlignment="Bottom"/>
-
         </Grid>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="Prelims">
+                <ScrollViewer>
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        
+                        <c:PrelimsViewer Grid.Column="2" Role="Follower" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Finals">
+                <ScrollViewer>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <c:CompetitionViewer Grid.Row="0" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="10"/>
+                        <c:CompetitionAdder Grid.Row="1" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10"/>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <Button 
+            Grid.Row="2"
+            Content="Add Competition To Database"
+            Width="200" Height="20"
+            FontWeight="Bold"
+            Command="{Binding AddCompetitionCommand}"
+            IsDefault="True"
+            Margin="20"
+            VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

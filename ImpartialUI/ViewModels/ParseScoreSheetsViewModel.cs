@@ -208,7 +208,6 @@ namespace ImpartialUI.ViewModels
             var division = Division.AllStar;
 
             _scoresheetParser = new EEProParser(PrelimsPath, FinalsPath);
-            Judges = _scoresheetParser.GetJudgesByDivision(division);
             RefreshJudgesDatabase();
 
             var selectJudges = new List<SelectJudgeViewModel>();

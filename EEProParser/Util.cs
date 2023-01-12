@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Impartial.Enums;
 
 namespace Impartial
 {
@@ -130,6 +131,24 @@ namespace Impartial
                         return 2;
                     else
                         return 0;
+            }
+        }
+
+        public static string CallbackScoreToString(CallbackScore score)
+        {
+            switch (score)
+            {
+                case CallbackScore.Alt1:
+                    return "A1";
+                case CallbackScore.Alt2:
+                    return "A2";
+                case CallbackScore.Alt3:
+                    return "A3";
+                case CallbackScore.Yes:
+                    return "Y";
+                default:
+                case CallbackScore.No:
+                    return "N";
             }
         }
 

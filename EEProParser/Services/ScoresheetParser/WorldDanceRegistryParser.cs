@@ -7,23 +7,59 @@ namespace Impartial.Services.ScoresheetParser
 {
     public class WorldDanceRegistryParser : IScoresheetParser
     {
+        private string _prelimsSheetDoc { get; set; }
         private string _finalsSheetDoc { get; set; }
 
-        public List<Judge> Judges { get; set; }
-        public List<Score> Scores { get; set; }
-
-        public WorldDanceRegistryParser(string finalsPath)
+        public WorldDanceRegistryParser(string prelimsPath, string finalsPath)
         {
+            if (prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath))
+                return;
             if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
                 return;
 
+            _prelimsSheetDoc = File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "");
             _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
         }
 
+        public List<Division> GetDivisions()
+        {
+            var divisions = new List<Division>();
+
+            var finals = Util.GetSubString(
+                s: _finalsSheetDoc,
+                from: "<div class=\"pb-4\"><br>",
+                to: "</tbody></table></div>");
+
+            var divisionString = Util.GetSubString(finals, "<h3 class=\"text-center\">", "</h3>");
+
+            if (divisionString.Contains("Masters"))
+                return divisions;
+
+            if (divisionString.Contains("Newcomer"))
+                divisions.Add(Division.Newcomer);
+            else if (divisionString.Contains("Novice"))
+                divisions.Add(Division.Novice);
+            else if (divisionString.Contains("Intermediate"))
+                divisions.Add(Division.Intermediate);
+            else if (divisionString.Contains("Advanced"))
+                divisions.Add(Division.Advanced);
+            else if (divisionString.Contains("All-Star"))
+                divisions.Add(Division.AllStar);
+            else if (divisionString.Contains("All Star"))
+                divisions.Add(Division.AllStar);
+            else if (divisionString.Contains("Champion"))
+                divisions.Add(Division.Champion);
+            else if (divisionString.Contains("Invitational"))
+                divisions.Add(Division.Open);
+            else
+                divisions.Add(Division.Open);
+
+            return divisions;
+        }
         public Competition GetCompetition(Division division)
         {
             var sub = GetFinalsDocByDivision(division);
-            var judges = GetJudgesByDivision(division);
+            var judges = GetFinalsJudgesByDivision(division);
 
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(sub);
@@ -82,43 +118,7 @@ namespace Impartial.Services.ScoresheetParser
             };
         }
 
-        public List<Division> GetDivisions()
-        {
-            var divisions = new List<Division>();
-
-            var finals = Util.GetSubString(
-                s: _finalsSheetDoc,
-                from: "<div class=\"pb-4\"><br>",
-                to: "</tbody></table></div>");
-
-            var divisionString = Util.GetSubString(finals, "<h3 class=\"text-center\">", "</h3>");
-
-            if (divisionString.Contains("Masters"))
-                return divisions;
-
-            if (divisionString.Contains("Newcomer"))
-                divisions.Add(Division.Newcomer);
-            else if (divisionString.Contains("Novice"))
-                divisions.Add(Division.Novice);
-            else if (divisionString.Contains("Intermediate"))
-                divisions.Add(Division.Intermediate);
-            else if (divisionString.Contains("Advanced"))
-                divisions.Add(Division.Advanced);
-            else if (divisionString.Contains("All-Star"))
-                divisions.Add(Division.AllStar);
-            else if (divisionString.Contains("All Star"))
-                divisions.Add(Division.AllStar);
-            else if (divisionString.Contains("Champion"))
-                divisions.Add(Division.Champion);
-            else if (divisionString.Contains("Invitational"))
-                divisions.Add(Division.Open);
-            else
-                divisions.Add(Division.Open);
-
-            return divisions;
-        }
-
-        public List<Judge> GetJudgesByDivision(Division division)
+        private List<Judge> GetFinalsJudgesByDivision(Division division)
         {
             var judges = new List<Judge>();
 
@@ -164,7 +164,6 @@ namespace Impartial.Services.ScoresheetParser
 
             return judges;
         }
-
         private string GetFinalsDocByDivision(Division division)
         {
             Division div;

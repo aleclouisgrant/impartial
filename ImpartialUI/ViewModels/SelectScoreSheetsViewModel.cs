@@ -211,7 +211,6 @@ namespace ImpartialUI.ViewModels
         private void GetJudges()
         {
             scoresheetParser = new EEProParser(PrelimsPath, FinalsPath);
-            Judges = scoresheetParser.GetJudgesByDivision(Division);
             RefreshJudgesDatabase();
 
             var selectJudges = new List<SelectJudgeViewModel>();
@@ -234,7 +233,6 @@ namespace ImpartialUI.ViewModels
         {
             // update judges list with the selected judges
             Judges = SelectJudges.Select(j => j.SelectedJudge).ToList();
-            scoresheetParser.Judges = Judges;
 
             var competition = scoresheetParser.GetCompetition(Division);
 

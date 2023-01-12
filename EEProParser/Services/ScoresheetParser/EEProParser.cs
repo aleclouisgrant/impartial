@@ -10,19 +10,14 @@ namespace Impartial
         private string _prelimsSheetDoc { get; set; }
         private string _finalsSheetDoc { get; set; }
 
-        public List<Judge> Judges { get; set; }
-        public List<Score> Scores { get; set; }
-
-        public EEProParser() { }
-
-        public EEProParser(string prelimsSheetPath, string finalsPath)
+        public EEProParser(string prelimsPath, string finalsPath)
         {
-            //if (prelimsSheetPath == null || prelimsSheetPath == String.Empty)
-            //    return;
+            if (prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath))
+                return;
             if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
                 return;
 
-            //_prelimsSheetDoc = File.ReadAllText(prelimsSheetPath).Replace("\n", "").Replace("\r", "");
+            _prelimsSheetDoc = File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "");
             _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
         }
 
@@ -70,43 +65,6 @@ namespace Impartial
 
             return divisions;
         }
-
-        public List<Judge> GetJudgesByDivision(Division division)
-        {
-            var judges = new List<Judge>();
-            
-            string sheet = GetFinalsDocByDivision(division);
-            string sub = Util.GetSubString(
-                s: sheet,
-                from: "<td><em><strong>Competitor</strong></em></td>",
-                to: "<td><em><strong>BIB</strong></em></td>");
-
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(sub);
-
-            var nodes = doc.DocumentNode.SelectNodes("td/em/strong");
-
-            if (nodes == null) //division may not exist
-                return judges;
-
-            foreach (var node in nodes)
-            {
-                string name = node.InnerText.Replace("&nbsp;", "");
-                int pos = name.IndexOf(' ');
-                
-                //no last name was recorded
-                if (pos == -1)
-                {
-                    judges.Add(new Judge(name, string.Empty));
-                }
-                else
-                {
-                    judges.Add(new Judge(name.Substring(0, pos), name.Substring(pos + 1)));
-                }
-            }
-
-            return judges;
-        }
         public Competition GetCompetition(Division division)
         {
             //var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader);
@@ -122,7 +80,7 @@ namespace Impartial
             //followNodes.RemoveAt(0);
 
             var sub = GetFinalsDocByDivision(division);
-            var judges = GetJudgesByDivision(division);
+            var judges = GetFinalsJudgesByDivision(division);
 
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(sub);
@@ -177,6 +135,43 @@ namespace Impartial
             {
                 Scores = scores
             };
+        }
+
+        private List<Judge> GetFinalsJudgesByDivision(Division division)
+        {
+            var judges = new List<Judge>();
+            
+            string sheet = GetFinalsDocByDivision(division);
+            string sub = Util.GetSubString(
+                s: sheet,
+                from: "<td><em><strong>Competitor</strong></em></td>",
+                to: "<td><em><strong>BIB</strong></em></td>");
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(sub);
+
+            var nodes = doc.DocumentNode.SelectNodes("td/em/strong");
+
+            if (nodes == null) //division may not exist
+                return judges;
+
+            foreach (var node in nodes)
+            {
+                string name = node.InnerText.Replace("&nbsp;", "");
+                int pos = name.IndexOf(' ');
+                
+                //no last name was recorded
+                if (pos == -1)
+                {
+                    judges.Add(new Judge(name, string.Empty));
+                }
+                else
+                {
+                    judges.Add(new Judge(name.Substring(0, pos), name.Substring(pos + 1)));
+                }
+            }
+
+            return judges;
         }
 
         private string GetPrelimsDocByDivision(Division division, Role role)

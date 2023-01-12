@@ -14,10 +14,7 @@ namespace Impartial.Services.ScoresheetParser
         private Competition _advancedCompetition;
         private Competition _allStarCompetition;
 
-        public List<Judge> Judges { get; set; }
-        public List<Score> Scores { get; set; }
-
-        public DanceConventionParser(string filePath)
+        public DanceConventionParser(string prelimsPath, string filePath)
         {
             using (var doc = new PdfDocument(new PdfReader(filePath)))
             {
@@ -39,7 +36,7 @@ namespace Impartial.Services.ScoresheetParser
             throw new NotImplementedException();
         }
 
-        public List<Judge> GetJudgesByDivision(Division division)
+        public List<Judge> GetFinalsJudgesByDivision(Division division)
         {
             throw new NotImplementedException();
         }

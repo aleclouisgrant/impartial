@@ -8,7 +8,8 @@
         xmlns:local="clr-namespace:ImpartialUI"
         mc:Ignorable="d"
         x:Name="View"
-        Title="Impartial" Height="800" Width="1600">
+        Title="Impartial" Height="1000" Width="1600"
+        WindowState="Maximized">
     <Grid>
         <TabControl Margin="0 20 0 0" BorderThickness="0 2 0 0">
             <TabItem Header="Ratings">
