@@ -20,19 +20,55 @@ namespace Impartial
             return (int)Math.Round(rating + k2 * (score - expectedScore));
         }
 
-        public static void CalculatePrelimRatings(List<Competitor> competitors, Role role)
+        public static List<Competitor> CalculatePrelimRatings(List<PrelimScore> prelimScores, Role role)
         {
+            var competitors = new List<Competitor>();
+            var c = new List<Tuple<Competitor, List<PrelimScore>>>();
 
+            foreach (var score in prelimScores)
+            {
+                if (!competitors.Any(s => s.Id == score.Competitor.Id)) { }
+                    competitors.Add(score.Competitor);
+            }
+            foreach (var competitor in competitors)
+            {
+                c.Add(new Tuple<Competitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList()));
+            }
+
+            foreach (var competitorA in c)
+            {
+                double expectedScore = 0;
+
+                foreach (var competitorB in c)
+                {
+                    if (competitorA != competitorB)
+                    {
+                        if (role == Role.Leader)
+                            expectedScore = expectedScore + ExpectedScore(competitorA.Item1.LeadStats.Rating, competitorB.Item1.LeadStats.Rating);
+                        else if (role == Role.Follower)
+                            expectedScore = expectedScore + ExpectedScore(competitorA.Item1.FollowStats.Rating, competitorB.Item1.FollowStats.Rating);
+                    }
+                }
+
+                int ratingDifference = UpdateRating(competitorA.Item1.LeadStats.Rating, competitorA.Item2.Sum(s => (int)s.CallbackScore), expectedScore) - competitorA.Item1.LeadStats.Rating;
+
+                if (role == Role.Leader)
+                    competitorA.Item1.LeadStats.Rating = competitorA.Item1.LeadStats.Rating + ratingDifference;
+                else if (role == Role.Follower)
+                    competitorA.Item1.FollowStats.Rating = competitorA.Item1.FollowStats.Rating + ratingDifference;
+            }
+
+            return competitors;
         }
 
         public static List<Couple> CalculateRatings(List<Couple> couples)
         {
             //first put the couples in order of average ranking 
-            List<Couple> couples_placed = couples.OrderBy(o => o.ActualPlacement).ToList();
+            List<Couple> couplesPlaced = couples.OrderBy(o => o.ActualPlacement).ToList();
 
-            int i = couples_placed.Count() + 1;
+            int i = couplesPlaced.Count() + 1;
             //then compare the probability that their actual placement is their expected placement
-            foreach (Couple coupleA in couples_placed)
+            foreach (Couple coupleA in couplesPlaced)
             {
                 double expectedScore = 0;
 

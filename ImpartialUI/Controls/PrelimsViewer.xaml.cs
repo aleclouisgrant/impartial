@@ -149,6 +149,7 @@ namespace ImpartialUI.Controls
             {
                 control.ScoreGrid.RowDefinitions.Add(new RowDefinition());
                 int count = 0; //todo
+                bool finaled = competitor.Item2.FirstOrDefault().Finaled;
 
                 // placement
                 var competitorCountBorder = new Border()
@@ -186,6 +187,12 @@ namespace ImpartialUI.Controls
 
                 nameBorder.Child = nameTextBlock;
 
+                if (finaled)
+                {
+                    competitorCountTextBlock.FontWeight = FontWeights.Bold;
+                    nameTextBlock.FontWeight = FontWeights.Bold;
+                }
+
                 control.ScoreGrid.Children.Add(nameBorder);
                 Grid.SetColumn(nameBorder, 1);
                 Grid.SetRow(nameBorder, i);
@@ -206,6 +213,9 @@ namespace ImpartialUI.Controls
                         Text = Util.CallbackScoreToString(score.CallbackScore),
                         Margin = new Thickness(1)
                     };
+
+                    if (finaled)
+                        textBlock.FontWeight = FontWeights.Bold;
 
                     border.Child = textBlock;
 
