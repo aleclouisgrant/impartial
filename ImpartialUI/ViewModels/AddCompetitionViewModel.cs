@@ -350,16 +350,16 @@ namespace ImpartialUI.ViewModels
             switch (ScoresheetSelector)
             {
                 case ScoresheetSelector.EEPro:
-                    _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
+                    _scoresheetParser = new EEProParser(finalsPath);
                     break;
                 case ScoresheetSelector.DanceConvention:
-                    _scoresheetParser = new DanceConventionParser(prelimsPath, finalsPath);
+                    _scoresheetParser = new DanceConventionParser(finalsPath);
                     break;
                 case ScoresheetSelector.StepRightSolutions:
-                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, finalsPath);
+                    _scoresheetParser = new StepRightSolutionsParser(finalsPath);
                     break;
                 case ScoresheetSelector.WorldDanceRegistry:
-                    _scoresheetParser = new WorldDanceRegistryParser(prelimsPath, finalsPath);
+                    _scoresheetParser = new WorldDanceRegistryParser(finalsPath);
                     break;
                 case ScoresheetSelector.Other:
                 default:
@@ -516,11 +516,11 @@ namespace ImpartialUI.ViewModels
             Competition = comp;
         }
 
-        private async Task<int> GuessWsdcId(string firstName, string LastName)
+        private async Task<int> GuessWsdcId(string firstName, string lastName)
         {
             try
             {
-                var response = await _client.PostAsync("/lookup/find?q=" + FirstName + "%20" + LastName, null);
+                var response = await _client.PostAsync("/lookup/find?q=" + firstName + "%20" + lastName, null);
                 string sheet = await response.Content.ReadAsStringAsync();
                 string idString = Regex.Match(sheet.Substring(sheet.IndexOf("wscid"), 20), @"\d+").Value;
                 return Int32.TryParse(idString, out int id) ? id : -1;
@@ -529,7 +529,6 @@ namespace ImpartialUI.ViewModels
             {
                 return -1;
             }
-
         }
 
         public ScoresheetSelector SelectScoresheetParser(string finalsPath)

@@ -1,6 +1,7 @@
 ﻿using iText.Kernel.Pdf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -20,6 +21,12 @@ namespace Impartial.Services.ScoresheetParser
             {
 
             }
+        }
+
+        public DanceConventionParser(string finalsPath)
+        {
+            if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
+                throw new FileNotFoundException();
         }
 
         public DanceConventionParser(List<string> filePaths)

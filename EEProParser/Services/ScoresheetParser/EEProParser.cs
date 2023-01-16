@@ -13,11 +13,19 @@ namespace Impartial
         public EEProParser(string prelimsPath, string finalsPath)
         {
             if (prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath))
-                return;
+                throw new FileNotFoundException();
             if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
-                return;
+                throw new FileNotFoundException();
 
             _prelimsSheetDoc = File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "");
+            _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
+        }
+
+        public EEProParser(string finalsPath)
+        {
+            if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
+                throw new FileNotFoundException();
+
             _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
         }
 

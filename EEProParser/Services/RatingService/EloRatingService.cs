@@ -8,9 +8,9 @@ namespace Impartial
 {
     public class EloRatingService
     {
-        const int k1 = 5000; //scales the probability that A wins over B at the same difference in rating. 
+        const int k1 = 2000; //scales the probability that A wins over B at the same difference in rating. 
                              //example: k = 300 sets +200 points to be a 75% win rate
-        const int k2 = 20; //scales the magnitude of the amount of points won/lost
+        const int k2 = 15; //scales the magnitude of the amount of points won/lost
 
         public static double ExpectedScore(int ratingA, int ratingB)
         {

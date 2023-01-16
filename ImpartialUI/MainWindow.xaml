@@ -18,7 +18,7 @@
             <TabItem Header="Add Competition">
                 <v:AddCompetitionView Margin="20" d:DataContext="{d:DesignInstance Type=vm:AddCompetitionViewModel, IsDesignTimeCreatable=True}"/>
             </TabItem>
-            <TabItem Header="Judge">
+            <TabItem Header="Judge" Visibility="Collapsed">
                 <v:ParseScoreSheetsView/>
             </TabItem>
             <TabItem Header="View Competition">
