@@ -160,10 +160,10 @@ namespace ImpartialUI.ViewModels
             Competition = new Competition(Division.AllStar);
             ScoresheetSelector = ScoresheetSelector.Auto;
 
-            ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
-            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\prelims.html";
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\finals.html";
-            ParseScoreSheets();
+            //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\finals.html";
+            //ParseScoreSheets();
         }
 
         private async void TestData()
@@ -370,6 +370,12 @@ namespace ImpartialUI.ViewModels
                 return;
 
             var comp = _scoresheetParser.GetCompetition(Division.AllStar);
+
+            //Trace.WriteLine("PRELIMS RATING CHANGES:");
+            //Trace.WriteLine("LEADERS:");
+            //EloRatingService.CalculatePrelimRatings(comp.LeaderPrelimScores, Role.Leader);
+            //Trace.WriteLine("FOLLOWERS:");
+            //EloRatingService.CalculatePrelimRatings(comp.FollowerPrelimScores, Role.Follower);
 
             foreach (var competitor in comp.PrelimLeaders)
             {

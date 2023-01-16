@@ -12,10 +12,10 @@
         WindowState="Maximized">
     <Grid>
         <TabControl Margin="0 20 0 0" BorderThickness="0 2 0 0">
-            <TabItem Header="Ratings">
+            <TabItem Header="Ratings" IsSelected="True">
                 <v:RatingsView/>
             </TabItem>
-            <TabItem Header="Add Competition" IsSelected="True">
+            <TabItem Header="Add Competition">
                 <v:AddCompetitionView Margin="20" d:DataContext="{d:DesignInstance Type=vm:AddCompetitionViewModel, IsDesignTimeCreatable=True}"/>
             </TabItem>
             <TabItem Header="Judge">

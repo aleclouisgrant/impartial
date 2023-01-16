@@ -33,7 +33,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Top" Margin="20,20,20,0" Visibility="Visible">
-                <StackPanel Orientation="Horizontal" Margin="0 5">
+                <StackPanel Orientation="Horizontal" Margin="0 5" Visibility="Collapsed">
                     <Button 
                         Content="Select Prelims Score Sheet"
                         Width="200" Height="20"
@@ -149,7 +149,7 @@
         </Grid>
 
         <TabControl Grid.Row="1">
-            <TabItem Header="Prelims">
+            <TabItem Header="Prelims" Visibility="Collapsed">
                 <ScrollViewer>
                     <Grid Margin="10">
                         <Grid.ColumnDefinitions>

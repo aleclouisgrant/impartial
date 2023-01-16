@@ -48,17 +48,18 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
-            <Button Content="Crunch" FontWeight="Bold" Width="120" Height="40" Margin="10" Command="{Binding CrunchRatingsCommand}" IsEnabled="False"/>
-            <Button Content="Refresh Competitors" FontWeight="Bold" Width="150" Height="40" Margin="10" Command="{Binding RefreshCompetitorsCommand}"/>
+            <Button Content="Crunch" FontWeight="Bold" Width="120" Height="40" Margin="10" Command="{Binding CrunchRatingsCommand}"/>
+            <Button Content="Reset Ratings" FontWeight="Bold" Width="150" Height="40" Margin="10" Command="{Binding ResetRatingsCommand}"/>
         </StackPanel>
 
-        <Grid Grid.Row="2" Margin="20">
+        <Grid Grid.Row="2" Margin="20" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            
-            <Border HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" >
+
+            <Border Grid.Column="0" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" >
                 <ScrollViewer>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -70,16 +71,14 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="90"/>
-                                <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
                             <TextBlock Grid.Column="1" Text="WSDC ID" FontWeight="Bold"/>
                             <TextBlock Grid.Column="2" Text="Leader Rating" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="3" Text="Follower Rating" FontWeight="Bold"/>
                         </Grid>
 
-                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding LeadCompetitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -87,13 +86,11 @@
                                             <ColumnDefinition Width="150"/>
                                             <ColumnDefinition Width="60"/>
                                             <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="100"/>
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>
                                         <TextBlock Grid.Column="1" Text="{Binding WsdcId, Mode=OneWay}"/>
                                         <TextBlock Grid.Column="2" Text="{Binding LeadStats.Rating, Mode=OneWay}"/>
-                                        <TextBlock Grid.Column="3" Text="{Binding FollowStats.Rating, Mode=OneWay}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -107,10 +104,51 @@
                 </ScrollViewer>
             </Border>
 
-            <!-- Data Visualization -->
-            <Grid Grid.Row="1">
-                
-            </Grid>
+            <Border Grid.Column="2" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" >
+                <ScrollViewer>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Background="LightGray">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="1" Text="WSDC ID" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="2" Text="Follower Rating" FontWeight="Bold"/>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding FollowCompetitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding WsdcId, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding FollowStats.Rating, Mode=OneWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+
         </Grid>
     </Grid>
 </UserControl>

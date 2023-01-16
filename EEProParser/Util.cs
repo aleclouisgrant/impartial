@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Impartial.Enums;
+using System.Linq;
 
 namespace Impartial
 {
@@ -280,6 +281,11 @@ namespace Impartial
             }
 
             return -1;
+        }
+
+        public static IEnumerable<T> RemoveWhere<T>(this IEnumerable<T> query, Predicate<T> predicate)
+        {
+            return query.Where(e => !predicate(e));
         }
     }
 }

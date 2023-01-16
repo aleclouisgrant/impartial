@@ -54,7 +54,9 @@ namespace Impartial
         public List<Judge> PrelimLeaderJudges => GetPrelimJudges(Role.Leader);
         public List<Judge> PrelimFollowerJudges => GetPrelimJudges(Role.Follower);
         public List<Competitor> PrelimLeaders => GetPrelimCompetitors(Role.Leader);
+        public List<Competitor> FinalLeaders => GetFinalCompetitors(Role.Leader);
         public List<Competitor> PrelimFollowers => GetPrelimCompetitors(Role.Follower);
+        public List<Competitor> FinalFollowers => GetFinalCompetitors(Role.Follower);
 
         public Competition() 
         { 
@@ -150,6 +152,26 @@ namespace Impartial
 
             return competitors;
         }
+        private List<Competitor> GetFinalCompetitors(Role role)
+        {
+            var competitors = new List<Competitor>();
+
+            foreach (Score score in Scores)
+            {
+                if (role == Role.Leader)
+                {
+                    if (!competitors.Any(c => c.Id == score.Leader.Id))
+                        competitors.Add(score.Leader);
+                }
+                else if (role == Role.Follower)
+                {
+                    if (!competitors.Any(c => c.Id == score.Follower.Id))
+                        competitors.Add(score.Follower);
+                }
+            }
+
+            return competitors;
+        }
         private List<Couple> GetCouples()
         {
             var couples = new List<Couple>();
@@ -170,6 +192,15 @@ namespace Impartial
             }
 
             return couples;
+        }
+
+        public void UpdateRatings(List<Competitor> leaders, List<Competitor> followers)
+        {
+            foreach (var score in Scores)
+            {
+                score.Leader.LeadStats.Rating = leaders.Where(c => c.Id == score.Leader.Id).FirstOrDefault().LeadStats.Rating;
+                score.Follower.FollowStats.Rating = followers.Where(c => c.Id == score.Follower.Id).FirstOrDefault().FollowStats.Rating;
+            }
         }
 
         public override string ToString()

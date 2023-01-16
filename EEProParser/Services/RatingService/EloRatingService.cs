@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 
 namespace Impartial
 {
     public class EloRatingService
     {
-        const int k1 = 1000; //scales the probability that A wins over B at the same difference in rating. 
+        const int k1 = 5000; //scales the probability that A wins over B at the same difference in rating. 
                              //example: k = 300 sets +200 points to be a 75% win rate
-        const int k2 = 10; //scales the magnitude of the amount of points won/lost
+        const int k2 = 20; //scales the magnitude of the amount of points won/lost
 
         public static double ExpectedScore(int ratingA, int ratingB)
         {
@@ -32,7 +34,10 @@ namespace Impartial
             }
             foreach (var competitor in competitors)
             {
-                c.Add(new Tuple<Competitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList()));
+                if (!c.Any(c => c.Item1.Id == competitor.Id)) 
+                { 
+                    c.Add(new Tuple<Competitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList()));
+                }
             }
 
             foreach (var competitorA in c)
@@ -56,6 +61,22 @@ namespace Impartial
                     competitorA.Item1.LeadStats.Rating = competitorA.Item1.LeadStats.Rating + ratingDifference;
                 else if (role == Role.Follower)
                     competitorA.Item1.FollowStats.Rating = competitorA.Item1.FollowStats.Rating + ratingDifference;
+
+                #region Output
+                string ratingChange;
+                if (ratingDifference > 0)
+                    ratingChange = "+" + ratingDifference;
+                else
+                    ratingChange = ratingDifference.ToString();
+
+                if (competitorA.Item2[0].Finaled)
+                    Trace.Write("*");
+
+                if (role == Role.Leader)
+                    Trace.WriteLine(competitorA.Item1.FullName + " (" + (competitorA.Item1.LeadStats.Rating - ratingDifference).ToString() + " => " + competitorA.Item1.LeadStats.Rating + ") (" + ratingChange + ")");
+                else if (role == Role.Follower)
+                    Trace.WriteLine(competitorA.Item1.FullName + " (" + (competitorA.Item1.FollowStats.Rating - ratingDifference).ToString() + " => " + competitorA.Item1.FollowStats.Rating + ") (" + ratingChange + ")");
+                #endregion
             }
 
             return competitors;
@@ -92,11 +113,14 @@ namespace Impartial
                 coupleA.Leader.LeadStats.Rating = coupleA.Leader.LeadStats.Rating + ratingDifference;
                 coupleA.Follower.FollowStats.Rating = coupleA.Follower.FollowStats.Rating + ratingDifference;
 
-                Console.WriteLine("{0}. {1} ({2} => {3}) ({4}) & {5} ({6} => {7}) ({8})", coupleA.ActualPlacement,
-                        coupleA.Leader.FullName, coupleA.Leader.LeadStats.Rating - ratingDifference, coupleA.Leader.LeadStats.Rating, ratingChange,
-                        coupleA.Follower.FullName, coupleA.Follower.FollowStats.Rating - ratingDifference, coupleA.Follower.FollowStats.Rating, ratingChange);
-                Console.WriteLine("expected score: {0}  actual score: {1}", expectedScore, i);
-                Console.WriteLine("Combined Rating: {0}", coupleA.CombinedRating);
+                Trace.WriteLine("{0}. {1} ({2} => {3}) ({4}) & {5} ({6} => {7}) ({8})",
+                    coupleA.ActualPlacement + ". " +
+                    coupleA.Leader.FullName + " (" + (coupleA.Leader.LeadStats.Rating - ratingDifference).ToString() + " => " + 
+                    coupleA.Leader.LeadStats.Rating + ") (" + ratingChange + ") & " + 
+                    coupleA.Follower.FullName + " (" + (coupleA.Follower.FollowStats.Rating - ratingDifference).ToString() + " => " + 
+                    coupleA.Follower.FollowStats.Rating + " ) (" +  ratingChange + ")");
+                Trace.WriteLine("Expected Score: " + expectedScore + "  Actual Score: " + i);
+                Trace.WriteLine("Combined Rating: " + coupleA.CombinedRating);
 
                 i--;
             }

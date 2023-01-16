@@ -5,6 +5,7 @@ using MongoDB.Bson.IO;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -16,6 +17,7 @@ namespace ImpartialUI.ViewModels
     public class RatingsViewModel : BaseViewModel
     {
         private HttpClient _client;
+        private List<Competition> _competitions = new List<Competition>();
 
         private string _firstName;
         public string FirstName
@@ -51,8 +53,8 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private List<Competitor> _competitors = new List<Competitor>();
-        public List<Competitor> Competitors
+        private ObservableCollection<Competitor> _competitors = new ObservableCollection<Competitor>();
+        public ObservableCollection<Competitor> Competitors
         {
             get { return _competitors; }
             set
@@ -62,8 +64,12 @@ namespace ImpartialUI.ViewModels
             }
         }
 
+        public IEnumerable<Competitor> LeadCompetitors => Util.RemoveWhere(_competitors, c => c.LeadStats.Rating == 1000).OrderByDescending(c => c.LeadStats.Rating);
+        public IEnumerable<Competitor> FollowCompetitors => Util.RemoveWhere(_competitors, c => c.FollowStats.Rating == 1000).OrderByDescending(c => c.FollowStats.Rating);
+
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand RefreshCompetitorsCommand { get; set; }
+        public ICommand ResetRatingsCommand { get; set; }
         public ICommand CrunchRatingsCommand { get; set; }
 
         private IDatabaseProvider _databaseProvider;
@@ -76,23 +82,59 @@ namespace ImpartialUI.ViewModels
 
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             RefreshCompetitorsCommand = new DelegateCommand(RefreshCompetitors);
+            ResetRatingsCommand = new DelegateCommand(ResetRatings);
             CrunchRatingsCommand = new DelegateCommand(CrunchRatings);
+
+            Initialize();
+            CrunchRatings();
         }
+
+        private async void Initialize()
+        {
+            //_competitions = (await _databaseProvider.GetAllCompetitionsAsync()).ToList();
+            //Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
+            
+            //_competitions = _competitions.OrderBy(c => c.Date).ToList();
+        }
+
         private async void CrunchRatings()
         {
             IEnumerable<Competition> competitions = await _databaseProvider.GetAllCompetitionsAsync();
             competitions = competitions.OrderBy(c => c.Date).ToList();
 
+            List<Competitor> competitors = (await _databaseProvider.GetAllCompetitorsAsync()).ToList();
+
             foreach (Competition competition in competitions)
             {
-                var couples = EloRatingService.CalculateRatings(competition.Couples);
-
-                foreach (Couple couple in couples)
+                var leads = competition.FinalLeaders.ToList();
+                foreach (var lead in leads)
                 {
-                    await App.DatabaseProvider.UpsertCompetitorAsync(couple.Leader);
-                    await App.DatabaseProvider.UpsertCompetitorAsync(couple.Follower);
+                    lead.LeadStats.Rating = competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating;
+                }
+                var follows = competition.FinalFollowers.ToList();
+                foreach (var follow in follows)
+                {
+                    follow.FollowStats.Rating = competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating;
+                }
+
+                competition.UpdateRatings(leads, follows);
+                EloRatingService.CalculateRatings(competition.Couples);
+
+                leads = competition.FinalLeaders.ToList();
+                foreach (var lead in leads)
+                {
+                    competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating = lead.LeadStats.Rating;
+                }
+                follows = competition.FinalFollowers.ToList();
+                foreach (var follow in follows)
+                {
+                    competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating = follow.FollowStats.Rating;
                 }
             }
+
+            Competitors = new ObservableCollection<Competitor>(competitors);
+            OnPropertyChanged(nameof(LeadCompetitors));
+            OnPropertyChanged(nameof(FollowCompetitors));
         }
 
         private async void AddCompetitor()
@@ -108,12 +150,21 @@ namespace ImpartialUI.ViewModels
                 WsdcId = string.Empty;
             }
 
-            Competitors = (await _databaseProvider.GetAllCompetitorsAsync()).ToList();
+            Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
         private async void RefreshCompetitors()
         {
-            Competitors = (await _databaseProvider.GetAllCompetitorsAsync()).ToList();
+            Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
+        }
+
+        private async void ResetRatings()
+        {
+            foreach (Competitor competitor in Competitors)
+            {
+                competitor.LeadStats.Rating = 1000;
+                competitor.FollowStats.Rating = 1000;
+            }
         }
 
         private async void GuessWsdcId()
