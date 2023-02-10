@@ -29,7 +29,7 @@ namespace ImpartialUI.Controls
             get { return (Competition)GetValue(CompetitionProperty); }
             set { SetValue(CompetitionProperty, value); }
         }
-        private static async void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var viewer = (CompetitionAdder)source;
             var competition = (Competition)e.NewValue;
@@ -48,6 +48,8 @@ namespace ImpartialUI.Controls
             {
                 viewer.AddCouple(couple);
             }
+
+            viewer.UpdateCompetition();
         }
         #endregion
 
@@ -237,8 +239,8 @@ namespace ImpartialUI.Controls
                 scoreBorder.Child = scoreTextBox;
 
                 ScoreGrid.Children.Add(scoreBorder);
-                Grid.SetRow(scoreBorder, ScoreGrid.RowDefinitions.Count() - 2);
                 Grid.SetColumn(scoreBorder, i + 2);
+                Grid.SetRow(scoreBorder, ScoreGrid.RowDefinitions.Count() - 2);
             }
 
             Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
@@ -414,10 +416,7 @@ namespace ImpartialUI.Controls
 
         private void UpdateCompetition()
         {
-            Competition.Clear();
-
-            Competition.Name = NameTextBox.Text;
-            Competition.Date = CompDatePicker.DisplayDate;
+            Competition.ClearFinals();
 
             for (int placement = 1; placement <= ScoreGrid.RowDefinitions.Count - 2; placement++)
             {
@@ -440,7 +439,6 @@ namespace ImpartialUI.Controls
             }
 
             OnPropertyChanged(nameof(Competition));
-            Trace.WriteLine(Competition.ToLongString());
         }
 
         private void RefreshItemSources()
@@ -457,22 +455,23 @@ namespace ImpartialUI.Controls
         {
             AddJudge();
         }
-
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
-
-        public void OnPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        // need to delete this once the selectionchanged event raises properly
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            UpdateCompetition();
-        }
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshItemSources();
+        }
+        private void NameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Competition));
+        }
+        private void CompDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Competition));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        public void OnPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

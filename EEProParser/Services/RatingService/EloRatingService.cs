@@ -22,6 +22,74 @@ namespace Impartial
             return (int)Math.Round(rating + k2 * (score - expectedScore));
         }
 
+        public static List<Competitor> PrelimRating(List<PrelimScore> prelimScores, Role role)
+        {
+            var competitors = new List<Competitor>();
+            var finalists = new List<Tuple<Competitor, List<PrelimScore>>>();
+            var notFinalists = new List<Tuple<Competitor, List<PrelimScore>>>();
+
+            foreach (var score in prelimScores)
+            {
+                if (!competitors.Any(s => s.Id == score.Competitor.Id)) { }
+                    competitors.Add(score.Competitor);
+            }
+            foreach (var competitor in competitors)
+            {
+                if (!finalists.Any(c => c.Item1.Id == competitor.Id) || !notFinalists.Any(c => c.Item1.Id == competitor.Id))
+                {
+                    var tuple = new Tuple<Competitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList());
+                    if (tuple.Item2.First().Finaled)
+                        finalists.Add(tuple);
+                    else    
+                        notFinalists.Add(tuple);
+                }
+            }
+
+            int totalNumber = competitors.Count();
+            int finalistSpots = finalists.Count();
+            int ratingSum = 0;
+
+            if (role == Role.Leader)
+                ratingSum = finalists.Sum(c => c.Item1.LeadStats.Rating) + notFinalists.Sum(c => c.Item1.LeadStats.Rating);
+            else if (role == Role.Follower)
+                ratingSum = finalists.Sum(c => c.Item1.FollowStats.Rating) + notFinalists.Sum(c => c.Item1.FollowStats.Rating);
+
+            int averageRating = ratingSum / totalNumber;
+
+            //maybe I should take the average of the top instead of the average of the entire playing field
+            foreach (var competitor in competitors)
+            {
+                int ratingDifference = 0;
+
+                if (role == Role.Leader)
+                {
+                    ratingDifference = UpdateRating(competitor.LeadStats.Rating, 1, ExpectedScore(competitor.LeadStats.Rating, averageRating)) - competitor.LeadStats.Rating;
+                    competitor.LeadStats.Rating = competitor.LeadStats.Rating + ratingDifference;
+                }
+                else if (role == Role.Follower)
+                {
+                    ratingDifference = UpdateRating(competitor.FollowStats.Rating, 1, ExpectedScore(competitor.FollowStats.Rating, averageRating)) - competitor.FollowStats.Rating;
+                    competitor.FollowStats.Rating = competitor.FollowStats.Rating + ratingDifference;
+                }
+
+                string ratingChange;
+                if (ratingDifference > 0)
+                    ratingChange = "+" + ratingDifference;
+                else
+                    ratingChange = ratingDifference.ToString();
+
+                if (finalists.Any(c => c.Item1.Id == competitor.Id))
+                    Trace.Write("*");
+
+                if (role == Role.Leader)
+                    Trace.WriteLine(competitor.FullName + " (" + (competitor.LeadStats.Rating - ratingDifference).ToString() + " => " + competitor.LeadStats.Rating + ") (" + ratingChange + ")");
+                else if (role == Role.Follower)
+                    Trace.WriteLine(competitor.FullName + " (" + (competitor.FollowStats.Rating - ratingDifference).ToString() + " => " + competitor.FollowStats.Rating + ") (" + ratingChange + ")");
+            }
+
+            return competitors;
+        }
+
         public static List<Competitor> CalculatePrelimRatings(List<PrelimScore> prelimScores, Role role)
         {
             var competitors = new List<Competitor>();

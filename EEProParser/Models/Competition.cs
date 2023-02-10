@@ -259,7 +259,7 @@ namespace Impartial
 
             str += System.Environment.NewLine + "----------";
             str += System.Environment.NewLine + "PRELIMS:";
-            str += System.Environment.NewLine + "LEADERS:";
+            str += System.Environment.NewLine + System.Environment.NewLine + "LEADERS:";
             str += System.Environment.NewLine + "JUDGES: ";
             foreach (Judge judge in PrelimLeaderJudges)
             {
@@ -298,7 +298,7 @@ namespace Impartial
                 }
             }
 
-            str += System.Environment.NewLine + "FOLLOWERS:";
+            str += System.Environment.NewLine + System.Environment.NewLine + "FOLLOWERS:";
             str += System.Environment.NewLine + "JUDGES: ";
             foreach (Judge judge in PrelimFollowerJudges)
             {
@@ -342,9 +342,18 @@ namespace Impartial
 
         public void Clear()
         {
-            Couples.Clear();
             Scores.Clear();
-            Judges.Clear();
+            LeaderPrelimScores.Clear();
+            FollowerPrelimScores.Clear();
+        }
+        public void ClearFinals()
+        {
+            Scores.Clear();
+        }
+        public void ClearPrelims()
+        {
+            LeaderPrelimScores.Clear();
+            FollowerPrelimScores.Clear();
         }
     }
 }

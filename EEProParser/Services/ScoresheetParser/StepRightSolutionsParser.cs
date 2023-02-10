@@ -72,7 +72,7 @@ namespace Impartial.Services.ScoresheetParser
                 prelims = GetPrelimScores(division);
             }
 
-            var sub = GetFinalsDoc(division);
+            var sub = GetFinalsDocByDivision(division);
             var finalsJudges = GetFinalsJudgesByDivision(division);
 
             HtmlDocument doc = new HtmlDocument();
@@ -140,11 +140,11 @@ namespace Impartial.Services.ScoresheetParser
 
         private Tuple<List<PrelimScore>, List<PrelimScore>> GetPrelimScores(Division division)
         {
-            var leadsPrelims = GetPrelimsDoc(division, Role.Leader);
+            var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader);
             HtmlDocument leadsDoc = new HtmlDocument();
             leadsDoc.LoadHtml(leadsPrelims);
             var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
-            var leadJudges = GetPrelimsJudgesByDivision(division, Role.Leader);
+            var leaderJudges = GetPrelimsJudgesByDivision(division, Role.Leader);
 
             List<PrelimScore> leaderPrelimScores = new List<PrelimScore>();
             foreach (var lead in leadNodes)
@@ -157,31 +157,29 @@ namespace Impartial.Services.ScoresheetParser
 
                 CallbackScore callbackScore;
                 int offset = 2;
-                for (int i = offset; i < leadJudges.Count + offset; i++)
+                for (int i = offset; i < leaderJudges.Count + offset; i++)
                 {
                     try
                     {
-                        callbackScore = NumberToCallbackScore(Double.Parse(node[i].InnerText));
+                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText));
                     }
                     catch
                     {
-                        callbackScore = NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
+                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
                     }
 
-                    var prelimScore = new PrelimScore()
-                    {
-                        Role = Role.Leader,
-                        Judge = leadJudges[i - offset],
-                        Competitor = competitor,
-                        Finaled = finaled,
-                        CallbackScore = callbackScore
-                    };
+                    var prelimScore = new PrelimScore(
+                        role: Role.Leader,
+                        judge: leaderJudges[i - offset],
+                        competitor: competitor,
+                        finaled: finaled,
+                        callbackScore: callbackScore);
 
                     leaderPrelimScores.Add(prelimScore);
                 }
             }
 
-            var followsPrelims = GetPrelimsDoc(division, Role.Follower);
+            var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower);
             HtmlDocument followsDoc = new HtmlDocument();
             followsDoc.LoadHtml(followsPrelims);
             var followerNodes = followsDoc.DocumentNode.SelectNodes("tr");
@@ -202,21 +200,19 @@ namespace Impartial.Services.ScoresheetParser
                 {
                     try
                     {
-                        callbackScore = NumberToCallbackScore(Double.Parse(node[i].InnerText));
+                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText));
                     }
                     catch
                     {
-                        callbackScore = NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
+                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
                     }
 
-                    var prelimScore = new PrelimScore()
-                    {
-                        Role = Role.Follower,
-                        Judge = followerJudges[i - offset],
-                        Competitor = competitor,
-                        Finaled = finaled,
-                        CallbackScore = callbackScore
-                    };
+                    var prelimScore = new PrelimScore(
+                        role: Role.Follower,
+                        judge: followerJudges[i - offset],
+                        competitor: competitor,
+                        finaled: finaled,
+                        callbackScore: callbackScore);
 
                     followerPrelimScores.Add(prelimScore);
                 }
@@ -305,7 +301,7 @@ namespace Impartial.Services.ScoresheetParser
             return judges;
         }
 
-        private string GetPrelimsDoc(Division division, Role role)
+        private string GetPrelimsDocByDivision(Division division, Role role)
         {
             Division div;
 
@@ -358,7 +354,7 @@ namespace Impartial.Services.ScoresheetParser
 
             return prelims.Substring(prelims.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length - 1);
         }
-        private string GetFinalsDoc(Division division)
+        private string GetFinalsDocByDivision(Division division)
         {
             Division div;
             var finals = Util.GetSubString(
@@ -396,25 +392,6 @@ namespace Impartial.Services.ScoresheetParser
                 return "";
 
             return "";
-        }
-
-        private CallbackScore NumberToCallbackScore(double value)
-        {
-            switch (value)
-            {
-                case 10:
-                    return CallbackScore.Yes;
-                case 4.5:
-                    return CallbackScore.Alt1;
-                case 4.3:
-                    return CallbackScore.Alt2;
-                case 4.2:
-                    return CallbackScore.Alt3;
-
-                default:
-                case 0:
-                    return CallbackScore.No;
-            }
         }
     }
 }

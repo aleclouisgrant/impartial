@@ -38,18 +38,32 @@ namespace Impartial
             {
                 await UpsertScoreAsync(score);
             }
+
+            foreach (PrelimScore score in competition.LeaderPrelimScores)
+            {
+                await UpsertPrelimScoreAsync(score);
+            }
+
+            foreach (PrelimScore score in competition.FollowerPrelimScores)
+            {
+                await UpsertPrelimScoreAsync(score);
+            }
         }
         public async Task<Competition> GetCompetitionByIdAsync(Guid id)
         {
             var results = await _helper.LoadDataAsync<Competition, dynamic>(storedProcedure: "dbo.Competitions_GetById", new { Id = id });
-            var result = results.FirstOrDefault();
+            var comp = results.FirstOrDefault();
 
-            if (result != null)
+            if (comp != null)
             {
-                result.Scores = (await GetScoresByCompAsync(result.Id, result.Division)).ToList();
+                comp.Scores = (await GetScoresByCompAsync(comp.Id, comp.Division)).ToList();
+
+                var prelimScores = (await GetPrelimScoresByCompAsync(comp.Id, comp.Division)).ToList();
+                comp.LeaderPrelimScores = prelimScores.Where(s => s.Role == Role.Leader).ToList();
+                comp.FollowerPrelimScores = prelimScores.Where(s => s.Role == Role.Follower).ToList();
             }
 
-            return result;
+            return comp;
         }
         public async Task<IEnumerable<Competition>> GetAllCompetitionsAsync()
         {
@@ -58,12 +72,17 @@ namespace Impartial
             foreach (var comp in comps)
             {
                 comp.Scores = (await GetScoresByCompAsync(comp.Id, comp.Division)).ToList();
+                var prelimScores = (await GetPrelimScoresByCompAsync(comp.Id, comp.Division)).ToList();
+                comp.LeaderPrelimScores = prelimScores.Where(s => s.Role == Role.Leader).ToList();
+                comp.FollowerPrelimScores = prelimScores.Where(s => s.Role == Role.Follower).ToList();
             }
 
             return comps;
         }
         public async Task DeleteCompetitionAsync(Competition competition)
         {
+            await DeleteScoresByCompIdAsync(competition.Id);
+            await DeletePrelimScoresByCompIdAsync(competition.Id);
             await _helper.SaveDataAsync(storedProcedure: "dbo.Competitions_DeleteById", new { Id = competition.Id });
         }
         public async Task DeleteAllCompetitionsAsync()
@@ -178,6 +197,40 @@ namespace Impartial
         {
             //not using Division right now but will need to update stored procedure to do so
             return await _helper.LoadDataAsync<Score, dynamic>(storedProcedure: "dbo.Scores_GetByCompId", new { Id = competitionId, Division = division });
+        }
+        public async Task DeleteScoresByCompIdAsync(Guid competitionId)
+        {
+            await _helper.SaveDataAsync(storedProcedure: "dbo.Scores_DeleteAllByCompId", new { CompetitionId = competitionId });
+        }
+
+        public async Task UpsertPrelimScoreAsync(PrelimScore score)
+        {
+            var s = new
+            {
+                Id = score.Id,
+                CompetitionId = score.Competition.Id,
+                JudgeId = score.Judge.Id,
+                CompetitorId = score.Competitor.Id,
+                Role = score.Role.ToString(),
+                Finaled = score.Finaled,
+                CallbackScore = score.CallbackScore
+            };
+
+            await _helper.SaveDataAsync(storedProcedure: "dbo.PrelimScores_Upsert", s);
+        }
+        public async Task<PrelimScore> GetPrelimScoreByIdAsync(Guid id)
+        {
+            var results = await _helper.LoadDataAsync<PrelimScore, dynamic>(storedProcedure: "dbo.PrelimScores_GetById", new { Id = id });
+            return results.FirstOrDefault();
+        }
+        public async Task<IEnumerable<PrelimScore>> GetPrelimScoresByCompAsync(Guid competitionId, Division division)
+        {
+            //not using Division right now but will need to update stored procedure to do so
+            return await _helper.LoadDataAsync<PrelimScore, dynamic>(storedProcedure: "dbo.PrelimScores_GetByCompId", new { Id = competitionId, Division = division});
+        }
+        public async Task DeletePrelimScoresByCompIdAsync(Guid competitionId)
+        {
+            await _helper.SaveDataAsync(storedProcedure: "dbo.PrelimScores_DeleteAllByCompId", new { CompetitionId = competitionId });
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using ImpartialUI.ViewModels;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace ImpartialUI.Views
 {
@@ -8,7 +7,6 @@ namespace ImpartialUI.Views
         public AddCompetitionView()
         {
             InitializeComponent();
-            DataContext = new AddCompetitionViewModel();
         }
     }
 }

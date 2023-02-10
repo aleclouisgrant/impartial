@@ -153,6 +153,68 @@ namespace Impartial
             }
         }
 
+        public static CallbackScore StringToCallbackScore(string score)
+        {
+            switch (score)
+            {
+                case "A1":
+                case "Alt1":
+                case "Alternate1":
+                case "45":
+                    return CallbackScore.Alt1;
+                case "A2":
+                case "Alt2":
+                case "Alternate2":
+                case "43":
+                    return CallbackScore.Alt2;
+                case "A3":
+                case "Alt3":
+                case "Alternate3":
+                case "42":
+                    return CallbackScore.Alt3;
+                case "Y":
+                case "Yes":
+                case "100":
+                    return CallbackScore.Yes;
+                default:
+                case "N":
+                case "No":
+                case "0":
+                    return CallbackScore.No;
+            }
+        }
+
+        public static Role StringToRole(string role)
+        {
+            switch (role)
+            {
+                case "Follower":
+                    return Role.Follower;
+                default:
+                case "Leader":
+                    return Role.Leader;
+            }
+        }
+
+        public static CallbackScore NumberToCallbackScore(double value)
+        {
+            switch (value)
+            {
+                case 10:
+                    return CallbackScore.Yes;
+                case 4.5:
+                    return CallbackScore.Alt1;
+                case 4.3:
+                    return CallbackScore.Alt2;
+                case 4.2:
+                    return CallbackScore.Alt3;
+
+                default:
+                case 0:
+                    return CallbackScore.No;
+            }
+        }
+
         public static double GetAccuracy(int placement, int actualPlacement)
         {
             return Math.Abs(placement - actualPlacement);
@@ -286,6 +348,39 @@ namespace Impartial
         public static IEnumerable<T> RemoveWhere<T>(this IEnumerable<T> query, Predicate<T> predicate)
         {
             return query.Where(e => !predicate(e));
+        }
+
+        public static Competitor FindCompetitorInCache(string firstName, string lastName, IEnumerable<Competitor> competitors)
+        {
+            //correcting some frequent misspellings
+            switch (firstName + " " + lastName)
+            {
+                case "Aidan Keith-hynes":
+                    return competitors.Where(c => c.FullName == "Aidan Keith-Hynes")?.FirstOrDefault();
+                case "Jt Anderson":
+                    return competitors.Where(c => c.FullName == "JT Anderson")?.FirstOrDefault();
+                case "Dimtri Hector":
+                    return competitors.Where(c => c.FullName == "Dimitri Hector")?.FirstOrDefault();
+                case "Conor mcclure":
+                case "Conor Mcclure":
+                    return competitors.Where(c => c.FullName == "Conor McClure")?.FirstOrDefault();
+                case "Aris Demarco":
+                    return competitors.Where(c => c.FullName == "Aris DeMarco")?.FirstOrDefault();
+                    
+
+                default:
+                    return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
+            }
+        }
+
+        public static Judge FindJudgeInCache(string firstName, string lastName, IEnumerable<Judge> judges)
+        {
+            //correcting some frequent misspellings
+            switch (firstName + " " + lastName)
+            {
+                default:
+                    return judges.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
+            }
         }
     }
 }

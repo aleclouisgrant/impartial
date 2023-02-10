@@ -115,14 +115,10 @@ namespace ImpartialUI.ViewModels
 
             //this should be passed in the constructor via DI
             _databaseProvider = App.DatabaseProvider;
-
-            RefreshJudgesDatabase();
         }
 
         private async void RefreshJudgesDatabase()
         {
-            //JudgesDb = (await _databaseProvider.GetAllJudgesAsync()).ToList();
-            //JudgesDb = JudgesDb.OrderBy(j => j.Accuracy).ToList();
             OnPropertyChanged(nameof(JudgesDb));
         }
 

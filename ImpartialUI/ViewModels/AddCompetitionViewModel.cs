@@ -1,5 +1,4 @@
-﻿using HtmlAgilityPack;
-using Impartial;
+﻿using Impartial;
 using Impartial.Services.ScoresheetParser;
 using ImpartialUI.Commands;
 using ImpartialUI.Enums;
@@ -11,7 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -31,6 +29,17 @@ namespace ImpartialUI.ViewModels
             set { 
                 _competitors = value; 
                 OnPropertyChanged(); 
+            }
+        }
+        
+        private List<Judge> _judges = new List<Judge>();
+        public List<Judge> Judges
+        {
+            get { return _judges; }
+            set
+            {
+                _judges = value;
+                OnPropertyChanged();
             }
         }
 
@@ -135,6 +144,19 @@ namespace ImpartialUI.ViewModels
             }
         }
 
+        private double _parseProgressPercentage;
+        public double ParseProgressPercentage
+        {
+            get { return _parseProgressPercentage; }
+            set
+            {
+                _parseProgressPercentage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IProgress<double> _parseProgress;
+
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand AddJudgeCommand { get; set; }
         public ICommand AddCompetitionCommand { get; set; }
@@ -160,10 +182,42 @@ namespace ImpartialUI.ViewModels
             Competition = new Competition(Division.AllStar);
             ScoresheetSelector = ScoresheetSelector.Auto;
 
+            _parseProgress = new Progress<double>(ReportProgress);
+        }
+        public AddCompetitionViewModel(List<Competitor> competitors, List<Judge> judges)
+        {
+            AddCompetitorCommand = new DelegateCommand(AddCompetitor);
+            AddJudgeCommand = new DelegateCommand(AddJudge);
+            AddCompetitionCommand = new DelegateCommand(AddCompetition);
+            SelectPrelimsPathCommand = new DelegateCommand(SelectPrelimsPath);
+            SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
+            ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
+            CancelCommand = new DelegateCommand(Clear);
+
+            _databaseProvider = App.DatabaseProvider;
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
+
+            Competition = new Competition(Division.AllStar);
+            ScoresheetSelector = ScoresheetSelector.Auto;
+
+            _parseProgress = new Progress<double>(ReportProgress);
+
+            Competitors = competitors;
+            Judges = judges;
+
+            Initialize();
+
             //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\Unlogged\2022-07-23 swingtime\finals.html";
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-07-23 swingtime\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-07-23 swingtime\finals.html";
             //ParseScoreSheets();
+        }
+
+        private async void Initialize()
+        {
+            Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
+            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
         }
 
         private async void TestData()
@@ -289,18 +343,19 @@ namespace ImpartialUI.ViewModels
                 var newCompetitor = new Competitor(FirstName, LastName, int.Parse(WsdcId));
 
                 await _databaseProvider.UpsertCompetitorAsync(newCompetitor);
+                Competitors.Add(newCompetitor);
 
                 FirstName = string.Empty;
                 LastName = string.Empty;
                 WsdcId = string.Empty;
             }
         }
-
         private async void AddJudge()
         {
             var newJudge = new Judge(JudgeFirstName, JudgeLastName);
 
             await _databaseProvider.UpsertJudgeAsync(newJudge);
+            Judges.Add(newJudge);
 
             JudgeFirstName = string.Empty;
             JudgeLastName = string.Empty;
@@ -309,9 +364,7 @@ namespace ImpartialUI.ViewModels
         private void AddCompetition()
         {
             Trace.WriteLine(Competition.ToLongString());
-
             _databaseProvider.UpsertCompetitionAsync(Competition);
-
             Clear();
         }
 
@@ -342,6 +395,8 @@ namespace ImpartialUI.ViewModels
 
         private async void ParseScoreSheets()
         {
+            _parseProgress.Report(0);
+
             if (ScoresheetSelector == ScoresheetSelector.Auto)
             {
                 ScoresheetSelector = SelectScoresheetParser(finalsPath);
@@ -350,16 +405,16 @@ namespace ImpartialUI.ViewModels
             switch (ScoresheetSelector)
             {
                 case ScoresheetSelector.EEPro:
-                    _scoresheetParser = new EEProParser(finalsPath);
+                    _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.DanceConvention:
-                    _scoresheetParser = new DanceConventionParser(finalsPath);
+                    _scoresheetParser = new DanceConventionParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.StepRightSolutions:
-                    _scoresheetParser = new StepRightSolutionsParser(finalsPath);
+                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.WorldDanceRegistry:
-                    _scoresheetParser = new WorldDanceRegistryParser(finalsPath);
+                    _scoresheetParser = new WorldDanceRegistryParser(prelimsPath, finalsPath);
                     break;
                 case ScoresheetSelector.Other:
                 default:
@@ -371,15 +426,12 @@ namespace ImpartialUI.ViewModels
 
             var comp = _scoresheetParser.GetCompetition(Division.AllStar);
 
-            //Trace.WriteLine("PRELIMS RATING CHANGES:");
-            //Trace.WriteLine("LEADERS:");
-            //EloRatingService.CalculatePrelimRatings(comp.LeaderPrelimScores, Role.Leader);
-            //Trace.WriteLine("FOLLOWERS:");
-            //EloRatingService.CalculatePrelimRatings(comp.FollowerPrelimScores, Role.Follower);
+            double totalToComplete = comp.PrelimLeaders.Count + comp.PrelimFollowers.Count + comp.TotalCouples;
+            double completed = 0;
 
             foreach (var competitor in comp.PrelimLeaders)
             {
-                var serverCompetitor = await _databaseProvider.GetCompetitorByNameAsync(competitor.FirstName, competitor.LastName);
+                var serverCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, Competitors);
 
                 if (serverCompetitor != null)
                 {
@@ -389,7 +441,7 @@ namespace ImpartialUI.ViewModels
                         serverCompetitor.LeadStats.Rating, serverCompetitor.LeadStats.Variance,
                         serverCompetitor.FollowStats.Rating, serverCompetitor.FollowStats.Variance);
 
-                    var scores = comp.LeaderPrelimScores.Where(s => s.Competitor.FullName == serverCompetitor.FullName).ToList();
+                    var scores = comp.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
                     foreach (var score in scores)
                     {
                         score.Competitor = serverCompetitor;
@@ -405,11 +457,13 @@ namespace ImpartialUI.ViewModels
                         score.Competitor.WsdcId = wsdcId;
                     }
                 }
+
+                _parseProgress.Report(Math.Round((++completed / totalToComplete) * 100));
             }
 
             foreach (var competitor in comp.PrelimFollowers)
             {
-                var serverCompetitor = await _databaseProvider.GetCompetitorByNameAsync(competitor.FirstName, competitor.LastName);
+                var serverCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, Competitors);
 
                 if (serverCompetitor != null)
                 {
@@ -419,7 +473,7 @@ namespace ImpartialUI.ViewModels
                         serverCompetitor.LeadStats.Rating, serverCompetitor.LeadStats.Variance,
                         serverCompetitor.FollowStats.Rating, serverCompetitor.FollowStats.Variance);
 
-                    var scores = comp.FollowerPrelimScores.Where(s => s.Competitor.FullName == serverCompetitor.FullName).ToList();
+                    var scores = comp.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
                     foreach (var score in scores)
                     {
                         score.Competitor = serverCompetitor;
@@ -435,11 +489,13 @@ namespace ImpartialUI.ViewModels
                         score.Competitor.WsdcId = wsdcId;
                     }
                 }
+
+                _parseProgress.Report(Math.Round((++completed / totalToComplete) * 100));
             }
 
             foreach (var judge in comp.Judges)
             {
-                var serverJudge = await _databaseProvider.GetJudgeByNameAsync(judge.FirstName, judge.LastName);
+                var serverJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, Judges);
 
                 if (serverJudge != null)
                 {
@@ -448,7 +504,7 @@ namespace ImpartialUI.ViewModels
                         Scores = judge.Scores
                     };
 
-                    var scores = comp.Scores.Where(s => s.Judge.FullName == serverJudge.FullName).ToList();
+                    var scores = comp.Scores.Where(s => s.Judge.FullName == judge.FullName).ToList();
                     foreach (var score in scores)
                     {
                         score.Judge = serverJudge;
@@ -458,7 +514,7 @@ namespace ImpartialUI.ViewModels
 
             foreach (var couple in comp.Couples)
             {
-                var serverLeader = await _databaseProvider.GetCompetitorByNameAsync(couple.Leader.FirstName, couple.Leader.LastName);
+                var serverLeader = Util.FindCompetitorInCache(couple.Leader.FirstName, couple.Leader.LastName, Competitors);
 
                 if (serverLeader != null)
                 {
@@ -468,7 +524,7 @@ namespace ImpartialUI.ViewModels
                         serverLeader.LeadStats.Rating, serverLeader.LeadStats.Variance,
                         serverLeader.FollowStats.Rating, serverLeader.FollowStats.Variance);
 
-                    var scores = comp.Scores.Where(s => s.Leader.FullName == serverLeader.FullName).ToList();
+                    var scores = comp.Scores.Where(s => s.Leader.FullName == couple.Leader.FullName).ToList();
                     foreach (var score in scores)
                     {
                         score.Leader = serverLeader;
@@ -485,7 +541,7 @@ namespace ImpartialUI.ViewModels
                     }
                 }
 
-                var serverFollower = await _databaseProvider.GetCompetitorByNameAsync(couple.Follower.FirstName, couple.Follower.LastName);
+                var serverFollower = Util.FindCompetitorInCache(couple.Follower.FirstName, couple.Follower.LastName, Competitors);
 
                 if (serverFollower != null)
                 {
@@ -495,7 +551,7 @@ namespace ImpartialUI.ViewModels
                         serverFollower.LeadStats.Rating, serverFollower.LeadStats.Variance,
                         serverFollower.FollowStats.Rating, serverFollower.FollowStats.Variance);
 
-                    var scores = comp.Scores.Where(s => s.Follower.FullName == serverFollower.FullName).ToList();
+                    var scores = comp.Scores.Where(s => s.Follower.FullName == couple.Follower.FullName).ToList();
                     foreach (var score in scores)
                     {
                         score.Follower = serverFollower;
@@ -511,9 +567,14 @@ namespace ImpartialUI.ViewModels
                         score.Follower.WsdcId = wsdcId;
                     }
                 }
+
+                _parseProgress.Report(Math.Round((++completed / totalToComplete) * 100));
             }
 
             Competition = comp;
+
+            _parseProgress.Report(100);
+            _parseProgress.Report(0);
         }
 
         private async Task<int> GuessWsdcId(string firstName, string lastName)
@@ -530,6 +591,11 @@ namespace ImpartialUI.ViewModels
                 return -1;
             }
         }
+        private void ReportProgress(double progress)
+        {
+            Trace.WriteLine("progress: " + progress);
+            ParseProgressPercentage = progress;
+        }
 
         public ScoresheetSelector SelectScoresheetParser(string finalsPath)
         {
@@ -545,5 +611,6 @@ namespace ImpartialUI.ViewModels
             else
                 return ScoresheetSelector.Other;
         }
+        
     }
 }

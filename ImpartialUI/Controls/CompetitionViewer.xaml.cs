@@ -1,4 +1,5 @@
 ﻿using Impartial;
+using ImpartialUI.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,17 @@ namespace ImpartialUI.Controls
     public partial class CompetitionViewer : UserControl
     {
         #region DependencyProperties
+
+        public static readonly DependencyProperty CompetitionTypeProperty = DependencyProperty.Register(
+            nameof(CompetitionType),
+            typeof(CompetitionType),
+            typeof(CompetitionViewer),
+            new FrameworkPropertyMetadata(CompetitionType.JackAndJill));
+        public CompetitionType CompetitionType
+        {
+            get { return (CompetitionType)GetValue(CompetitionTypeProperty); }
+            set { SetValue(CompetitionTypeProperty, value); }
+        }
 
         public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
             nameof(Competition),

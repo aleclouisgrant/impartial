@@ -61,6 +61,8 @@ namespace ImpartialUI.ViewModels
             {
                 _competitors = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(LeadCompetitors));
+                OnPropertyChanged(nameof(FollowCompetitors));
             }
         }
 
@@ -86,35 +88,44 @@ namespace ImpartialUI.ViewModels
             CrunchRatingsCommand = new DelegateCommand(CrunchRatings);
 
             Initialize();
-            CrunchRatings();
+        }
+
+        public RatingsViewModel(List<Competitor> competitors, List<Competition> competitions)
+        {
+            _databaseProvider = App.DatabaseProvider;
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
+
+            AddCompetitorCommand = new DelegateCommand(AddCompetitor);
+            RefreshCompetitorsCommand = new DelegateCommand(RefreshCompetitors);
+            ResetRatingsCommand = new DelegateCommand(ResetRatings);
+            CrunchRatingsCommand = new DelegateCommand(CrunchRatings);
+
+            Competitors = new ObservableCollection<Competitor>(competitors);
+            _competitions = competitions;
+
+            Initialize();
         }
 
         private async void Initialize()
         {
-            //_competitions = (await _databaseProvider.GetAllCompetitionsAsync()).ToList();
-            //Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
-            
-            //_competitions = _competitions.OrderBy(c => c.Date).ToList();
+            _competitions = (await _databaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date).ToList();
+            Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
-        private async void CrunchRatings()
+        private void CrunchRatings()
         {
-            IEnumerable<Competition> competitions = await _databaseProvider.GetAllCompetitionsAsync();
-            competitions = competitions.OrderBy(c => c.Date).ToList();
-
-            List<Competitor> competitors = (await _databaseProvider.GetAllCompetitorsAsync()).ToList();
-
-            foreach (Competition competition in competitions)
+            foreach (Competition competition in _competitions)
             {
                 var leads = competition.FinalLeaders.ToList();
                 foreach (var lead in leads)
                 {
-                    lead.LeadStats.Rating = competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating;
+                    lead.LeadStats.Rating = Competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating;
                 }
                 var follows = competition.FinalFollowers.ToList();
                 foreach (var follow in follows)
                 {
-                    follow.FollowStats.Rating = competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating;
+                    follow.FollowStats.Rating = Competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating;
                 }
 
                 competition.UpdateRatings(leads, follows);
@@ -123,16 +134,15 @@ namespace ImpartialUI.ViewModels
                 leads = competition.FinalLeaders.ToList();
                 foreach (var lead in leads)
                 {
-                    competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating = lead.LeadStats.Rating;
+                    Competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating = lead.LeadStats.Rating;
                 }
                 follows = competition.FinalFollowers.ToList();
                 foreach (var follow in follows)
                 {
-                    competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating = follow.FollowStats.Rating;
+                    Competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating = follow.FollowStats.Rating;
                 }
             }
 
-            Competitors = new ObservableCollection<Competitor>(competitors);
             OnPropertyChanged(nameof(LeadCompetitors));
             OnPropertyChanged(nameof(FollowCompetitors));
         }

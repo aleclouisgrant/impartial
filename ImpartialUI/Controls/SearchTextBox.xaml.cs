@@ -1,6 +1,7 @@
 ﻿using Impartial;
 using ImpartialUI.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -37,8 +38,6 @@ namespace ImpartialUI.Controls
         {
             var control = (SearchTextBox)source;
             control.TextBlock1.Text = (string)e.NewValue;
-            control.TextBlock2.Text = (string)e.NewValue;
-
             control.GuessPerson();
         }
 
@@ -104,20 +103,25 @@ namespace ImpartialUI.Controls
 
         #endregion
 
-        public static readonly RoutedEvent SelectionChangedEvent =
-           EventManager.RegisterRoutedEvent("SelectionChanged", RoutingStrategy.Bubble,
-           typeof(RoutedEventHandler), typeof(SearchTextBox));
+        public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent(
+            "SelectionChanged", 
+            RoutingStrategy.Bubble, 
+            typeof(SelectionChangedEventHandler), 
+            typeof(SearchTextBox));
 
-        public event RoutedEventHandler SelectionChanged
+        public event SelectionChangedEventHandler SelectionChanged
         {
             add { AddHandler(SelectionChangedEvent, value); }
             remove { RemoveHandler(SelectionChangedEvent, value); }
         }
-        protected virtual void RaiseSelectionChangedEvent()
+        protected virtual void RaiseSelectionChangedEvent(SelectionChangedEventArgs eventArgs)
         {
-            RoutedEventArgs args = new RoutedEventArgs(SearchTextBox.SelectionChangedEvent);
-            RaiseEvent(args);
+            RaiseEvent(eventArgs);
         }
+
+        private string _cancelledPersonFirstName = "";
+        private string _cancelledPersonLastName = "";
+        private bool _wasCancelled = false;
 
         public SearchTextBox()
         {
@@ -131,6 +135,9 @@ namespace ImpartialUI.Controls
             FirstNameTextBox.Text = firstName;
             LastNameTextBox.Text = lastName;
             WsdcIdTextBox.Text = wsdcId.ToString();
+
+            _cancelledPersonFirstName = firstName;
+            _cancelledPersonLastName = lastName;
         }
 
         private void GuessPerson()
@@ -240,11 +247,13 @@ namespace ImpartialUI.Controls
         }
         private void ShowAddPersonButton_Click(object sender, RoutedEventArgs e)
         {
+            _wasCancelled = false;
             AddMode();
         }
         private void HideAddPersonButton_Click(object sender, RoutedEventArgs e)
         {
-            SearchMode();   
+            _wasCancelled = true;
+            SearchMode();
         }
         private void GuessButton_Click(object sender, RoutedEventArgs e)
         {
@@ -253,7 +262,15 @@ namespace ImpartialUI.Controls
 
         private void ComboBoxItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RaiseEvent(e);
+            if (_wasCancelled)
+            {
+                var removedItems = new List<PersonModel> {
+                    new Competitor(_cancelledPersonFirstName, _cancelledPersonLastName) };
+
+                e = new SelectionChangedEventArgs(SelectionChangedEvent, removedItems, e.AddedItems);
+            }
+
+            RaiseSelectionChangedEvent(e);
         }
     }
 }

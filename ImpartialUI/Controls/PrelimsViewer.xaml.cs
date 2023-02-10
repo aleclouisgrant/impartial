@@ -1,4 +1,5 @@
 ﻿using Impartial;
+using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ImpartialUI.Controls
 {
@@ -118,6 +120,28 @@ namespace ImpartialUI.Controls
                 Grid.SetRow(border, 0);
             }
 
+            // for total score
+            control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            var scoreBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1)
+            };
+
+            var scoreTextBlock = new TextBlock()
+            {
+                Text = "Score",
+                Margin = new Thickness(1),
+                FontWeight = FontWeights.Bold,
+            };
+
+            scoreBorder.Child = scoreTextBlock;
+
+            control.ScoreGrid.Children.Add(scoreBorder);
+            Grid.SetColumn(scoreBorder, control.ScoreGrid.Children.Count - 1);
+            Grid.SetRow(scoreBorder, 0);
+
             List<Competitor> c = new List<Competitor>();
 
             if (control.Role == Role.Leader)
@@ -125,31 +149,32 @@ namespace ImpartialUI.Controls
             else if (control.Role == Role.Follower)
                 c = competition.PrelimFollowers;
 
-            var competitors = new List<Tuple<Competitor, List<PrelimScore>>>();
+            var competitors = new LinkedList<Tuple<Competitor, List<PrelimScore>>>();
 
             if (control.Role == Role.Leader)
             {
                 foreach (var competitor in c)
                 {
-                    competitors.Add(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList()));
+                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList()));
                 }
             }
             else if (control.Role == Role.Follower)
             {
                 foreach (var competitor in c)
                 {
-                    competitors.Add(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList()));
+                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList()));
                 }
             }
 
-            competitors = competitors.OrderByDescending(s => s.Item2.Sum(x => (int)x.CallbackScore)).ToList();
+            competitors = new LinkedList<Tuple<Competitor, List<PrelimScore>>>(competitors.OrderByDescending(s => s.Item2.Sum(x => (int)x.CallbackScore)));
 
             int i = 1;
-            foreach (var competitor in competitors)
+            int count = 1;
+            int sameCount = 0;
+            for (LinkedListNode<Tuple<Competitor, List<PrelimScore>>> competitor = competitors.First; competitor != null; competitor = competitor.Next)
             {
                 control.ScoreGrid.RowDefinitions.Add(new RowDefinition());
-                int count = 0; //todo
-                bool finaled = competitor.Item2.FirstOrDefault().Finaled;
+                bool finaled = competitor.Value.Item2.FirstOrDefault().Finaled;
 
                 // placement
                 var competitorCountBorder = new Border()
@@ -158,6 +183,19 @@ namespace ImpartialUI.Controls
                     BorderThickness = new Thickness(1),
                     Margin = new Thickness(1)
                 };
+
+                if (competitor.Previous != null)
+                {
+                    if (competitor.Value.Item2.Sum(s => (int)s.CallbackScore) == competitor.Previous.Value.Item2.Sum(s => (int)s.CallbackScore))
+                    {
+                        sameCount++;
+                    }
+                    else
+                    {
+                        count = count + sameCount + 1;
+                        sameCount = 0;
+                    }
+                }
 
                 var competitorCountTextBlock = new TextBlock()
                 {
@@ -181,7 +219,7 @@ namespace ImpartialUI.Controls
 
                 var nameTextBlock = new TextBlock()
                 {
-                    Text = competitor.Item1.FullName,
+                    Text = competitor.Value.Item1.FullName,
                     Margin = new Thickness(1)
                 };
 
@@ -199,7 +237,7 @@ namespace ImpartialUI.Controls
 
                 // scores
                 int j = 2;
-                foreach (var score in competitor.Item2)
+                foreach (var score in competitor.Value.Item2)
                 {
                     var border = new Border()
                     {
@@ -224,10 +262,32 @@ namespace ImpartialUI.Controls
                     Grid.SetRow(border, i);
                     j++;
                 }
+
+                var callbackBorder = new Border()
+                {
+                    BorderBrush = Brushes.Gray,
+                    BorderThickness = new Thickness(1),
+                    Margin = new Thickness(1)
+                };
+
+                var callbackTextBlock = new TextBlock()
+                {
+                    Text = (competitor.Value.Item2.Sum(s => (int)s.CallbackScore) / 10.0f).ToString(),
+                    Margin = new Thickness(1)
+                };
+
+                if (finaled)
+                    callbackTextBlock.FontWeight = FontWeights.Bold;
+
+                callbackBorder.Child = callbackTextBlock;
+
+                control.ScoreGrid.Children.Add(callbackBorder);
+                Grid.SetColumn(callbackBorder, j);
+                Grid.SetRow(callbackBorder, i);
+
                 i++;
             }
             control.OnPropertyChanged(nameof(Count));
-            control.OnPropertyChanged(nameof(Role));
         }
 
         public static readonly DependencyProperty RoleProperty = DependencyProperty.Register(

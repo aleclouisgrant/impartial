@@ -18,5 +18,6 @@ namespace Impartial
         public Guid Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
     }
 }

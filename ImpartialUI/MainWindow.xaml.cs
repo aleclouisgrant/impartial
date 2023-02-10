@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ImpartialUI.ViewModels;
+using System.Windows;
 
 namespace ImpartialUI
 {
@@ -7,6 +8,7 @@ namespace ImpartialUI
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel();
         }
     }
 }

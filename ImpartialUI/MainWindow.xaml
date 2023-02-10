@@ -9,20 +9,18 @@
         mc:Ignorable="d"
         x:Name="View"
         Title="Impartial" Height="1000" Width="1600"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <TabControl Margin="0 20 0 0" BorderThickness="0 2 0 0">
-            <TabItem Header="Ratings" IsSelected="True">
-                <v:RatingsView/>
+            <TabItem Header="Ratings">
+                <v:RatingsView DataContext="{Binding RatingsViewModel, Mode=OneWay}"/>
             </TabItem>
             <TabItem Header="Add Competition">
-                <v:AddCompetitionView Margin="20" d:DataContext="{d:DesignInstance Type=vm:AddCompetitionViewModel, IsDesignTimeCreatable=True}"/>
+                <v:AddCompetitionView Margin="20" DataContext="{Binding AddCompetitionViewModel, Mode=OneWay}"/>
             </TabItem>
-            <TabItem Header="Judge" Visibility="Collapsed">
-                <v:ParseScoreSheetsView/>
-            </TabItem>
-            <TabItem Header="View Competition">
-                <v:ViewCompetitionView Margin="30"/>
+            <TabItem Header="View Competition" IsSelected="True">
+                <v:ViewCompetitionView Margin="30" DataContext="{Binding ViewCompetitionViewModel, Mode=OneWay}"/>
             </TabItem>
         </TabControl>
     </Grid>
