@@ -376,9 +376,15 @@ namespace Impartial
                     return competitors.Where(c => c.FullName == "Stephanie Loveira")?.FirstOrDefault();
                 case "Samuel Vaden":
                     return competitors.Where(c => c.FullName == "Sam Vaden")?.FirstOrDefault();
-
-
-
+                case "Casey Lane Margules":
+                    return competitors.Where(c => c.FullName == "Casey Margules")?.FirstOrDefault();
+                case "Margaret Tuttle":
+                    return competitors.Where(c => c.FullName == "Margie Tuttle")?.FirstOrDefault();
+                case "Alexander Glover":
+                    return competitors.Where(c => c.FullName == "Alex Glover")?.FirstOrDefault();
+                case "Frank Moda III":
+                    return competitors.Where(c => c.FullName == "Frank Moda")?.FirstOrDefault();
+                    
                 default:
                     return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
             }
@@ -389,6 +395,11 @@ namespace Impartial
             //correcting some frequent misspellings
             switch (firstName + " " + lastName)
             {
+                case "Sean McKeaver":
+                    return judges.Where(c => c.FullName == "Sean McKeever")?.FirstOrDefault();
+                case "Tatiana Mollman":
+                    return judges.Where(c => c.FullName == "Tatiana Mollmann")?.FirstOrDefault();
+
                 default:
                     return judges.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
             }

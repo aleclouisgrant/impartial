@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using HtmlAgilityPack;
 using Impartial.Enums;
+using iText.Kernel.Pdf.Canvas.Parser.ClipperLib;
 
 namespace Impartial
 {
@@ -150,11 +151,15 @@ namespace Impartial
             var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
             var leadJudges = GetPrelimsJudgesByDivision(division, Role.Leader);
 
+            if (leadNodes != null)
+                leadNodes.RemoveAt(0);
+
             List<PrelimScore> leaderPrelimScores = new List<PrelimScore>();
             foreach (var lead in leadNodes)
             {
                 var node = lead.SelectNodes("td");
-                bool finaled = lead.GetClasses().Contains("adv");
+
+                bool finaled = node[5 + leadJudges.Count].InnerText == "X" && node[6 + leadJudges.Count].InnerText == "";
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
                 var competitor = new Competitor(name.Substring(0, pos), name.Substring(pos + 1));
@@ -163,14 +168,7 @@ namespace Impartial
                 int offset = 2;
                 for (int i = offset; i < leadJudges.Count + offset; i++)
                 {
-                    try
-                    {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText));
-                    }
-                    catch
-                    {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
-                    }
+                    callbackScore = Util.StringToCallbackScore(node[i].InnerText);
 
                     var prelimScore = new PrelimScore(
                         role: Role.Leader,
@@ -189,11 +187,15 @@ namespace Impartial
             var followerNodes = followsDoc.DocumentNode.SelectNodes("tr");
             var followerJudges = GetPrelimsJudgesByDivision(division, Role.Follower);
 
+            if (followerNodes != null)
+                followerNodes.RemoveAt(0);
+
             List<PrelimScore> followerPrelimScores = new List<PrelimScore>();
             foreach (var follow in followerNodes)
             {
                 var node = follow.SelectNodes("td");
-                bool finaled = follow.GetClasses().Contains("adv");
+
+                bool finaled = node[5 + leadJudges.Count].InnerText == "X" && node[6 + leadJudges.Count].InnerText == "";
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
                 var competitor = new Competitor(name.Substring(0, pos), name.Substring(pos + 1));
@@ -202,14 +204,7 @@ namespace Impartial
                 int offset = 2;
                 for (int i = offset; i < followerJudges.Count + offset; i++)
                 {
-                    try
-                    {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText));
-                    }
-                    catch
-                    {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
-                    }
+                    callbackScore = Util.StringToCallbackScore(node[i].InnerText);
 
                     var prelimScore = new PrelimScore(
                         role: Role.Follower,
@@ -228,27 +223,21 @@ namespace Impartial
         private List<Judge> GetPrelimsJudgesByDivision(Division division, Role role)
         {
             var judges = new List<Judge>();
-            string sub = string.Empty;
+            string sub = Util.GetSubString(
+                    s: GetPrelimsDocByDivision(division, role),
+                    from: "<td><em><strong>Count</strong></em></td>",
+                    to: "<td><em><strong>BIB</strong></em></td>");
 
-            if (role == Role.Leader)
-            {
-                sub = Util.GetSubString(
-                    s: _prelimsSheetDoc,
-                    from: "<div><b>Judges: </b>",
-                    to: "</div><div class=\"judge_note\">");
-            }
-            else if (role == Role.Follower)
-            {
-                sub = Util.GetSubString(
-                    s: _prelimsSheetDoc.Substring(_prelimsSheetDoc.IndexOf("<h3 id=\"followers\">Followers")),
-                    from: "<div><b>Judges: </b>",
-                    to: "<div class=\"judge_note\">");
-            }
+            var doc = new HtmlDocument();
+            doc.LoadHtml(sub);
+            var nodes = doc.DocumentNode.SelectNodes("td");
 
-            List<string> names = sub.Split(',').ToList();
+            if (nodes != null)
+                nodes.RemoveAt(0);
 
-            foreach (var name in names)
+            foreach (var node in nodes)
             {
+                var name = node.InnerText.Trim();
                 int pos = name.Trim().IndexOf(' ');
 
                 //no last name was recorded

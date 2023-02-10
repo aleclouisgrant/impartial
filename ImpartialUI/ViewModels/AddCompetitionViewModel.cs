@@ -208,9 +208,9 @@ namespace ImpartialUI.ViewModels
 
             Initialize();
 
-            ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
-            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-02-05 charlotte\prelims.html";
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-02-05 charlotte\finals.html";
+            ScoresheetSelector = ScoresheetSelector.EEPro;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-06-26 liberty\prelims.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-06-26 liberty\finals.html";
             ParseScoreSheets();
         }
 
