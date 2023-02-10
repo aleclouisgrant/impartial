@@ -208,10 +208,10 @@ namespace ImpartialUI.ViewModels
 
             Initialize();
 
-            //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-07-23 swingtime\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-07-23 swingtime\finals.html";
-            //ParseScoreSheets();
+            ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-02-05 charlotte\prelims.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-02-05 charlotte\finals.html";
+            ParseScoreSheets();
         }
 
         private async void Initialize()

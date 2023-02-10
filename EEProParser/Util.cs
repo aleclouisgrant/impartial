@@ -366,7 +366,18 @@ namespace Impartial
                     return competitors.Where(c => c.FullName == "Conor McClure")?.FirstOrDefault();
                 case "Aris Demarco":
                     return competitors.Where(c => c.FullName == "Aris DeMarco")?.FirstOrDefault();
-                    
+                case "J Khayree Jones":
+                    return competitors.Where(c => c.FullName == "Khayree Jones")?.FirstOrDefault();
+                case "JennAy Ferreira":
+                    return competitors.Where(c => c.FullName == "Jen Ferreira")?.FirstOrDefault();
+                case "Karla Anita Catana":
+                    return competitors.Where(c => c.FullName == "Karla Catana")?.FirstOrDefault();
+                case "Stephanie Risser":
+                    return competitors.Where(c => c.FullName == "Stephanie Loveira")?.FirstOrDefault();
+                case "Samuel Vaden":
+                    return competitors.Where(c => c.FullName == "Sam Vaden")?.FirstOrDefault();
+
+
 
                 default:
                     return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
