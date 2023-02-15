@@ -44,7 +44,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var placeTextBlock = new TextBlock()
@@ -64,7 +65,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var competitorTextBlock = new TextBlock()
@@ -100,7 +102,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 var textBlock = new TextBlock()
@@ -128,7 +131,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 var placementTextBlock = new TextBlock()
@@ -148,7 +152,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 var nameTextBlock = new TextBlock()
@@ -172,7 +177,8 @@ namespace ImpartialUI.Controls
                     {
                         BorderBrush = Brushes.Gray,
                         BorderThickness = new Thickness(1),
-                        Margin = new Thickness(1)
+                        Margin = new Thickness(1),
+                        Height = 24
                     };
 
                     var textBlock = new TextBlock()

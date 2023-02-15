@@ -1,11 +1,8 @@
 ﻿using Impartial;
-using iText.StyledXmlParser.Jsoup.Nodes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,18 +35,23 @@ namespace ImpartialUI.Controls
             if (control.Role == Role.Leader)
             {
                 competitors = competition.PrelimLeaders;
-                judges = competition.PrelimLeaderJudges;
+                judges = competition.PrelimLeaderJudges.OrderBy(j => j.FullName).ToList();
             }
             else if (control.Role == Role.Follower)
             {
                 competitors = competition.PrelimFollowers;
-                judges = competition.PrelimFollowerJudges;
+                judges = competition.PrelimFollowerJudges.OrderBy(j => j.FullName).ToList();
             }
 
             control.Clear();
 
             foreach (var judge in judges)
             {
+                if (control.Role == Role.Leader)
+                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.LeaderPrelimScores.Where(s => s.Judge.FullName == judge.FullName).ToList()));
+                else if (control.Role == Role.Follower)
+                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.FollowerPrelimScores.Where(s => s.Judge.FullName == judge.FullName).ToList()));
+
                 control.AddJudge(judge);
             }
 
@@ -138,6 +140,8 @@ namespace ImpartialUI.Controls
         private List<SearchTextBox> _competitorBoxes = new List<SearchTextBox>();
         private List<SearchTextBox> _judgeBoxes = new List<SearchTextBox>();
 
+        private List<Tuple<Judge, List<PrelimScore>>> _judgeScores = new();
+
         // not used right now
         private Border _addRowBorder;
         private Button _addColumnButton;
@@ -202,7 +206,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var countTextBlock = new TextBlock()
@@ -225,13 +230,15 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var competitorSearchBox = new SearchTextBox()
             {
                 Margin = new Thickness(1),
-                ItemsSource = Competitors
+                ItemsSource = Competitors,
+                SelectedPerson = null
             };
 
             competitorSearchBox.SelectionChanged += (o, e) =>
@@ -274,7 +281,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 var textBlock = new TextBlock()
@@ -320,17 +328,23 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             SearchTextBox judgeSearchBox = new SearchTextBox()
             {
                 ItemsSource = Judges
             };
+            _judgeBoxes.Add(judgeSearchBox);
 
             judgeSearchBox.SelectionChanged += (o, e) =>
             {
-                UpdateJudgeScores((Judge)e.RemovedItems[0], (Judge)e.AddedItems[0]);
+                if (e.AddedItems.Count > 0)
+                {
+                    int index = _judgeBoxes.IndexOf(judgeSearchBox);
+                    UpdateJudgeScores(index, (Judge)e.AddedItems[0]);
+                }
             };
 
             if (judge != null)
@@ -339,22 +353,11 @@ namespace ImpartialUI.Controls
 
                 if (judgeSearchBox.SelectedPerson != null)
                 {
-                    List<PrelimScore> scores = new();
-                    if (Role == Role.Leader)
-                        scores = Competition.LeaderPrelimScores.Where(s => s.Judge.FullName == ((Judge)judgeSearchBox.SelectedPerson).FullName).ToList();
-                    else if (Role == Role.Follower)
-                        scores = Competition.FollowerPrelimScores.Where(s => s.Judge.FullName == ((Judge)judgeSearchBox.SelectedPerson).FullName).ToList();
-
-                    foreach (var score in scores)
-                    {
-                        score.Judge = (Judge)judgeSearchBox.SelectedPerson;
-                    }
+                    UpdateJudgeScores(_judgeBoxes.IndexOf(judgeSearchBox), (Judge)judgeSearchBox.SelectedPerson);
                 }
             }
 
             judgeBorder.Child = judgeSearchBox;
-
-            _judgeBoxes.Add(judgeSearchBox);
 
             ScoreGrid.Children.Add(judgeBorder);
             Grid.SetColumn(judgeBorder, ScoreGrid.ColumnDefinitions.Count() - 1);
@@ -365,7 +368,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 TextBox scoreTextBox = new TextBox()
@@ -400,17 +404,11 @@ namespace ImpartialUI.Controls
 
             OnPropertyChanged(nameof(Competition));
         }
-        private void UpdateJudgeScores(Judge oldJudge, Judge newJudge)
+        private void UpdateJudgeScores(int index, Judge judge)
         {
-            foreach (var prelimScore in PrelimScores)
+            foreach (var prelimScore in _judgeScores[index].Item2)
             {
-                foreach (var score in prelimScore.Item2)
-                {
-                    if (score.Judge.FullName == oldJudge.FullName)
-                    {
-                        score.Judge = newJudge;
-                    }
-                }
+                prelimScore.Judge = judge;
             }
 
             OnPropertyChanged(nameof(Competition));
@@ -418,6 +416,11 @@ namespace ImpartialUI.Controls
 
         private void Clear()
         {
+            _judgeScores.Clear();
+            _judgeBoxes.Clear();
+            _prelimScores.Clear();
+            _competitorBoxes.Clear();
+
             ScoreGrid.Children.Clear();
             ScoreGrid.RowDefinitions.Clear();
             ScoreGrid.ColumnDefinitions.Clear();
@@ -431,7 +434,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var placeTextBlock = new TextBlock()
@@ -451,7 +455,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var competitorTextBlock = new TextBlock()

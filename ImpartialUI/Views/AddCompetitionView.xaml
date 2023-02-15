@@ -17,8 +17,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition />
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -76,10 +76,10 @@
 
             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
                 <Button 
-                        Width="150" Height="20"
-                        FontWeight="Bold"
-                        Command="{Binding ParseScoreSheetsCommand}"
-                        Margin="20">
+                    Width="150" Height="20"
+                    FontWeight="Bold"
+                    Command="{Binding ParseScoreSheetsCommand}"
+                    Margin="20">
                     <Button.Content>
                         <Grid>
                             <Grid>
@@ -131,13 +131,13 @@
                     </StackPanel>
 
                     <Button 
-                    Grid.Row="1"
-                    Content="Add Competitor To Database"
-                    Width="200" Height="20"
-                    FontWeight="Bold"
-                    Command="{Binding AddCompetitorCommand}"
-                    IsDefault="True"
-                    Margin="20"/>
+                        Grid.Row="1"
+                        Content="Add Competitor To Database"
+                        Width="200" Height="20"
+                        FontWeight="Bold"
+                        Command="{Binding AddCompetitorCommand}"
+                        IsDefault="True"
+                        Margin="20"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Grid.Column="1" Width="400" Margin="20">
@@ -154,13 +154,13 @@
                     </StackPanel>
 
                     <Button 
-                    Grid.Row="1"
-                    Content="Add Judge To Database"
-                    Width="200" Height="20"
-                    FontWeight="Bold"
-                    Command="{Binding AddJudgeCommand}"
-                    IsDefault="True"
-                    Margin="20"/>
+                        Grid.Row="1"
+                        Content="Add Judge To Database"
+                        Width="200" Height="20"
+                        FontWeight="Bold"
+                        Command="{Binding AddJudgeCommand}"
+                        IsDefault="True"
+                        Margin="20"/>
                 </StackPanel>
             </Grid>
         </Grid>
@@ -168,12 +168,30 @@
         <TabControl Grid.Row="1">
             <TabItem Header="Prelims (Leaders)" IsSelected="True">
                 <ScrollViewer Margin="10 5">
-                    <c:PrelimsAdder Role="Leader" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder Grid.Column="2" Role="Leader" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Prelims (Followers)">
                 <ScrollViewer Margin="10 5">
-                    <c:PrelimsAdder Role="Follower" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <c:PrelimsViewer Grid.Column="0" Role="Follower" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder Grid.Column="2" Role="Follower" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Finals">

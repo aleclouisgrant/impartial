@@ -131,7 +131,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var placementTextBlock = new TextBlock()
@@ -151,13 +152,15 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var leaderSearchBox = new SearchTextBox()
             {
                 Margin = new Thickness(1),
-                ItemsSource = Competitors
+                ItemsSource = Competitors,
+                SelectedPerson = null
             };
 
             if (couple?.Leader != null)
@@ -184,13 +187,15 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var followerSearchBox = new SearchTextBox()
             {
                 Margin = new Thickness(1),
-                ItemsSource = Competitors
+                ItemsSource = Competitors,
+                SelectedPerson = null
             };
 
             if (couple?.Follower != null)
@@ -223,7 +228,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 TextBox scoreTextBox = new TextBox()
@@ -259,12 +265,19 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             SearchTextBox judgeSearchBox = new SearchTextBox()
             {
-                ItemsSource = Judges
+                ItemsSource = Judges,
+                SelectedPerson = null
+            };
+
+            judgeSearchBox.SelectionChanged += (o, e) =>
+            {
+                UpdateCompetition();
             };
 
             if (judge != null)
@@ -285,7 +298,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 TextBox scoreTextBox = new TextBox()
@@ -323,7 +337,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var placeTextBlock = new TextBlock()
@@ -343,7 +358,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var leaderTextBlock = new TextBlock()
@@ -363,7 +379,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var followerTextBlock = new TextBlock()
@@ -384,7 +401,8 @@ namespace ImpartialUI.Controls
                 Content = "+",
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Width = 20,
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
             addColumnButton.Click += AddColumn_Click;
 
@@ -396,7 +414,8 @@ namespace ImpartialUI.Controls
             {
                 BorderThickness = new Thickness(0),
                 BorderBrush = Brushes.Gray,
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var addRowButton = new Button()
@@ -434,7 +453,12 @@ namespace ImpartialUI.Controls
                     var scoreBox = (TextBox)ScoreGrid.Children.OfType<Border>().
                         First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == i).Child;
 
-                    Competition.Scores.Add(new Score(Competition, judge, leader, follower, Int32.Parse(scoreBox.Text), placement));
+                    try
+                    {
+                        Competition.Scores.Add(new Score(Competition, judge, leader, follower, Int32.Parse(scoreBox.Text), placement));
+                    }
+                    catch { }
+
                 }
             }
 

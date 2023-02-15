@@ -114,7 +114,7 @@ namespace ImpartialUI.Controls
             add { AddHandler(SelectionChangedEvent, value); }
             remove { RemoveHandler(SelectionChangedEvent, value); }
         }
-        protected virtual void RaiseSelectionChangedEvent(SelectionChangedEventArgs eventArgs)
+        protected virtual void OnSelectionChanged(SelectionChangedEventArgs eventArgs)
         {
             RaiseEvent(eventArgs);
         }
@@ -269,8 +269,12 @@ namespace ImpartialUI.Controls
 
                 e = new SelectionChangedEventArgs(SelectionChangedEvent, removedItems, e.AddedItems);
             }
+            else 
+            {
+                e = new SelectionChangedEventArgs(SelectionChangedEvent, e.RemovedItems, e.AddedItems);
+            }
 
-            RaiseSelectionChangedEvent(e);
+            OnSelectionChanged(e);
         }
     }
 }

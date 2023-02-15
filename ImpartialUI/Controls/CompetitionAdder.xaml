@@ -13,7 +13,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
+        <Border VerticalAlignment="Top" Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -35,7 +35,7 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1" x:Name="ScoreGrid">
+        <Grid VerticalAlignment="Top" Grid.Row="1" x:Name="ScoreGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>

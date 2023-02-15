@@ -80,6 +80,9 @@ namespace Impartial.Services.ScoresheetParser
 
             var nodes = doc.DocumentNode.SelectNodes("tr");
 
+            var leaders = new List<Competitor>();
+            var followers = new List<Competitor>();
+
             var scores = new List<Score>();
             for (int i = 0; i < nodes.Count; i++)
             {
@@ -90,16 +93,27 @@ namespace Impartial.Services.ScoresheetParser
 
                 string leaderName = node.Where(n => n.GetClasses().Contains("nolines") && n.GetClasses().Contains("name")).FirstOrDefault().InnerText;
                 int leadPos = leaderName.IndexOf(' ');
-                string leaderFirstName = leaderName.Substring(0, leadPos);
-                string leaderLastName = leaderName.Substring(leadPos + 1);
+                string leaderFirstName = leaderName.Substring(0, leadPos).Trim();
+                string leaderLastName = leaderName.Substring(leadPos + 1).Trim();
+
+                Competitor leader = leaders.Where(c => c.FullName == leaderFirstName + " " + leaderLastName)?.FirstOrDefault();
+                if (leader == null)
+                {
+                    leader = new Competitor(leaderFirstName, leaderLastName);
+                    leaders.Add(leader);
+                }
 
                 string followerName = node.Where(n => n.GetClasses().Contains("nolines") && n.GetClasses().Contains("name") && n.GetClasses().Contains("heavyborder")).FirstOrDefault().InnerText;
                 int followPos = followerName.IndexOf(' ');
-                string followerFirstName = followerName.Substring(0, followPos);
-                string followerLastName = followerName.Substring(followPos + 1);
+                string followerFirstName = followerName.Substring(0, followPos).Trim();
+                string followerLastName = followerName.Substring(followPos + 1).Trim();
 
-                Competitor leader = new Competitor(leaderFirstName, leaderLastName);
-                Competitor follower = new Competitor(followerFirstName, followerLastName);
+                Competitor follower = followers.Where(c => c.FullName == followerFirstName + " " + followerLastName)?.FirstOrDefault();
+                if (follower == null)
+                {
+                    follower = new Competitor(followerFirstName, followerLastName);
+                    followers.Add(follower);
+                }
 
                 int offset = 3;
                 for (int j = offset; j < finalsJudges.Count + offset; j++)
@@ -130,8 +144,17 @@ namespace Impartial.Services.ScoresheetParser
                 }
             }
 
+            var nameDoc = new HtmlDocument();
+            nameDoc.LoadHtml(
+            Util.GetSubString(
+                s: _finalsSheetDoc,
+                from: "<h2>",
+                to: "</h2>"));
+            string name = nameDoc.DocumentNode.SelectNodes("a")?.FirstOrDefault().InnerText;
+
             return new Competition(division)
             {
+                Name = name,
                 Scores = scores,
                 LeaderPrelimScores = prelims.Item1 ?? new List<PrelimScore>(),
                 FollowerPrelimScores = prelims.Item2 ?? new List<PrelimScore>(), 
@@ -147,13 +170,14 @@ namespace Impartial.Services.ScoresheetParser
             var leaderJudges = GetPrelimsJudgesByDivision(division, Role.Leader);
 
             List<PrelimScore> leaderPrelimScores = new List<PrelimScore>();
+            int rawScore = 1;
             foreach (var lead in leadNodes)
             {
                 var node = lead.SelectNodes("td");
                 bool finaled = lead.GetClasses().Contains("adv");
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
-                var competitor = new Competitor(name.Substring(0, pos), name.Substring(pos + 1));
+                var competitor = new Competitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
 
                 CallbackScore callbackScore;
                 int offset = 2;
@@ -173,10 +197,12 @@ namespace Impartial.Services.ScoresheetParser
                         judge: leaderJudges[i - offset],
                         competitor: competitor,
                         finaled: finaled,
-                        callbackScore: callbackScore);
+                        callbackScore: callbackScore,
+                        rawScore: rawScore);
 
                     leaderPrelimScores.Add(prelimScore);
                 }
+                rawScore++;
             }
 
             var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower);
@@ -186,13 +212,14 @@ namespace Impartial.Services.ScoresheetParser
             var followerJudges = GetPrelimsJudgesByDivision(division, Role.Follower);
 
             List<PrelimScore> followerPrelimScores = new List<PrelimScore>();
+            rawScore = 1;
             foreach (var follow in followerNodes)
             {
                 var node = follow.SelectNodes("td");
                 bool finaled = follow.GetClasses().Contains("adv");
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
-                var competitor = new Competitor(name.Substring(0, pos), name.Substring(pos + 1));
+                var competitor = new Competitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
 
                 CallbackScore callbackScore;
                 int offset = 2;
@@ -212,10 +239,12 @@ namespace Impartial.Services.ScoresheetParser
                         judge: followerJudges[i - offset],
                         competitor: competitor,
                         finaled: finaled,
-                        callbackScore: callbackScore);
+                        callbackScore: callbackScore,
+                        rawScore: rawScore);
 
                     followerPrelimScores.Add(prelimScore);
                 }
+                rawScore++;
             }
 
             return new Tuple<List<PrelimScore>, List<PrelimScore>>(leaderPrelimScores, followerPrelimScores);

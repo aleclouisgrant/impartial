@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace ImpartialUI.Controls
 {
@@ -41,7 +40,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var placeTextBlock = new TextBlock()
@@ -61,7 +61,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var competitorTextBlock = new TextBlock()
@@ -103,7 +104,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 var textBlock = new TextBlock()
@@ -126,7 +128,8 @@ namespace ImpartialUI.Controls
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Height = 24
             };
 
             var scoreTextBlock = new TextBlock()
@@ -166,7 +169,7 @@ namespace ImpartialUI.Controls
                 }
             }
 
-            competitors = new LinkedList<Tuple<Competitor, List<PrelimScore>>>(competitors.OrderByDescending(s => s.Item2.Sum(x => (int)x.CallbackScore)));
+            competitors = new LinkedList<Tuple<Competitor, List<PrelimScore>>>(competitors.OrderBy(s => s.Item2.FirstOrDefault().RawScore));
 
             int i = 1;
             int count = 1;
@@ -181,7 +184,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 if (competitor.Previous != null)
@@ -214,7 +218,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 var nameTextBlock = new TextBlock()
@@ -237,13 +242,14 @@ namespace ImpartialUI.Controls
 
                 // scores
                 int j = 2;
-                foreach (var score in competitor.Value.Item2)
+                foreach (var score in competitor.Value.Item2.OrderBy(c => c.Judge.FullName))
                 {
                     var border = new Border()
                     {
                         BorderBrush = Brushes.Gray,
                         BorderThickness = new Thickness(1),
-                        Margin = new Thickness(1)
+                        Margin = new Thickness(1),
+                        Height = 24
                     };
 
                     var textBlock = new TextBlock()
@@ -267,7 +273,8 @@ namespace ImpartialUI.Controls
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1)
+                    Margin = new Thickness(1),
+                    Height = 24
                 };
 
                 var callbackTextBlock = new TextBlock()

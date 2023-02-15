@@ -57,7 +57,12 @@ namespace ImpartialUI.ViewModels
         private async void DeleteCompetition()
         {
             await App.DatabaseProvider.DeleteCompetitionAsync(Competition);
-            Competitions.Remove(Competition);
+
+            // should be able to do just this instead of refreshing but it's not working for some reason
+            //Competitions.Remove(Competition);
+            //OnPropertyChanged(nameof(Competitions));
+
+            RefreshCompetitions();
 
             Competition = null;
         }

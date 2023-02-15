@@ -62,11 +62,11 @@
         <Grid x:Name="AddPersonGrid" Visibility="Collapsed" HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal"  Margin="5 0">
                 <TextBlock Text="First Name: "/>
-                <TextBox x:Name="FirstNameTextBox" Margin="5 0" MinWidth="100"/>
+                <TextBox x:Name="FirstNameTextBox" Margin="5 0" MinWidth="60"/>
                 <TextBlock Text="Last Name: "/>
-                <TextBox x:Name="LastNameTextBox" Margin="5 0" MinWidth="100"/>
+                <TextBox x:Name="LastNameTextBox" Margin="5 0" MinWidth="60"/>
                 <TextBlock Text="WSDC ID: "/>
-                <TextBox x:Name="WsdcIdTextBox" Margin="5 0" MinWidth="60"/>
+                <TextBox x:Name="WsdcIdTextBox" Margin="5 0" MinWidth="30"/>
 
                 <Button
                     x:Name="AddToDatabaseButton"

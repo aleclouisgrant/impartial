@@ -22,7 +22,7 @@
             </TextBlock>
         </Border>
 
-        <Grid Grid.Row="1" x:Name="ScoreGrid">
+        <Grid VerticalAlignment="Top" Grid.Row="1" x:Name="ScoreGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition />

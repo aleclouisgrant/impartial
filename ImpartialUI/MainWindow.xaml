@@ -16,11 +16,11 @@
             <TabItem Header="Ratings">
                 <v:RatingsView DataContext="{Binding RatingsViewModel, Mode=OneWay}"/>
             </TabItem>
-            <TabItem Header="Add Competition">
-                <v:AddCompetitionView Margin="20" DataContext="{Binding AddCompetitionViewModel, Mode=OneWay}"/>
+            <TabItem Header="Add Competition" IsSelected="True">
+                <v:AddCompetitionView Margin="20" DataContext="{Binding AddCompetitionViewModel, Mode=TwoWay}"/>
             </TabItem>
-            <TabItem Header="View Competition" IsSelected="True">
-                <v:ViewCompetitionView Margin="30" DataContext="{Binding ViewCompetitionViewModel, Mode=OneWay}"/>
+            <TabItem Header="View Competition">
+                <v:ViewCompetitionView Margin="30" DataContext="{Binding ViewCompetitionViewModel, Mode=TwoWay}"/>
             </TabItem>
         </TabControl>
     </Grid>

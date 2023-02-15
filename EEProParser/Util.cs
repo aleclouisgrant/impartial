@@ -384,7 +384,9 @@ namespace Impartial
                     return competitors.Where(c => c.FullName == "Alex Glover")?.FirstOrDefault();
                 case "Frank Moda III":
                     return competitors.Where(c => c.FullName == "Frank Moda")?.FirstOrDefault();
-                    
+                case "Kelly Ponce De Leon":
+                    return competitors.Where(c => c.FullName == "Kelly Ponce de Leon")?.FirstOrDefault();
+
                 default:
                     return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
             }
@@ -393,13 +395,25 @@ namespace Impartial
         public static Judge FindJudgeInCache(string firstName, string lastName, IEnumerable<Judge> judges)
         {
             //correcting some frequent misspellings
-            switch (firstName + " " + lastName)
+            switch ((firstName.Trim() + " " + lastName.Trim()).Trim())
             {
                 case "Sean McKeaver":
                     return judges.Where(c => c.FullName == "Sean McKeever")?.FirstOrDefault();
                 case "Tatiana Mollman":
                     return judges.Where(c => c.FullName == "Tatiana Mollmann")?.FirstOrDefault();
-
+                case "Bonnie":
+                    return judges.Where(c => c.FullName == "Bonnie Cannon")?.FirstOrDefault();
+                case "Bryn":
+                    return judges.Where(c => c.FullName == "Bryn Anderson")?.FirstOrDefault();
+                case "Jerome":
+                    return judges.Where(c => c.FullName == "Jerome Subey")?.FirstOrDefault();
+                case "Annmarie":
+                    return judges.Where(c => c.FullName == "Annmarie Marker")?.FirstOrDefault();
+                case "PJ":
+                    return judges.Where(c => c.FullName == "PJ Turner")?.FirstOrDefault();
+                case "Patty":
+                    return judges.Where(c => c.FullName == "Patty Vo")?.FirstOrDefault();
+                    
                 default:
                     return judges.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
             }

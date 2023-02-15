@@ -213,7 +213,8 @@ namespace Impartial
                 CompetitorId = score.Competitor.Id,
                 Role = score.Role.ToString(),
                 Finaled = score.Finaled,
-                CallbackScore = score.CallbackScore
+                CallbackScore = score.CallbackScore,
+                RawScore = score.RawScore
             };
 
             await _helper.SaveDataAsync(storedProcedure: "dbo.PrelimScores_Upsert", s);

@@ -13,8 +13,9 @@ namespace Impartial
         public Role Role { get; set; }
         public bool Finaled { get; set; }
         public CallbackScore CallbackScore { get; set; }
+        public int RawScore { get; set; }
 
-        public PrelimScore(Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore)
+        public PrelimScore(Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore, int rawScore)
         {
             Id = Guid.NewGuid();
 
@@ -23,9 +24,10 @@ namespace Impartial
             Role = role;
             Finaled = finaled;
             CallbackScore = callbackScore;
+            RawScore = rawScore;
         }
 
-        public PrelimScore(Competition competition, Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore)
+        public PrelimScore(Competition competition, Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore, int rawScore)
         {
             Id = Guid.NewGuid();
 
@@ -35,6 +37,7 @@ namespace Impartial
             Role = role;
             Finaled = finaled;
             CallbackScore = callbackScore;
+            RawScore = rawScore;
         }
 
         public PrelimScore(
@@ -44,12 +47,14 @@ namespace Impartial
             Guid competitorId, int competitorWsdcId, string competitorFirstName, string competitorLastName, int competitorLeaderRating, double competitorLeaderVariance, int competitorFollowerRating, double competitorFollowerVariance,
             string role, 
             bool finaled, 
-            string callbackScore)
+            string callbackScore,
+            int rawScore)
         {
             Id = id;
             Role = Util.StringToRole(role);
             Finaled = finaled;
             CallbackScore = Util.StringToCallbackScore(callbackScore);
+            RawScore = rawScore;
 
             Competition = new Competition(competitionId, competitionName, competitionDate, Division.AllStar);
             Judge = new Judge(judgeId, judgeFirstName, judgeLastName, judgeAccuracy, judgeTop5Accuracy);

@@ -209,8 +209,8 @@ namespace ImpartialUI.ViewModels
             Initialize();
 
             //ScoresheetSelector = ScoresheetSelector.EEPro;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-06-26 liberty\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-06-26 liberty\finals.html";
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\unlogged\2021-08-18 philly swing classic\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\unlogged\2021-08-18 philly swing classic\finals.html";
             //ParseScoreSheets();
         }
 
@@ -428,6 +428,36 @@ namespace ImpartialUI.ViewModels
 
             double totalToComplete = comp.PrelimLeaders.Count + comp.PrelimFollowers.Count + comp.TotalCouples;
             double completed = 0;
+
+            //foreach (var judge in comp.PrelimLeaderJudges)
+            //{
+            //    var serverJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, Judges);
+            //    if (serverJudge != null)
+            //    {
+            //        serverJudge = new Judge(serverJudge.Id, serverJudge.FirstName, serverJudge.LastName, serverJudge.Accuracy, serverJudge.Top5Accuracy);
+
+            //        var scores = comp.LeaderPrelimScores.Where(s => s.Judge.FullName == judge.FullName).ToList();
+            //        foreach (var score in scores)
+            //        {
+            //            score.Judge = serverJudge;
+            //        }
+            //    }
+            //}
+
+            //foreach (var judge in comp.PrelimFollowerJudges)
+            //{
+            //    var serverJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, Judges);
+            //    if (serverJudge != null)
+            //    {
+            //        serverJudge = new Judge(serverJudge.Id, serverJudge.FirstName, serverJudge.LastName, serverJudge.Accuracy, serverJudge.Top5Accuracy);
+
+            //        var scores = comp.FollowerPrelimScores.Where(s => s.Judge.FullName == judge.FullName).ToList();
+            //        foreach (var score in scores)
+            //        {
+            //            score.Judge = serverJudge;
+            //        }
+            //    }
+            //}
 
             foreach (var competitor in comp.PrelimLeaders)
             {
