@@ -194,15 +194,6 @@ namespace Impartial
             return couples;
         }
 
-        public void UpdateRatings(List<Competitor> leaders, List<Competitor> followers)
-        {
-            foreach (var score in Scores)
-            {
-                score.Leader.LeadStats.Rating = leaders.Where(c => c.Id == score.Leader.Id).FirstOrDefault().LeadStats.Rating;
-                score.Follower.FollowStats.Rating = followers.Where(c => c.Id == score.Follower.Id).FirstOrDefault().FollowStats.Rating;
-            }
-        }
-
         public override string ToString()
         {
             return Name + " " + Division + " Jack & Jill (" + Date.ToShortDateString() + ")";

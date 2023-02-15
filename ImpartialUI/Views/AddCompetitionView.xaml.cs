@@ -8,5 +8,19 @@ namespace ImpartialUI.Views
         {
             InitializeComponent();
         }
+
+        private void AddJudgeButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            LeaderPrelimsAdder.UpdateJudges();
+            FollowersPrelimsAdder.UpdateJudges();
+            FinalsCompetitionAdder.UpdateJudges();
+        }
+
+        private void AddCompetitorButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            LeaderPrelimsAdder.UpdateCompetitors();
+            FollowersPrelimsAdder.UpdateCompetitors();
+            FinalsCompetitionAdder.UpdateCompetitors();
+        }
     }
 }

@@ -358,6 +358,7 @@ namespace Impartial
                 case "Aidan Keith-hynes":
                     return competitors.Where(c => c.FullName == "Aidan Keith-Hynes")?.FirstOrDefault();
                 case "Jt Anderson":
+                case "JT anderson":
                     return competitors.Where(c => c.FullName == "JT Anderson")?.FirstOrDefault();
                 case "Dimtri Hector":
                     return competitors.Where(c => c.FullName == "Dimitri Hector")?.FirstOrDefault();
@@ -386,7 +387,22 @@ namespace Impartial
                     return competitors.Where(c => c.FullName == "Frank Moda")?.FirstOrDefault();
                 case "Kelly Ponce De Leon":
                     return competitors.Where(c => c.FullName == "Kelly Ponce de Leon")?.FirstOrDefault();
-
+                case "Agustin Gutierrez":
+                    return competitors.Where(c => c.FullName == "Augie Leija")?.FirstOrDefault();
+                case "Saya Suzaki":
+                    return competitors.Where(c => c.FullName == "Sayaka Suzaki")?.FirstOrDefault();
+                case "Brittani Schiro":
+                    return competitors.Where(c => c.FullName == "Brittany Schiro")?.FirstOrDefault();
+                case "Xander Stavola":
+                    return competitors.Where(c => c.FullName == "Alexander Stavola")?.FirstOrDefault();
+                case "Skyler Pritchard":
+                    return competitors.Where(c => c.FullName == "Skylar Pritchard")?.FirstOrDefault();
+                case "Jade Ruiz":
+                    return competitors.Where(c => c.FullName == "Jade Bryan")?.FirstOrDefault();
+                case "Julie Edwards-Auclair":
+                    return competitors.Where(c => c.FullName == "Julie Auclair")?.FirstOrDefault();
+                case "Vincent van Mierlo":
+                    return competitors.Where(c => c.FullName == "Vincent Van Mierlo")?.FirstOrDefault();
                 default:
                     return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
             }

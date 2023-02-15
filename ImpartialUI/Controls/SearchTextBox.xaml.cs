@@ -244,6 +244,15 @@ namespace ImpartialUI.Controls
 
             SearchMode();
             ComboBoxItems.SelectedValue = ItemsSource.Where(c => c.Id == competitor.Id).FirstOrDefault();
+
+            List<Competitor> removedItems = new List<Competitor>(){
+                new Competitor(_cancelledPersonFirstName, _cancelledPersonLastName)
+            };
+            List<Competitor> addedItems = new List<Competitor>(){
+                (Competitor)ComboBoxItems.SelectedValue
+            };
+
+            OnSelectionChanged(new SelectionChangedEventArgs(SearchTextBox.SelectionChangedEvent, removedItems, addedItems));
         }
         private void ShowAddPersonButton_Click(object sender, RoutedEventArgs e)
         {

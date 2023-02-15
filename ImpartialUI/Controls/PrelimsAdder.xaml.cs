@@ -156,7 +156,7 @@ namespace ImpartialUI.Controls
             UpdateJudges();
         }
 
-        private async void UpdateCompetitors()
+        public async void UpdateCompetitors()
         {
             Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
@@ -168,7 +168,7 @@ namespace ImpartialUI.Controls
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
             }
         }
-        private async void UpdateJudges()
+        public async void UpdateJudges()
         {
             Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).OrderBy(j => j.FirstName).ToList();
 
@@ -192,9 +192,9 @@ namespace ImpartialUI.Controls
             List<PrelimScore> competitorPrelimScores = new();
 
             if (Role == Role.Leader)
-                competitorPrelimScores = Competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
+                competitorPrelimScores = Competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).OrderBy(c => c.Judge.FullName).ToList();
             else if (Role == Role.Follower)
-                competitorPrelimScores = Competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
+                competitorPrelimScores = Competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).OrderBy(c => c.Judge.FullName).ToList();
 
             bool finaled = false;
             if (competitorPrelimScores.Count > 0)

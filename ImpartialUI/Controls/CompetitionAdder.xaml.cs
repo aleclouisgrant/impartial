@@ -93,7 +93,7 @@ namespace ImpartialUI.Controls
             UpdateJudges();
         }
 
-        private async void UpdateCompetitors()
+        public async void UpdateCompetitors()
         {
             Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
@@ -105,7 +105,7 @@ namespace ImpartialUI.Controls
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
             }
         }
-        private async void UpdateJudges()
+        public async void UpdateJudges()
         {
             Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).OrderBy(j => j.FirstName).ToList();
             
@@ -220,6 +220,11 @@ namespace ImpartialUI.Controls
 
             _competitorBoxes.Add(leaderSearchBox);
             _competitorBoxes.Add(followerSearchBox);
+
+            if (couple?.Scores != null)
+            {
+                couple.Scores.OrderBy(s => s.Judge.FullName);
+            }
 
             // scores
             for (int i = 1; i < ScoreGrid.ColumnDefinitions.Count - 3; i++)
@@ -458,7 +463,6 @@ namespace ImpartialUI.Controls
                         Competition.Scores.Add(new Score(Competition, judge, leader, follower, Int32.Parse(scoreBox.Text), placement));
                     }
                     catch { }
-
                 }
             }
 

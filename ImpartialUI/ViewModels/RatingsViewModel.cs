@@ -1,12 +1,8 @@
 ﻿using Impartial;
 using ImpartialUI.Commands;
-using iText.StyledXmlParser.Jsoup.Parser;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -115,34 +111,44 @@ namespace ImpartialUI.ViewModels
 
         private void CrunchRatings()
         {
-            foreach (Competition competition in _competitions)
+            ResetRatings();
+
+            foreach (var competition in _competitions)
             {
-                var leads = competition.FinalLeaders.ToList();
-                foreach (var lead in leads)
+                // prelims
+                if (competition.LeaderPrelimScores.Count > 0 && competition.FollowerPrelimScores.Count > 0)
                 {
-                    lead.LeadStats.Rating = Competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating;
-                }
-                var follows = competition.FinalFollowers.ToList();
-                foreach (var follow in follows)
-                {
-                    follow.FollowStats.Rating = Competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating;
+                    // // update the ratings of all competitors in the scores
+                    foreach (var score in competition.LeaderPrelimScores)
+                    {
+                        score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
+                    }
+                    foreach (var score in competition.FollowerPrelimScores)
+                    {
+                        score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
+                    }
+
+                    // calculating the new ratings
+                    EloRatingService.PrelimRatings(competition.LeaderPrelimScores, Role.Leader, competition.PrelimLeaderJudges);
+                    EloRatingService.PrelimRatings(competition.FollowerPrelimScores, Role.Follower, competition.PrelimFollowerJudges);
                 }
 
-                competition.UpdateRatings(leads, follows);
-                EloRatingService.CalculateRatings(competition.Couples);
+                // finals
+                if (competition.Scores.Count > 0)
+                {
+                    // update the ratings of all competitors in the scores
+                    foreach (var score in competition.Scores)
+                    {
+                        score.Leader = Competitors.Where(c => c.Id == score.Leader.Id).FirstOrDefault();
+                        score.Follower = Competitors.Where(c => c.Id == score.Follower.Id).FirstOrDefault();
+                    }
 
-                leads = competition.FinalLeaders.ToList();
-                foreach (var lead in leads)
-                {
-                    Competitors.Where(c => c.Id == lead.Id).FirstOrDefault().LeadStats.Rating = lead.LeadStats.Rating;
-                }
-                follows = competition.FinalFollowers.ToList();
-                foreach (var follow in follows)
-                {
-                    Competitors.Where(c => c.Id == follow.Id).FirstOrDefault().FollowStats.Rating = follow.FollowStats.Rating;
+                    // calculate the new ratings
+                    EloRatingService.CalculateFinalsRating(competition.Couples);
                 }
             }
 
+            OnPropertyChanged(nameof(Competitors));
             OnPropertyChanged(nameof(LeadCompetitors));
             OnPropertyChanged(nameof(FollowCompetitors));
         }

@@ -25,5 +25,10 @@ namespace ImpartialUI.Views
                 PrelimsGrid.Visibility = Visibility.Collapsed;
             }
         }
+
+        private void EditCompetitionButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

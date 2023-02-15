@@ -15,13 +15,21 @@ namespace Impartial
 
         public EEProParser(string prelimsPath, string finalsPath)
         {
-            if (prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath))
-                throw new FileNotFoundException();
-            if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
-                throw new FileNotFoundException();
+            bool prelimPathFound = !(prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath));
+            bool finalsPathFound = !(finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath));
 
-            _prelimsSheetDoc = File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "");
-            _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
+            if (!prelimPathFound && !finalsPathFound)
+                throw new FileNotFoundException();
+            if (!prelimPathFound && finalsPathFound)
+            {
+                _prelimsSheetDoc = null;
+                _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
+            }
+            else if (prelimPathFound && finalsPathFound)
+            {
+                _prelimsSheetDoc = File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "");
+                _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
+            }
         }
 
         public EEProParser(string finalsPath)
@@ -226,7 +234,7 @@ namespace Impartial
             {
                 var node = follow.SelectNodes("td");
 
-                bool finaled = node[5 + leadJudges.Count].InnerText == "X" && node[6 + leadJudges.Count].InnerText == "";
+                bool finaled = node[5 + followerJudges.Count].InnerText == "X" && node[6 + followerJudges.Count].InnerText == "";
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
                 var competitor = new Competitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
@@ -356,9 +364,9 @@ namespace Impartial
                     div = Division.Open;
 
                 Role r;
-                if (divisionString.Contains("Leader"))
+                if (divisionString.Contains("Leader") || divisionString.Contains("LEADER"))
                     r = Role.Leader;
-                else if (divisionString.Contains("Follower"))
+                else if (divisionString.Contains("Follower") || divisionString.Contains("FOLLOWER"))
                     r = Role.Follower;
                 else
                     r = Role.None;

@@ -23,6 +23,7 @@
                       ItemsSource="{Binding Competitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedItem="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Content="Refresh" Command="{Binding RefreshCompetitionsCommand}" Width="70" Height="30"/>
+            <Button Content="Edit" Click="EditCompetitionButton_Click" Width="70" Height="30" Margin="5 0 0 0"/>
             <Button Content="Delete" Command="{Binding DeleteCompetitionCommand}" Width="70" Height="30" Margin="5 0 0 0"/>
         </StackPanel>
 

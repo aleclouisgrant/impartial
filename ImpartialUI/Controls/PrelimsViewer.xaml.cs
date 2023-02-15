@@ -110,7 +110,7 @@ namespace ImpartialUI.Controls
 
                 var textBlock = new TextBlock()
                 {
-                    Text = judge.FullName + " (" + judge.Accuracy.ToString() + ")" + "(" + judge.Top5Accuracy.ToString() + ")",
+                    Text = judge.FullName,
                     FontWeight = FontWeights.Bold,
                     FontStyle = FontStyles.Italic,
                     Margin = new Thickness(1)
