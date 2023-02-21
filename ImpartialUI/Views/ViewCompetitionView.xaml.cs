@@ -15,14 +15,19 @@ namespace ImpartialUI.Views
         {
             if (e.AddedItems.Count > 0)
             {
+                //CompetitionScrollViewer.Visibility = Visibility.Collapsed;
                 CompetitionViewerGrid.Visibility = Visibility.Visible;
-                if (((Competition)e.AddedItems[0]).FollowerPrelimScores.Count > 0)
+                if (((Competition)e.AddedItems[0]).HasRound(1))
                     PrelimsGrid.Visibility = Visibility.Visible;
+                if (((Competition)e.AddedItems[0]).HasRound(2))
+                    SemisGrid.Visibility = Visibility.Visible;
             }
             else
             {
+                //CompetitionScrollViewer.Visibility = Visibility.Collapsed;
                 CompetitionViewerGrid.Visibility = Visibility.Collapsed;
                 PrelimsGrid.Visibility = Visibility.Collapsed;
+                SemisGrid.Visibility = Visibility.Collapsed;
             }
         }
 

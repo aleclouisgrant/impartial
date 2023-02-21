@@ -14,8 +14,9 @@ namespace Impartial
         public bool Finaled { get; set; }
         public CallbackScore CallbackScore { get; set; }
         public int RawScore { get; set; }
+        public int Round { get; set; }
 
-        public PrelimScore(Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore, int rawScore)
+        public PrelimScore(Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore, int rawScore, int round)
         {
             Id = Guid.NewGuid();
 
@@ -25,9 +26,10 @@ namespace Impartial
             Finaled = finaled;
             CallbackScore = callbackScore;
             RawScore = rawScore;
+            Round = round;
         }
 
-        public PrelimScore(Competition competition, Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore, int rawScore)
+        public PrelimScore(Competition competition, Judge judge, Competitor competitor, Role role, bool finaled, CallbackScore callbackScore, int rawScore, int round)
         {
             Id = Guid.NewGuid();
 
@@ -38,6 +40,7 @@ namespace Impartial
             Finaled = finaled;
             CallbackScore = callbackScore;
             RawScore = rawScore;
+            Round = round;
         }
 
         public PrelimScore(
@@ -48,13 +51,15 @@ namespace Impartial
             string role, 
             bool finaled, 
             string callbackScore,
-            int rawScore)
+            int rawScore,
+            int round)
         {
             Id = id;
             Role = Util.StringToRole(role);
             Finaled = finaled;
             CallbackScore = Util.StringToCallbackScore(callbackScore);
             RawScore = rawScore;
+            Round = round;
 
             Competition = new Competition(competitionId, competitionName, competitionDate, Division.AllStar);
             Judge = new Judge(judgeId, judgeFirstName, judgeLastName, judgeAccuracy, judgeTop5Accuracy);

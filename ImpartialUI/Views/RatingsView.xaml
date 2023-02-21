@@ -48,7 +48,32 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
-            <Button Content="Crunch" FontWeight="Bold" Width="120" Height="40" Margin="10" Command="{Binding CrunchRatingsCommand}"/>
+            <Button 
+                Width="120" Height="40"
+                FontWeight="Bold"
+                Command="{Binding CrunchRatingsCommand}"
+                Margin="10"
+                IsEnabled="{Binding CrunchEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                <Button.Content>
+                    <Grid>
+                        <Grid>
+                            <ProgressBar
+                                    Width="120"
+                                    Height="40"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    Value="{Binding CrunchProgressPercentage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <Grid>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Calculate Ratings"/>
+                        </Grid>
+                    </Grid>
+                </Button.Content>
+            </Button>
+
+
             <Button Content="Reset Ratings" FontWeight="Bold" Width="150" Height="40" Margin="10" Command="{Binding ResetRatingsCommand}"/>
         </StackPanel>
 

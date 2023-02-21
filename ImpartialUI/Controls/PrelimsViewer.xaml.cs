@@ -85,9 +85,9 @@ namespace ImpartialUI.Controls
             List<Judge> judges = new List<Judge>();
 
             if (control.Role == Role.Leader)
-                judges = competition.PrelimLeaderJudges?.OrderBy(j => j.FullName).ToList();
+                judges = competition.PrelimLeaderJudges(control.Round)?.OrderBy(j => j.FullName).ToList();
             else if (control.Role == Role.Follower)
-                judges = competition.PrelimFollowerJudges?.OrderBy(j => j.FullName).ToList();
+                judges = competition.PrelimFollowerJudges(control.Round)?.OrderBy(j => j.FullName).ToList();
 
             // judge names
             foreach (var judge in judges)
@@ -148,9 +148,9 @@ namespace ImpartialUI.Controls
             List<Competitor> c = new List<Competitor>();
 
             if (control.Role == Role.Leader)
-                c = competition.PrelimLeaders;
+                c = competition.PrelimLeaders(control.Round);
             else if (control.Role == Role.Follower)
-                c = competition.PrelimFollowers;
+                c = competition.PrelimFollowers(control.Round);
 
             var competitors = new LinkedList<Tuple<Competitor, List<PrelimScore>>>();
 
@@ -158,14 +158,14 @@ namespace ImpartialUI.Controls
             {
                 foreach (var competitor in c)
                 {
-                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList()));
+                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == control.Round).ToList()));
                 }
             }
             else if (control.Role == Role.Follower)
             {
                 foreach (var competitor in c)
                 {
-                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList()));
+                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == control.Round).ToList()));
                 }
             }
 
@@ -313,6 +313,25 @@ namespace ImpartialUI.Controls
                 new DependencyPropertyChangedEventArgs(
                     CompetitionProperty, 
                     ((PrelimsViewer)source).Competition, 
+                    ((PrelimsViewer)source).Competition));
+        }
+
+        public static readonly DependencyProperty RoundProperty = DependencyProperty.Register(
+            nameof(Round),
+            typeof(int),
+            typeof(PrelimsViewer),
+            new FrameworkPropertyMetadata(1, OnRoundPropertyChanged));
+        public int Round
+        {
+            get { return (int)GetValue(RoundProperty); }
+            set { SetValue(RoundProperty, value); }
+        }
+        private static void OnRoundPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+            OnCompetitionPropertyChanged(source,
+                new DependencyPropertyChangedEventArgs(
+                    CompetitionProperty,
+                    ((PrelimsViewer)source).Competition,
                     ((PrelimsViewer)source).Competition));
         }
 

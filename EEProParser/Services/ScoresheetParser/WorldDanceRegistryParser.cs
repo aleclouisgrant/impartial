@@ -12,23 +12,16 @@ namespace Impartial.Services.ScoresheetParser
         private string _prelimsSheetDoc { get; set; }
         private string _finalsSheetDoc { get; set; }
 
-        public WorldDanceRegistryParser(string prelimsPath, string finalsPath)
+        public WorldDanceRegistryParser(string prelimsPath = null, string finalsPath = null)
         {
-            if (prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath))
-                throw new FileNotFoundException();
-            if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
-                throw new FileNotFoundException();
+            bool prelimPathFound = !(prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath));
+            bool finalsPathFound = !(finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath));
 
-            _prelimsSheetDoc = File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "");
-            _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
-        }
-
-        public WorldDanceRegistryParser(string finalsPath)
-        {
-            if (finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath))
+            if (!prelimPathFound && !finalsPathFound)
                 throw new FileNotFoundException();
 
-            _finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
+            _prelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
+            _finalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
         }
 
         public List<Division> GetDivisions()
@@ -66,6 +59,7 @@ namespace Impartial.Services.ScoresheetParser
 
             return divisions;
         }
+        
         public Competition GetCompetition(Division division)
         {
             var prelims = new Tuple<List<PrelimScore>, List<PrelimScore>>(null, null);
@@ -74,94 +68,18 @@ namespace Impartial.Services.ScoresheetParser
                 prelims = GetPrelimScores(division);
             }
 
-            var sub = GetFinalsDocByDivision(division);
-            var judges = GetFinalsJudgesByDivision(division);
-
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(sub);
-
-            var nodes = doc.DocumentNode.SelectNodes("tr");
-
-            var leaders = new List<Competitor>();
-            var followers = new List<Competitor>();
-
-            var scores = new List<Score>();
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                var node = nodes[i].SelectNodes("td");
-                int actualPlacement = Int32.Parse(node[3].InnerText);
-
-                string leaderName = node[1].InnerText;
-                int leadPos = leaderName.IndexOf(' ');
-                string leaderFirstName = leaderName.Substring(0, leadPos).Trim();
-                string leaderLastName = leaderName.Substring(leadPos + 1).Trim();
-                
-                Competitor leader = leaders.Where(c => c.FullName == leaderFirstName + " " + leaderLastName)?.FirstOrDefault();
-                if (leader == null)
-                {
-                    leader = new Competitor(leaderFirstName, leaderLastName);
-                    leaders.Add(leader);
-                }
-
-                string followerName = node[2].InnerText;
-                int followPos = followerName.IndexOf(' ');
-                string followerFirstName = followerName.Substring(0, followPos).Trim();
-                string followerLastName = followerName.Substring(followPos + 1).Trim();
-
-                Competitor follower = followers.Where(c => c.FullName == followerFirstName + " " + followerLastName)?.FirstOrDefault();
-                if (follower == null)
-                {
-                    follower = new Competitor(followerFirstName, followerLastName);
-                    followers.Add(follower);
-                }
-
-                // scores start on the 5th node
-                int offset = 4;
-                for (int j = offset; j < judges.Count + offset; j++)
-                {
-                    int placement;
-
-                    try
-                    {
-                        placement = Int32.Parse(node[j].InnerText);
-                    }
-                    catch
-                    {
-                        placement = Int32.Parse(node[j].InnerText.Substring(0, 1));
-                    }
-
-                    var score = new Score(judges[j - offset], placement, actualPlacement)
-                    {
-                        Leader = leader,
-                        Follower = follower,
-                    };
-
-                    scores.Add(score);
-
-                    if (judges[j - offset].Scores == null)
-                        judges[j - offset].Scores = new List<Score>();
-
-                    judges[j - offset].Scores.Add(score);
-                }
-            }
-
-            string name = Util.GetSubString(
-                s: _finalsSheetDoc,
-                from: "<title>",
-                to: "</title>").Trim();
-
-            if (name.EndsWith(" - Scores"))
-            {
-                name = name.Substring(0, name.LastIndexOf(" - Scores"));
-            }
-
             return new Competition(division)
             {
-                Name = name,
-                Scores = scores,
+                Name = GetName(),
+                Scores = _finalsSheetDoc != null ? GetFinalScores(division) : new(),
                 LeaderPrelimScores = prelims.Item1 ?? new List<PrelimScore>(),
                 FollowerPrelimScores = prelims.Item2 ?? new List<PrelimScore>(),
             };
+        }
+
+        private bool SemisExist(Division division)
+        {
+            return true;
         }
 
         private Tuple<List<PrelimScore>, List<PrelimScore>> GetPrelimScores(Division division)
@@ -218,7 +136,8 @@ namespace Impartial.Services.ScoresheetParser
                         competitor: competitor,
                         finaled: finaled,
                         callbackScore: callbackScore,
-                        rawScore: rawScore);
+                        rawScore: rawScore,
+                        round: 1);
 
                     leaderPrelimScores.Add(prelimScore);
                 }
@@ -277,7 +196,8 @@ namespace Impartial.Services.ScoresheetParser
                         competitor: competitor,
                         finaled: finaled,
                         callbackScore: callbackScore, 
-                        rawScore: rawScore);
+                        rawScore: rawScore,
+                        round: 1);
 
                     followerPrelimScores.Add(prelimScore);
                 }
@@ -285,6 +205,80 @@ namespace Impartial.Services.ScoresheetParser
             }
 
             return new Tuple<List<PrelimScore>, List<PrelimScore>>(leaderPrelimScores, followerPrelimScores);
+        }
+        private List<Score> GetFinalScores(Division division)
+        {
+            var sub = GetFinalsDocByDivision(division);
+            var judges = GetFinalsJudgesByDivision(division);
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(sub);
+
+            var nodes = doc.DocumentNode.SelectNodes("tr");
+
+            var leaders = new List<Competitor>();
+            var followers = new List<Competitor>();
+
+            var scores = new List<Score>();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i].SelectNodes("td");
+                int actualPlacement = Int32.Parse(node[3].InnerText);
+
+                string leaderName = node[1].InnerText;
+                int leadPos = leaderName.IndexOf(' ');
+                string leaderFirstName = leaderName.Substring(0, leadPos).Trim();
+                string leaderLastName = leaderName.Substring(leadPos + 1).Trim();
+
+                Competitor leader = leaders.Where(c => c.FullName == leaderFirstName + " " + leaderLastName)?.FirstOrDefault();
+                if (leader == null)
+                {
+                    leader = new Competitor(leaderFirstName, leaderLastName);
+                    leaders.Add(leader);
+                }
+
+                string followerName = node[2].InnerText;
+                int followPos = followerName.IndexOf(' ');
+                string followerFirstName = followerName.Substring(0, followPos).Trim();
+                string followerLastName = followerName.Substring(followPos + 1).Trim();
+
+                Competitor follower = followers.Where(c => c.FullName == followerFirstName + " " + followerLastName)?.FirstOrDefault();
+                if (follower == null)
+                {
+                    follower = new Competitor(followerFirstName, followerLastName);
+                    followers.Add(follower);
+                }
+
+                // scores start on the 5th node
+                int offset = 4;
+                for (int j = offset; j < judges.Count + offset; j++)
+                {
+                    int placement;
+
+                    try
+                    {
+                        placement = Int32.Parse(node[j].InnerText);
+                    }
+                    catch
+                    {
+                        placement = Int32.Parse(node[j].InnerText.Substring(0, 1));
+                    }
+
+                    var score = new Score(judges[j - offset], placement, actualPlacement)
+                    {
+                        Leader = leader,
+                        Follower = follower,
+                    };
+
+                    scores.Add(score);
+
+                    if (judges[j - offset].Scores == null)
+                        judges[j - offset].Scores = new List<Score>();
+
+                    judges[j - offset].Scores.Add(score);
+                }
+            }
+            return scores;
         }
 
         private List<Judge> GetPrelimsJudgesByDivision(Division division, Role role)
@@ -482,6 +476,24 @@ namespace Impartial.Services.ScoresheetParser
                 return "";
 
             return "";
+        }
+
+        private string GetName()
+        {
+            if (_finalsSheetDoc == null)
+                return string.Empty;
+
+            string name = Util.GetSubString(
+                s: _finalsSheetDoc,
+                from: "<title>",
+                to: "</title>").Trim();
+
+            if (name.EndsWith(" - Scores"))
+            {
+                name = name.Substring(0, name.LastIndexOf(" - Scores"));
+            }
+
+            return name;
         }
     }
 }

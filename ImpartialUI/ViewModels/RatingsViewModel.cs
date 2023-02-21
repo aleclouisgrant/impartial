@@ -3,9 +3,11 @@ using ImpartialUI.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ImpartialUI.ViewModels
@@ -45,6 +47,30 @@ namespace ImpartialUI.ViewModels
             set
             {
                 _wsdcId = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _crunchProgressPercentage;
+        public double CrunchProgressPercentage
+        {
+            get { return _crunchProgressPercentage; }
+            set
+            {
+                _crunchProgressPercentage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IProgress<double> _crunchProgress;
+
+        private bool _crunchEnabled;
+        public bool CrunchEnabled
+        {
+            get { return _crunchEnabled; }
+            set
+            {
+                _crunchEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -95,10 +121,16 @@ namespace ImpartialUI.ViewModels
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             RefreshCompetitorsCommand = new DelegateCommand(RefreshCompetitors);
             ResetRatingsCommand = new DelegateCommand(ResetRatings);
-            CrunchRatingsCommand = new DelegateCommand(CrunchRatings);
+            CrunchRatingsCommand = new DelegateCommand(new Action(async () => 
+            {
+                await Task.Run(CrunchRatings);
+            }));
 
             Competitors = new ObservableCollection<Competitor>(competitors);
             _competitions = competitions;
+
+            _crunchProgress = new Progress<double>(ReportProgress);
+            CrunchEnabled = true;
 
             Initialize();
         }
@@ -109,28 +141,41 @@ namespace ImpartialUI.ViewModels
             Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
+        private void ReportProgress(double progress)
+        {
+            Trace.WriteLine("progress: " + progress);
+            CrunchProgressPercentage = progress;
+        }
+
         private void CrunchRatings()
         {
+            CrunchEnabled = false;
             ResetRatings();
+            _crunchProgress.Report(0);
+            double totalProgress = _competitions.Count;
+            int count = 1;
 
             foreach (var competition in _competitions)
             {
-                // prelims
-                if (competition.LeaderPrelimScores.Count > 0 && competition.FollowerPrelimScores.Count > 0)
+                // prelim rounds
+                foreach (int round in competition.Rounds)
                 {
-                    // // update the ratings of all competitors in the scores
-                    foreach (var score in competition.LeaderPrelimScores)
+                    if (competition.LeaderPrelimScores.Count > 0 && competition.FollowerPrelimScores.Count > 0)
                     {
-                        score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
-                    }
-                    foreach (var score in competition.FollowerPrelimScores)
-                    {
-                        score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
-                    }
+                        // update the ratings of all competitors in the scores
+                        foreach (var score in competition.LeaderPrelimScores)
+                        {
+                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id && score.Round == round).FirstOrDefault();
+                        }
+                        foreach (var score in competition.FollowerPrelimScores)
+                        {
+                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id && score.Round == round).FirstOrDefault();
+                        }
 
-                    // calculating the new ratings
-                    EloRatingService.PrelimRatings(competition.LeaderPrelimScores, Role.Leader, competition.PrelimLeaderJudges);
-                    EloRatingService.PrelimRatings(competition.FollowerPrelimScores, Role.Follower, competition.PrelimFollowerJudges);
+                        // calculating the new ratings
+                        EloRatingService.PrelimRatings(competition.LeaderPrelimScores, Role.Leader, competition.PrelimLeaderJudges(round));
+                        EloRatingService.PrelimRatings(competition.FollowerPrelimScores, Role.Follower, competition.PrelimFollowerJudges(round));
+                    }
                 }
 
                 // finals
@@ -146,11 +191,16 @@ namespace ImpartialUI.ViewModels
                     // calculate the new ratings
                     EloRatingService.CalculateFinalsRating(competition.Couples);
                 }
+
+                _crunchProgress.Report(Math.Round((double)count / totalProgress * 100));
+                count++;
             }
 
             OnPropertyChanged(nameof(Competitors));
             OnPropertyChanged(nameof(LeadCompetitors));
             OnPropertyChanged(nameof(FollowCompetitors));
+            _crunchProgress.Report(0);
+            CrunchEnabled = true;
         }
 
         private async void AddCompetitor()

@@ -214,7 +214,8 @@ namespace Impartial
                 Role = score.Role.ToString(),
                 Finaled = score.Finaled,
                 CallbackScore = score.CallbackScore,
-                RawScore = score.RawScore
+                RawScore = score.RawScore,
+                Round = score.Round
             };
 
             await _helper.SaveDataAsync(storedProcedure: "dbo.PrelimScores_Upsert", s);

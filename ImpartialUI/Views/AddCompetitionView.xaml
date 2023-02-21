@@ -14,6 +14,10 @@
              d:DesignHeight="800" d:DesignWidth="1600"
              d:DataContext="{d:DesignInstance Type=vm:AddCompetitionViewModel, IsDesignTimeCreatable=True}"
              Background="White">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -38,12 +42,12 @@
                         Content="Select Prelims Score Sheet"
                         Width="200" Height="20"
                         Margin="0 0 20 0"
-                        Command="{Binding SelectPrelimsPathCommand}"/>
+                        Command="{Binding SelectSemisPathCommand}"/>
                     <TextBox
                         Width="500" Height="20"
                         Text="{Binding PrelimsPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0 5">
+                <StackPanel Orientation="Horizontal" Margin="0 2">
                     <Button 
                             Content="Select Prelims Score Sheet"
                             Width="200" Height="20"
@@ -53,7 +57,17 @@
                             Width="500" Height="20"
                             Text="{Binding PrelimsPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Margin="0 2">
+                    <Button 
+                            Content="Select Semis Score Sheet"
+                            Width="200" Height="20"
+                            Margin="0 0 20 0"
+                            Command="{Binding SelectSemisPathCommand}"/>
+                    <TextBox
+                            Width="500" Height="20"
+                            Text="{Binding SemisPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0 2">
                     <Button 
                             Content="Select Finals Score Sheet"
                             Width="200" Height="20"
@@ -99,11 +113,11 @@
                     </Button.Content>
                 </Button>
                 <Button 
-                        Content="Cancel"
-                        Width="150" Height="20"
-                        FontWeight="Bold"
-                        Command="{Binding CancelCommand}"
-                        Margin="20"/>
+                    Content="Cancel"
+                    Width="150" Height="20"
+                    FontWeight="Bold"
+                    Command="{Binding CancelCommand}"
+                    Margin="20"/>
             </StackPanel>
 
             <Grid Grid.Row="0" Grid.Column="1">
@@ -177,7 +191,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <c:PrelimsAdder x:Name="LeaderPrelimsAdder" Grid.Column="2" Role="Leader" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </ScrollViewer>
@@ -191,11 +205,41 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Follower" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsViewer Grid.Column="0" Role="Follower" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <c:PrelimsAdder x:Name="FollowersPrelimsAdder" Grid.Column="2" Role="Follower" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>
+
+            <TabItem Header="Semis (Leaders)" Visibility="{Binding Competition.HasSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ScrollViewer Margin="10 5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder x:Name="LeaderSemisAdder" Grid.Column="2" Role="Leader" Round="2" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Semis (Followers)" Visibility="{Binding Competition.HasSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ScrollViewer Margin="10 5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <c:PrelimsViewer Grid.Column="0" Role="Follower" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder x:Name="FollowerSemisAdder" Grid.Column="2" Role="Follower" Round="2" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="Finals">
                 <ScrollViewer>
                     <Grid>

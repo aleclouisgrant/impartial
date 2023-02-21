@@ -11,6 +11,8 @@ namespace Impartial
                              //example: k = 300 sets +200 points to be a 75% win rate
         const int k2 = 10; //scales the magnitude of the amount of points won/lost
 
+        const int k3 = 10; //scales the magnitude of points won/lost in finals
+
         public static double ExpectedScore(int ratingA, int ratingB)
         {
             return 1 / (1 + Math.Pow(10, (ratingB - ratingA) / (double)k1));
@@ -19,6 +21,11 @@ namespace Impartial
         public static int UpdateRating(int rating, double score, double expectedScore)
         {
             return (int)Math.Round(rating + k2 * (score - expectedScore));
+        }
+
+        public static int UpdateRatingFinals(int rating, double score, double expectedScore)
+        {
+            return (int)Math.Round(rating + k3 * (score - expectedScore));
         }
 
         public static List<Competitor> PrelimRatings(List<PrelimScore> prelimScores, Role role, List<Judge> prelimJudges)
@@ -106,66 +113,6 @@ namespace Impartial
             return competitors;
         }
 
-        public static List<Competitor> CalculatePrelimRatings(List<PrelimScore> prelimScores, Role role)
-        {
-            var competitors = new List<Competitor>();
-            var c = new List<Tuple<Competitor, List<PrelimScore>>>();
-
-            foreach (var score in prelimScores)
-            {
-                if (!competitors.Any(s => s.Id == score.Competitor.Id)) { }
-                    competitors.Add(score.Competitor);
-            }
-            foreach (var competitor in competitors)
-            {
-                if (!c.Any(c => c.Item1.Id == competitor.Id)) 
-                { 
-                    c.Add(new Tuple<Competitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList()));
-                }
-            }
-
-            foreach (var competitorA in c)
-            {
-                double expectedScore = 0;
-
-                foreach (var competitorB in c)
-                {
-                    if (competitorA != competitorB)
-                    {
-                        if (role == Role.Leader)
-                            expectedScore = expectedScore + ExpectedScore(competitorA.Item1.LeadStats.Rating, competitorB.Item1.LeadStats.Rating);
-                        else if (role == Role.Follower)
-                            expectedScore = expectedScore + ExpectedScore(competitorA.Item1.FollowStats.Rating, competitorB.Item1.FollowStats.Rating);
-                    }
-                }
-
-                int ratingDifference = UpdateRating(competitorA.Item1.LeadStats.Rating, competitorA.Item2.Sum(s => (int)s.CallbackScore), expectedScore) - competitorA.Item1.LeadStats.Rating;
-
-                if (role == Role.Leader)
-                    competitorA.Item1.LeadStats.Rating = competitorA.Item1.LeadStats.Rating + ratingDifference;
-                else if (role == Role.Follower)
-                    competitorA.Item1.FollowStats.Rating = competitorA.Item1.FollowStats.Rating + ratingDifference;
-
-                #region Output
-                string ratingChange;
-                if (ratingDifference > 0)
-                    ratingChange = "+" + ratingDifference;
-                else
-                    ratingChange = ratingDifference.ToString();
-
-                if (competitorA.Item2[0].Finaled)
-                    Trace.Write("*");
-
-                if (role == Role.Leader)
-                    Trace.WriteLine(competitorA.Item1.FullName + " (" + (competitorA.Item1.LeadStats.Rating - ratingDifference).ToString() + " => " + competitorA.Item1.LeadStats.Rating + ") (" + ratingChange + ")");
-                else if (role == Role.Follower)
-                    Trace.WriteLine(competitorA.Item1.FullName + " (" + (competitorA.Item1.FollowStats.Rating - ratingDifference).ToString() + " => " + competitorA.Item1.FollowStats.Rating + ") (" + ratingChange + ")");
-                #endregion
-            }
-
-            return competitors;
-        }
-
         public static List<Couple> CalculateFinalsRating(List<Couple> couples)
         {
             //first put the couples in order of average ranking 
@@ -186,7 +133,7 @@ namespace Impartial
                     }
                 }
 
-                int ratingDifference = UpdateRating(coupleA.CombinedRating, i, expectedScore) - coupleA.CombinedRating;
+                int ratingDifference = UpdateRatingFinals(coupleA.CombinedRating, 2, expectedScore / i) - coupleA.CombinedRating;
 
                 string ratingChange;
                 if (ratingDifference > 0)

@@ -403,6 +403,10 @@ namespace Impartial
                     return competitors.Where(c => c.FullName == "Julie Auclair")?.FirstOrDefault();
                 case "Vincent van Mierlo":
                     return competitors.Where(c => c.FullName == "Vincent Van Mierlo")?.FirstOrDefault();
+                case "Kyle Fitzgerald":
+                    return competitors.Where(c => c.FullName == "Kyle FitzGerald")?.FirstOrDefault();
+                case "Joel Jiminez":
+                    return competitors.Where(c => c.FullName == "Joel Jimenez")?.FirstOrDefault();
                 default:
                     return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
             }
