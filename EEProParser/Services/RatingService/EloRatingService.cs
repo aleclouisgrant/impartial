@@ -9,9 +9,9 @@ namespace Impartial
     {
         const int k1 = 1000; //scales the probability that A wins over B at the same difference in rating. 
                              //example: k = 300 sets +200 points to be a 75% win rate
-        const int k2 = 20; //scales the magnitude of the amount of points won/lost
+        const int k2 = 40; //scales the magnitude of the amount of points won/lost
 
-        const int k3 = 20; //scales the magnitude of points won/lost in finals
+        const int k3 = 40; //scales the magnitude of points won/lost in finals
 
         public static double ExpectedScore(int ratingA, int ratingB)
         {

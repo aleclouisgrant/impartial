@@ -25,5 +25,8 @@ namespace Impartial
         Task DeleteJudgeAsync(Judge judge);
         Task<IEnumerable<Judge>> GetAllJudgesAsync();
         Task DeleteAllJudgesAsync();
+
+        Task<IEnumerable<CompetitorDataModel>> GetCompetitorDataModelsAsync();
+        Task UpsertCompetitorDataModelAsync(CompetitorDataModel competitorDataModel);
     }
 }

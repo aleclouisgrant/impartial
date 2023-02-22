@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using MongoDB.Driver.Core.Configuration;
+using static System.Formats.Asn1.AsnWriter;
 using static iText.IO.Image.Jpeg2000ImageData;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
@@ -235,6 +236,22 @@ namespace Impartial
         public async Task DeletePrelimScoresByCompIdAsync(Guid competitionId)
         {
             await _helper.SaveDataAsync(storedProcedure: "dbo.PrelimScores_DeleteAllByCompId", new { CompetitionId = competitionId });
+        }
+
+        public async Task<IEnumerable<CompetitorDataModel>> GetCompetitorDataModelsAsync()
+        {
+            return (await _helper.LoadDataAsync<CompetitorDataModel, dynamic>(storedProcedure: "dbo.CompetitorData_GetAll", new { }));
+        }
+
+        public async Task UpsertCompetitorDataModelAsync(CompetitorDataModel competitorDataModel)
+        {
+            var s = new
+            {
+                CompetitorId = competitorDataModel.Competitor.Id,
+                WsdcPoints = competitorDataModel.WsdcPoints
+            };
+
+            await _helper.SaveDataAsync(storedProcedure: "dbo.CompetitorData_Upsert", s);
         }
     }
 }

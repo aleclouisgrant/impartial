@@ -334,12 +334,19 @@ namespace Impartial
             int i = 1;
             int index = -1;
 
-            while (i <= n && (index = s.IndexOf(match, index + 1)) != -1)
+            try
             {
-                if (i == n)
-                    return index;
+                while (i <= n && (index = s.IndexOf(match, index + 1)) != -1)
+                {
+                    if (i == n)
+                        return index;
 
-                i++;
+                    i++;
+                }
+            }
+            catch
+            {
+                return -1;
             }
 
             return -1;

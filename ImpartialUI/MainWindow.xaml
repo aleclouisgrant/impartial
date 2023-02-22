@@ -13,10 +13,10 @@
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <TabControl Margin="0 20 0 0" BorderThickness="0 2 0 0">
-            <TabItem Header="Ratings">
+            <TabItem Header="Ratings" IsSelected="True">
                 <v:RatingsView DataContext="{Binding RatingsViewModel, Mode=OneWay}"/>
             </TabItem>
-            <TabItem Header="Add Competition" IsSelected="True">
+            <TabItem Header="Add Competition">
                 <v:AddCompetitionView Margin="20" DataContext="{Binding AddCompetitionViewModel, Mode=TwoWay}"/>
             </TabItem>
             <TabItem Header="View Competition">

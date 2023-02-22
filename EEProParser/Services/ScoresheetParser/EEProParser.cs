@@ -100,6 +100,9 @@ namespace Impartial
 
         private bool SemisExist(Division division)
         {
+            if (_prelimsSheetDoc == null)
+                return false;
+
             return (GetPrelimsDocByDivision(division, Role.Leader, 2) != string.Empty);
         }
         

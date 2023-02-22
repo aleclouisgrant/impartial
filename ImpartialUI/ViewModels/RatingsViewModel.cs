@@ -1,19 +1,56 @@
 ﻿using Impartial;
 using ImpartialUI.Commands;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Xml;
 
 namespace ImpartialUI.ViewModels
 {
     public class RatingsViewModel : BaseViewModel
     {
+        private List<CompetitorDataModel> _compDm;
+        public List<CompetitorDataModel> CompDm
+        {
+            get { return _compDm; }
+            set 
+            { 
+                _compDm = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _plotProgressPercentage;
+        public double PlotProgressPercentage
+        {
+            get { return _plotProgressPercentage; }
+            set
+            {
+                _plotProgressPercentage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IProgress<double> _plotProgress;
+        private bool _plotEnabled;
+        public bool PlotEnabled
+        {
+            get { return _plotEnabled; }
+            set
+            {
+                _plotEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
         private HttpClient _client;
         private List<Competition> _competitions = new List<Competition>();
 
@@ -88,9 +125,26 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        public IEnumerable<Competitor> LeadCompetitors => Util.RemoveWhere(_competitors, c => c.LeadStats.Rating == 1000).OrderByDescending(c => c.LeadStats.Rating);
-        public IEnumerable<Competitor> FollowCompetitors => Util.RemoveWhere(_competitors, c => c.FollowStats.Rating == 1000).OrderByDescending(c => c.FollowStats.Rating);
+        public IEnumerable<CompetitorDataModel> LeadCompetitors
+        {
+            get
+            {
+                if (_compDm?.FirstOrDefault().Competitor == null)
+                    return Enumerable.Empty<CompetitorDataModel>();
+                
+                return Util.RemoveWhere(_compDm, c => c.Competitor.LeadStats.Rating == 1000).OrderByDescending(c => c.Competitor.LeadStats.Rating);
+            }
+        }
+        public IEnumerable<CompetitorDataModel> FollowCompetitors {
+            get
+            {
+                if (_compDm?.FirstOrDefault().Competitor == null)
+                    return Enumerable.Empty<CompetitorDataModel>();
 
+                return Util.RemoveWhere(_compDm, c => c.Competitor.FollowStats.Rating == 1000).OrderByDescending(c => c.Competitor.FollowStats.Rating);
+            }
+        }
+        
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand RefreshCompetitorsCommand { get; set; }
         public ICommand ResetRatingsCommand { get; set; }
@@ -132,6 +186,9 @@ namespace ImpartialUI.ViewModels
             _crunchProgress = new Progress<double>(ReportProgress);
             CrunchEnabled = true;
 
+            _plotProgress = new Progress<double>(ReportPlotProgress);
+            PlotEnabled = false;
+
             Initialize();
         }
 
@@ -141,13 +198,47 @@ namespace ImpartialUI.ViewModels
             Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
+        private async void UploadWsdcPoints()
+        {
+            _plotProgress.Report(0);
+            double total = Competitors.Count();
+            double completed = 0;
+
+            List<CompetitorDataModel> compDm = new();
+            foreach (var competitor in Competitors)
+            {
+                int points = await GetWsdcPoints(competitor);
+                compDm.Add(new CompetitorDataModel(competitor, points));
+
+                completed++;
+                _plotProgress.Report(Math.Round((completed / total) * 100));
+            }
+            _plotProgress.Report(0);
+
+            CompDm = compDm;
+            OnPropertyChanged(nameof(CompDm));
+
+            foreach (var comp in CompDm)
+            {
+                await App.DatabaseProvider.UpsertCompetitorDataModelAsync(comp);
+            }
+        }
+
         private void ReportProgress(double progress)
         {
-            Trace.WriteLine("progress: " + progress);
             CrunchProgressPercentage = progress;
         }
 
-        private void CrunchRatings()
+        private void ReportPlotProgress(double progress)
+        {
+            PlotProgressPercentage = progress;
+            if (progress == 100)
+            {
+                PlotEnabled = true;
+            }
+        }
+
+        private async void CrunchRatings()
         {
             CrunchEnabled = false;
             ResetRatings();
@@ -196,11 +287,21 @@ namespace ImpartialUI.ViewModels
                 count++;
             }
 
+            CompDm = (await App.DatabaseProvider.GetCompetitorDataModelsAsync()).ToList();
+            foreach (var compDm in CompDm)
+            {
+                compDm.Competitor = Competitors.Where(c => c.Id == compDm.CompetitorId).First();
+            }
+
+            CompDm = CompDm.OrderBy(c => c.Competitor.FullName).ToList();
+
+            OnPropertyChanged(nameof(CompDm));
             OnPropertyChanged(nameof(Competitors));
             OnPropertyChanged(nameof(LeadCompetitors));
             OnPropertyChanged(nameof(FollowCompetitors));
             _crunchProgress.Report(0);
             CrunchEnabled = true;
+            PlotEnabled = true;
         }
 
         private async void AddCompetitor()
@@ -242,6 +343,23 @@ namespace ImpartialUI.ViewModels
             if (Int32.TryParse(idString, out int id))
             {
                 WsdcId = id.ToString();
+            }
+        }
+
+        private async Task<int> GetWsdcPoints(Competitor competitor)
+        {
+            var response = await _client.PostAsync("/lookup/find?q=" + competitor.WsdcId, null);
+            string sheet = await response.Content.ReadAsStringAsync();
+
+            var doc = JObject.Parse(sheet);
+
+            try
+            {
+                return doc.SelectToken("placements.['West Coast Swing'].ALS.total_points").Value<int>();
+            }
+            catch
+            {
+                return 0;
             }
         }
     }

@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+    <PackageReference Include="ScottPlot" Version="4.1.60" />
+    <PackageReference Include="ScottPlot.WPF" Version="4.1.60" />
   </ItemGroup>
 
   <ItemGroup>

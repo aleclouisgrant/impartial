@@ -58,13 +58,13 @@
                     <Grid>
                         <Grid>
                             <ProgressBar
-                                    Width="120"
-                                    Height="40"
-                                    Minimum="0"
-                                    Maximum="100"
-                                    BorderBrush="Transparent"
-                                    BorderThickness="0"
-                                    Value="{Binding CrunchProgressPercentage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                Width="120"
+                                Height="40"
+                                Minimum="0"
+                                Maximum="100"
+                                BorderBrush="Transparent"
+                                BorderThickness="0"
+                                Value="{Binding CrunchProgressPercentage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
                         <Grid>
                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Calculate Ratings"/>
@@ -72,12 +72,41 @@
                     </Grid>
                 </Button.Content>
             </Button>
-
-
             <Button Content="Reset Ratings" FontWeight="Bold" Width="150" Height="40" Margin="10" Command="{Binding ResetRatingsCommand}"/>
+
+            <Button 
+                Width="120" Height="40"
+                FontWeight="Bold"
+                Click="Button_Click"
+                IsEnabled="{Binding PlotEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="10">
+                <Button.Content>
+                    <Grid>
+                        <Grid>
+                            <ProgressBar
+                                Width="120"
+                                Height="40"
+                                Minimum="0"
+                                Maximum="100"
+                                BorderBrush="Transparent"
+                                BorderThickness="0"
+                                Value="{Binding PlotProgressPercentage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <Grid>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Plot"/>
+                        </Grid>
+                    </Grid>
+                </Button.Content>
+            </Button>
         </StackPanel>
 
-        <Grid Grid.Row="2" Margin="20" HorizontalAlignment="Center">
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="0" Margin="20" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="30"/>
@@ -96,11 +125,13 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="90"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
                             <TextBlock Grid.Column="1" Text="WSDC ID" FontWeight="Bold"/>
                             <TextBlock Grid.Column="2" Text="Leader Rating" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="3" Text="WSDC Points" FontWeight="Bold"/>
                         </Grid>
 
                         <ItemsControl Grid.Row="1" ItemsSource="{Binding LeadCompetitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
@@ -111,11 +142,13 @@
                                             <ColumnDefinition Width="150"/>
                                             <ColumnDefinition Width="60"/>
                                             <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="90"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding WsdcId, Mode=OneWay}"/>
-                                        <TextBlock Grid.Column="2" Text="{Binding LeadStats.Rating, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding Competitor.FullName, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Competitor.WsdcId, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Competitor.LeadStats.Rating, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding WsdcPoints, Mode=OneWay}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -141,11 +174,13 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="90"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0" Text="Name" FontWeight="Bold"/>
                             <TextBlock Grid.Column="1" Text="WSDC ID" FontWeight="Bold"/>
                             <TextBlock Grid.Column="2" Text="Follower Rating" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="3" Text="WSDC Points" FontWeight="Bold"/>
                         </Grid>
 
                         <ItemsControl Grid.Row="1" ItemsSource="{Binding FollowCompetitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
@@ -156,11 +191,13 @@
                                             <ColumnDefinition Width="150"/>
                                             <ColumnDefinition Width="60"/>
                                             <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="90"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="{Binding FullName, Mode=OneWay}"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding WsdcId, Mode=OneWay}"/>
-                                        <TextBlock Grid.Column="2" Text="{Binding FollowStats.Rating, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding Competitor.FullName, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Competitor.WsdcId, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Competitor.FollowStats.Rating, Mode=OneWay}"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding WsdcPoints, Mode=OneWay}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -173,6 +210,11 @@
                     </Grid>
                 </ScrollViewer>
             </Border>
+
+        </Grid>
+            <Grid Grid.Column="1">
+                <WpfPlot x:Name="Plot"/>
+            </Grid>
 
         </Grid>
     </Grid>
