@@ -6,34 +6,131 @@ namespace ImpartialUI.Views
 {
     public partial class ViewCompetitionView : UserControl
     {
+        private bool _editMode = false;
+
         public ViewCompetitionView()
         {
             InitializeComponent();
+        }
+
+        private void EditMode()
+        {
+            if (CompetitionComboBox.SelectedValue != null)
+            {
+                _editMode = true;
+
+                CompetitionViewerGrid.Visibility = Visibility.Collapsed;
+                CompetitionEditorGrid.Visibility = Visibility.Visible;
+
+                EditButton.Content = "View";
+                RefreshButton.Visibility = Visibility.Collapsed;
+                SaveButton.Visibility = Visibility.Visible;
+
+                CompetitionComboBox.IsEnabled = false;
+
+                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(1))
+                {
+                    PrelimsEditorGrid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    PrelimsEditorGrid.Visibility = Visibility.Collapsed;
+                }
+
+                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(2))
+                {
+                    SemisEditorGrid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    SemisEditorGrid.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+        private void ViewMode()
+        {
+            _editMode = false;
+            
+            CompetitionEditorGrid.Visibility = Visibility.Collapsed;
+            SemisEditorGrid.Visibility = Visibility.Collapsed;
+            PrelimsEditorGrid.Visibility = Visibility.Collapsed;
+
+            EditButton.Content = "Edit";
+            RefreshButton.Visibility = Visibility.Visible;
+            SaveButton.Visibility = Visibility.Collapsed;
+
+            CompetitionComboBox.IsEnabled = true;
+
+            if (CompetitionComboBox.SelectedValue != null)
+            {
+                CompetitionViewerGrid.Visibility = Visibility.Visible;
+
+                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(1))
+                {
+                    PrelimsViewerGrid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    PrelimsViewerGrid.Visibility = Visibility.Collapsed;
+                }
+
+                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(2))
+                {
+                    SemisViewerGrid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    SemisViewerGrid.Visibility = Visibility.Collapsed;
+                }
+            }
         }
 
         private void CompetitionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
             {
-                //CompetitionScrollViewer.Visibility = Visibility.Collapsed;
                 CompetitionViewerGrid.Visibility = Visibility.Visible;
+                
                 if (((Competition)e.AddedItems[0]).HasRound(1))
-                    PrelimsGrid.Visibility = Visibility.Visible;
+                {
+                    PrelimsViewerGrid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    PrelimsViewerGrid.Visibility = Visibility.Collapsed;
+                }
+
                 if (((Competition)e.AddedItems[0]).HasRound(2))
-                    SemisGrid.Visibility = Visibility.Visible;
+                {
+                    SemisViewerGrid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    SemisViewerGrid.Visibility = Visibility.Collapsed;
+                }
             }
             else
             {
-                //CompetitionScrollViewer.Visibility = Visibility.Collapsed;
                 CompetitionViewerGrid.Visibility = Visibility.Collapsed;
-                PrelimsGrid.Visibility = Visibility.Collapsed;
-                SemisGrid.Visibility = Visibility.Collapsed;
+                PrelimsViewerGrid.Visibility = Visibility.Collapsed;
+                SemisViewerGrid.Visibility = Visibility.Collapsed;
+            }
+        }
+        private void EditCompetitionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_editMode)
+            {
+                EditMode();
+            }
+            else
+            {
+                ViewMode();
             }
         }
 
-        private void EditCompetitionButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-
+            ViewMode();
         }
     }
 }

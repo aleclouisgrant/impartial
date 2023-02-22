@@ -9,9 +9,9 @@ namespace Impartial
     {
         const int k1 = 1000; //scales the probability that A wins over B at the same difference in rating. 
                              //example: k = 300 sets +200 points to be a 75% win rate
-        const int k2 = 10; //scales the magnitude of the amount of points won/lost
+        const int k2 = 20; //scales the magnitude of the amount of points won/lost
 
-        const int k3 = 10; //scales the magnitude of points won/lost in finals
+        const int k3 = 20; //scales the magnitude of points won/lost in finals
 
         public static double ExpectedScore(int ratingA, int ratingB)
         {
@@ -33,10 +33,11 @@ namespace Impartial
             var competitors = new List<Competitor>();
             var finalists = new List<Tuple<Competitor, List<PrelimScore>>>();
             var notFinalists = new List<Tuple<Competitor, List<PrelimScore>>>();
+            int round = prelimScores.FirstOrDefault().Round;
 
             foreach (var score in prelimScores)
             {
-                if (!competitors.Any(s => s.Id == score.Competitor.Id)) { }
+                if (!competitors.Any(c => c.Id == score.Competitor.Id))
                     competitors.Add(score.Competitor);
             }
             foreach (var competitor in competitors)
@@ -58,39 +59,33 @@ namespace Impartial
 
             if (role == Role.Leader)
             {
-                //ratingSum = finalists.Sum(c => c.Item1.LeadStats.Rating) + notFinalists.Sum(c => c.Item1.LeadStats.Rating);
                 ratingSum = finalists.Sum(c => c.Item1.LeadStats.Rating);
                 maxScore = prelimJudges.Count() * 10;
             }
             else if (role == Role.Follower)
             {
-                //ratingSum = finalists.Sum(c => c.Item1.FollowStats.Rating) + notFinalists.Sum(c => c.Item1.FollowStats.Rating);
                 ratingSum = finalists.Sum(c => c.Item1.FollowStats.Rating);
                 maxScore = prelimJudges.Count() * 10;
             }
 
-            //int averageRating = ratingSum / totalNumber;
             int averageRating = ratingSum / finalistSpots;
 
             foreach (var competitor in competitors)
             {
                 int ratingDifference = 0;
 
+                double score = prelimScores.Where(s => s.Competitor.Id == competitor.Id).Sum(s => (int)s.CallbackScore) / 10;
+                double normalizedScore = (score / maxScore) + ((double)(round - 1) * 0.2);
+
                 if (role == Role.Leader)
                 {
-                    double score = prelimScores.Where(s => s.Competitor.Id == competitor.Id).Sum(s => (int)s.CallbackScore) / 10;
-                    double normalizedScore = score / maxScore;
                     double expectedScore = ExpectedScore(competitor.LeadStats.Rating, averageRating);
-
                     ratingDifference = UpdateRating(competitor.LeadStats.Rating, normalizedScore, expectedScore) - competitor.LeadStats.Rating;
                     competitor.LeadStats.Rating = competitor.LeadStats.Rating + ratingDifference;
                 }
                 else if (role == Role.Follower)
                 {
-                    double score = prelimScores.Where(s => s.Competitor.Id == competitor.Id).Sum(s => (int)s.CallbackScore) / 10;
-                    double normalizedScore = score / maxScore;
                     double expectedScore = ExpectedScore(competitor.FollowStats.Rating, averageRating);
-
                     ratingDifference = UpdateRating(competitor.FollowStats.Rating, normalizedScore, expectedScore) - competitor.FollowStats.Rating;
                     competitor.FollowStats.Rating = competitor.FollowStats.Rating + ratingDifference;
                 }

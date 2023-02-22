@@ -29,35 +29,49 @@ namespace ImpartialUI.Controls
             var control = (PrelimsAdder)source;
             var competition = (Competition)e.NewValue;
 
+            if (competition == null)
+                return;
+
             var judges = new List<Judge>();
-            var competitors = new List<Competitor>();
+            List<Tuple<Competitor, List<PrelimScore>>> c = new();
 
             if (control.Role == Role.Leader)
             {
-                competitors = competition.PrelimLeaders(control.Round);
+                List<Competitor> competitors = competition.PrelimLeaders(control.Round);
+                foreach (var competitor in competitors)
+                {
+                    c.Add(new(competitor, competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == control.Round).OrderBy(c => c.Judge.FullName).ToList()));
+                }
+
                 judges = competition.PrelimLeaderJudges(control.Round).OrderBy(j => j.FullName).ToList();
             }
             else if (control.Role == Role.Follower)
             {
-                competitors = competition.PrelimFollowers(control.Round);
+                List<Competitor> competitors = competition.PrelimFollowers(control.Round);
+                foreach (var competitor in competitors)
+                {
+                    c.Add(new(competitor, competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == control.Round).OrderBy(c => c.Judge.FullName).ToList()));
+                }
                 judges = competition.PrelimFollowerJudges(control.Round).OrderBy(j => j.FullName).ToList();
             }
+
+            c = c.OrderBy(cc => cc.Item2.FirstOrDefault().RawScore).ToList();
 
             control.Clear();
 
             foreach (var judge in judges)
             {
                 if (control.Role == Role.Leader)
-                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.LeaderPrelimScores.Where(s => s.Judge.FullName == judge.FullName && s.Round == control.Round).ToList()));
+                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.LeaderPrelimScores.Where(s => s.Judge.Id == judge.Id && s.Round == control.Round).ToList()));
                 else if (control.Role == Role.Follower)
-                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.FollowerPrelimScores.Where(s => s.Judge.FullName == judge.FullName && s.Round == control.Round).ToList()));
+                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.FollowerPrelimScores.Where(s => s.Judge.Id == judge.Id && s.Round == control.Round).ToList()));
 
                 control.AddJudge(judge);
             }
 
-            foreach (var competitor in competitors)
+            foreach (var competitor in c)
             {
-                control.AddCompetitor(competitor);
+                control.AddCompetitor(competitor.Item1, competitor.Item2);
             }
 
             foreach (var score in competition.LeaderPrelimScores)
@@ -204,16 +218,23 @@ namespace ImpartialUI.Controls
             }
         }
 
-        private void AddCompetitor(Competitor competitor = null)
+        private void AddCompetitor(Competitor competitor = null, List<PrelimScore> competitorPrelimScores = null)
         {
             ScoreGrid.RowDefinitions.Add(new RowDefinition());
 
-            List<PrelimScore> competitorPrelimScores = new();
-
-            if (Role == Role.Leader)
-                competitorPrelimScores = Competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == Round).OrderBy(c => c.Judge.FullName).ToList();
-            else if (Role == Role.Follower)
-                competitorPrelimScores = Competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == Round).OrderBy(c => c.Judge.FullName).ToList();
+            if (competitorPrelimScores == null)
+            {
+                competitorPrelimScores = new();
+                
+                if (Role == Role.Leader)
+                    competitorPrelimScores = Competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == Round).OrderBy(c => c.Judge.FullName).ToList();
+                else if (Role == Role.Follower)
+                    competitorPrelimScores = Competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == Round).OrderBy(c => c.Judge.FullName).ToList();
+            }
+            else
+            {
+                competitorPrelimScores = competitorPrelimScores.OrderBy(c => c.Judge.FullName).ToList();
+            }
 
             bool finaled = false;
             if (competitorPrelimScores.Count > 0)

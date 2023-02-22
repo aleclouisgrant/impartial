@@ -34,6 +34,8 @@ namespace Impartial
 
             await _helper.SaveDataAsync(storedProcedure: "dbo.Competitions_Upsert", c);
 
+            await DeleteScoresByCompIdAsync(competition.Id);
+
             foreach (Score score in competition.Scores)
             {
                 await UpsertScoreAsync(score);

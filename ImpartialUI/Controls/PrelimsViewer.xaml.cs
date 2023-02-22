@@ -294,7 +294,8 @@ namespace ImpartialUI.Controls
 
                 i++;
             }
-            control.OnPropertyChanged(nameof(Count));
+            control.OnPropertyChanged(nameof(control.Count));
+            control.OnPropertyChanged(nameof(control.RoundString));
         }
 
         public static readonly DependencyProperty RoleProperty = DependencyProperty.Register(
@@ -347,6 +348,20 @@ namespace ImpartialUI.Controls
                     return Competition.TotalFollowers.ToString();
                 else
                     return string.Empty;
+            }
+        }
+        public string RoundString
+        {
+            get 
+            { 
+                switch (Round)
+                {
+                    case 2:
+                        return "Semis";
+                    default:
+                    case 1:
+                        return "Prelims";
+                } 
             }
         }
 

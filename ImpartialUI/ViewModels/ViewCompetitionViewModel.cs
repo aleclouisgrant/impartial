@@ -32,11 +32,13 @@ namespace ImpartialUI.ViewModels
         }
 
         public ICommand RefreshCompetitionsCommand { get; set; }
+        public ICommand SaveCompetitionCommand { get; set; }
         public ICommand DeleteCompetitionCommand { get; set; }
 
         public ViewCompetitionViewModel()
         {
             RefreshCompetitionsCommand = new DelegateCommand(RefreshCompetitions);
+            SaveCompetitionCommand = new DelegateCommand(SaveCompetition);
             DeleteCompetitionCommand = new DelegateCommand(DeleteCompetition);
         }
 
@@ -45,6 +47,7 @@ namespace ImpartialUI.ViewModels
             Competitions = competitions;
 
             RefreshCompetitionsCommand = new DelegateCommand(RefreshCompetitions);
+            SaveCompetitionCommand = new DelegateCommand(SaveCompetition);
             DeleteCompetitionCommand = new DelegateCommand(DeleteCompetition);
 
             RefreshCompetitions();
@@ -63,8 +66,15 @@ namespace ImpartialUI.ViewModels
             //OnPropertyChanged(nameof(Competitions));
 
             RefreshCompetitions();
-
             Competition = null;
+        }
+        private async void SaveCompetition()
+        {
+            Guid id = Competition.Id;
+            await App.DatabaseProvider.UpsertCompetitionAsync(Competition);
+
+            RefreshCompetitions();
+            Competition = Competitions.Where(c => c.Id == id).FirstOrDefault();
         }
     }
 }

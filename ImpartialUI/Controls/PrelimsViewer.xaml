@@ -16,7 +16,8 @@
             <TextBlock Margin="2">
                 <Run Text="Jack &amp; Jill"/>
                 <Run Text="{Binding Competition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Run Text="Prelims ("/>
+                <Run Text="{Binding RoundString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text=" ("/>
                 <Run Text="{Binding Role, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Run Text="("/>
                 <Run Text="{Binding Count, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>

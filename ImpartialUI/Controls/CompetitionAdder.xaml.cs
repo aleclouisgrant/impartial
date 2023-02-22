@@ -34,19 +34,25 @@ namespace ImpartialUI.Controls
             var viewer = (CompetitionAdder)source;
             var competition = (Competition)e.NewValue;
 
-            var judges = competition.Judges;
-            var couples = competition.Couples;
+            var judges = competition?.Judges.OrderBy(j => j.FullName);
+            var couples = competition?.Couples.OrderBy(c => c.ActualPlacement);
 
             viewer.Clear();
 
-            foreach (var judge in judges)
+            if (judges != null)
             {
-                viewer.AddJudge(judge);
+                foreach (var judge in judges)
+                {
+                    viewer.AddJudge(judge);
+                }
             }
 
-            foreach (var couple in couples)
+            if (couples != null)
             {
-                viewer.AddCouple(couple);
+                foreach (var couple in couples)
+                {
+                    viewer.AddCouple(couple);
+                }
             }
 
             viewer.UpdateCompetition();
@@ -223,7 +229,7 @@ namespace ImpartialUI.Controls
 
             if (couple?.Scores != null)
             {
-                couple.Scores.OrderBy(s => s.Judge.FullName);
+                couple.Scores = couple.Scores.OrderBy(s => s.Judge.FullName).ToList();
             }
 
             // scores
@@ -440,6 +446,9 @@ namespace ImpartialUI.Controls
 
         private void UpdateCompetition()
         {
+            if (Competition == null)
+                return;
+
             Competition.ClearFinals();
 
             for (int placement = 1; placement <= ScoreGrid.RowDefinitions.Count - 2; placement++)

@@ -163,18 +163,18 @@ namespace ImpartialUI.ViewModels
                     if (competition.LeaderPrelimScores.Count > 0 && competition.FollowerPrelimScores.Count > 0)
                     {
                         // update the ratings of all competitors in the scores
-                        foreach (var score in competition.LeaderPrelimScores)
+                        foreach (var score in competition.LeaderPrelimScores.Where(s => s.Round == round))
                         {
-                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id && score.Round == round).FirstOrDefault();
+                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
                         }
-                        foreach (var score in competition.FollowerPrelimScores)
+                        foreach (var score in competition.FollowerPrelimScores.Where(s => s.Round == round))
                         {
-                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id && score.Round == round).FirstOrDefault();
+                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
                         }
 
                         // calculating the new ratings
-                        EloRatingService.PrelimRatings(competition.LeaderPrelimScores, Role.Leader, competition.PrelimLeaderJudges(round));
-                        EloRatingService.PrelimRatings(competition.FollowerPrelimScores, Role.Follower, competition.PrelimFollowerJudges(round));
+                        EloRatingService.PrelimRatings(competition.LeaderPrelimScores.Where(s => s.Round == round).ToList(), Role.Leader, competition.PrelimLeaderJudges(round));
+                        EloRatingService.PrelimRatings(competition.FollowerPrelimScores.Where(s => s.Round == round).ToList(), Role.Follower, competition.PrelimFollowerJudges(round));
                     }
                 }
 
