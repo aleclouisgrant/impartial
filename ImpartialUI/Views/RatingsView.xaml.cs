@@ -1,8 +1,9 @@
 ﻿using ImpartialUI.ViewModels;
 using MongoDB.Driver.Linq;
+using System;
 using System.Linq;
 using System.Windows.Controls;
-using System.Windows.Media;
+using System.Windows;
 
 namespace ImpartialUI.Views
 {
@@ -34,6 +35,13 @@ namespace ImpartialUI.Views
             var leads = compDm.Where(c => c.Competitor.LeadStats.Rating != 1000);
             var follows = compDm.Where(c => c.Competitor.FollowStats.Rating != 1000);
 
+            int xMax = compDm.Max(c => c.Competitor.LeadStats.Rating);
+            int xMin = compDm.Min(c => c.Competitor.LeadStats.Rating);
+            int yMax = compDm.Max(c => c.WsdcPoints);
+
+            Plot.Plot.SetAxisLimitsX(Math.Round((double)xMin / 100d, 0) * 100 - 100, Math.Round((double)xMax / 100d, 0) * 100 + 100);
+            Plot.Plot.SetAxisLimitsY(-1, Math.Round((double)yMax / 100d, 0) * 100);
+
             foreach (var comp in leads)
             {
                 Plot.Plot.AddPoint(comp.Competitor.LeadStats.Rating, comp.WsdcPoints, label: comp.Competitor.FullName, color: System.Drawing.Color.Blue);
@@ -46,9 +54,29 @@ namespace ImpartialUI.Views
             Plot.Refresh();
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MakePlot();
+            if (PlotGrid.Visibility == Visibility.Visible)
+            {
+                PlotGrid.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                PlotGrid.Visibility = Visibility.Visible;
+                MakePlot();
+            }
+        }
+
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LeadListView.SelectedItem == null && FollowListView.SelectedItem == null)
+            {
+                CompetitorProfileGrid.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                CompetitorProfileGrid.Visibility = Visibility.Visible;
+            }
         }
     }
 }

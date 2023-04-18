@@ -2,6 +2,7 @@
 using Impartial.Enums;
 using iText.Barcodes.Dmcode;
 using iText.Layout.Element;
+using iText.StyledXmlParser.Jsoup.Nodes;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
@@ -262,19 +263,41 @@ namespace Impartial.Services.ScoresheetParser
                 sub = Util.GetSubString(
                     s: doc,
                     from: "<div><b>Judges: </b>",
-                    to: "</div><div class=\"judge_note\">");
+                    to: "</div>");
             }
             else if (role == Role.Follower)
             {
                 sub = Util.GetSubString(
                     s: doc.Substring(doc.IndexOf("<h3 id=\"followers\">Followers")),
                     from: "<div><b>Judges: </b>",
-                    to: "<div class=\"judge_note\">");
+                    to: "</div>");
             }
 
             List<string> names = sub.Split(',').ToList();
 
-            // because step right solutions anonymizes judges, we are going to return anonymous judges
+            // step right solutions usuallys anonymizes judges, so we test for that
+            if (names.First().Contains("J1"))
+            {
+                foreach (var nameString in names)
+                {
+                    string name = nameString.Substring(0, nameString.IndexOf("<em>"));
+                    int pos = name.Trim().IndexOf(' ');
+
+                    //no last name was recorded
+                    if (pos == -1)
+                    {
+                        judges.Add(new Judge(name.Trim(), string.Empty));
+                    }
+                    else
+                    {
+                        judges.Add(new Judge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
+                    }
+                }
+
+                return judges;
+            }
+
+            // otherwise, we are going to return anonymous judges
             for (int i = 1; i <= names.Count; i++)
             {
                 judges.Add(new Judge("Anonymous", i.ToString()));
@@ -289,30 +312,37 @@ namespace Impartial.Services.ScoresheetParser
             string sub = Util.GetSubString(
                 s: _finalsSheetDoc,
                 from: "<div><b>Judges: </b>",
-                to: "<div class=\"judge_note\">");
+                to: "</div>");
 
             List<string> names = sub.Split(',').ToList();
-            
-            // because step right solutions anonymizes judges, we are going to return anonymous judges
+
+            // step right solutions usuallys anonymizes judges, so we test for that
+            if (names.First().Contains("J1"))
+            {
+                foreach (var nameString in names)
+                {
+                    string name = nameString.Substring(0, nameString.IndexOf("<em>"));
+                    int pos = name.Trim().IndexOf(' ');
+
+                    //no last name was recorded
+                    if (pos == -1)
+                    {
+                        judges.Add(new Judge(name.Trim(), string.Empty));
+                    }
+                    else
+                    {
+                        judges.Add(new Judge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
+                    }
+                }
+
+                return judges;
+            }
+
+            // otherwise, we are going to return anonymous judges
             for (int i = 1; i <= names.Count; i++)
             {
                 judges.Add(new Judge("Anonymous", i.ToString()));
             }
-
-            //foreach (var name in names)
-            //{
-            //    int pos = name.Trim().IndexOf(' ');
-
-            //    //no last name was recorded
-            //    if (pos == -1)
-            //    {
-            //        judges.Add(new Judge(name.Trim(), string.Empty));
-            //    }
-            //    else
-            //    {
-            //        judges.Add(new Judge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
-            //    }
-            //}
 
             return judges;
         }
@@ -375,12 +405,12 @@ namespace Impartial.Services.ScoresheetParser
             Division div;
             var finals = Util.GetSubString(
                 s: _finalsSheetDoc,
-                from: "<div class=\"span9\"><div class=\"well clearfix\">",
+                from: "<div class=\"well clearfix\">",
                 to: "</tbody></table></div>");
 
             var divisionString = Util.GetSubString(finals, "<h3>", "</h3>");
 
-            finals = finals.Substring(finals.IndexOf("<th rowspan=\"1\">Placement</th></tr></thead><tbody>") + new string("<th rowspan =\"1\">Placement</th></tr></thead><tbody>").Length - 1);
+            finals = finals.Substring(finals.IndexOf("<tbody>") + new string("<tbody>").Length - 1);
 
             if (divisionString.Contains("Newcomer"))
                 div = Division.Newcomer;

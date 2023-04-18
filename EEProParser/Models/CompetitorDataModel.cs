@@ -8,10 +8,11 @@ namespace Impartial
         public Guid CompetitorId { get; set; }
         public Competitor Competitor { get; set; }
         public int WsdcPoints { get; set; }
-        private List<int> CompetitionHistory { get; set; } = new();
+        public List<CompetitionHistory> CompetitionHistory { get; set; } = new();
 
         public CompetitorDataModel(Competitor competitor, int points) 
         {
+            CompetitorId = competitor.Id;
             Competitor = competitor;
             WsdcPoints = points;
         }

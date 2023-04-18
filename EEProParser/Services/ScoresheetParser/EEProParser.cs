@@ -33,7 +33,7 @@ namespace Impartial
 
             int c = 1;
 
-            while (c < 21)
+            while (c < 30)
             {
                 Division div;
                 var finals = Util.GetSubStringN(
@@ -59,6 +59,8 @@ namespace Impartial
                     div = Division.AllStar;
                 else if (divisionString.Contains("All Star"))
                     div = Division.AllStar;
+                else if (divisionString.Contains("Allstar"))
+                    div = Division.AllStar;
                 else if (divisionString.Contains("Champion"))
                     div = Division.Champion;
                 else if (divisionString.Contains("Open"))
@@ -78,9 +80,7 @@ namespace Impartial
         {
             var prelims = new Tuple<List<PrelimScore>, List<PrelimScore>>(null, null);
             if (_prelimsSheetDoc != null)
-            {
                 prelims = GetPrelimScores(division, 1);
-            }
 
             if (SemisExist(division))
             {
@@ -108,7 +108,7 @@ namespace Impartial
         
         private Tuple<List<PrelimScore>, List<PrelimScore>> GetPrelimScores(Division division, int round)
         {
-            var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader, round);
+            string leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader, round);
             HtmlDocument leadsDoc = new HtmlDocument();
             leadsDoc.LoadHtml(leadsPrelims);
             var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
@@ -272,6 +272,9 @@ namespace Impartial
                     from: "<td><em><strong>Count</strong></em></td>",
                     to: "<td><em><strong>BIB</strong></em></td>");
 
+            if (sub == string.Empty)
+                throw new DivisionNotFoundException(division);
+
             var doc = new HtmlDocument();
             doc.LoadHtml(sub);
             var nodes = doc.DocumentNode.SelectNodes("td");
@@ -336,7 +339,7 @@ namespace Impartial
 
         private string GetPrelimsDocByDivision(Division division, Role role, int round)
         {
-            for (int c = 1; c < 20; c++)
+            for (int c = 1; c < 30; c++)
             {
                 Division div;
                 var prelims = Util.GetSubStringN(
@@ -345,7 +348,9 @@ namespace Impartial
                     to: "</tr></tbody></table><p>",
                     n: c);
 
-                var divisionString = Util.GetSubString(prelims, "<td colspan=\"11\">", "</td></tr><tr>");
+                string divisionString = Util.GetSubString(prelims, "<td colspan=\"11\">", "</td></tr><tr>");
+                if (divisionString == string.Empty)
+                    return "";
 
                 if (round == 1)
                 {
@@ -370,6 +375,8 @@ namespace Impartial
                     div = Division.AllStar;
                 else if (divisionString.Contains("All Star"))
                     div = Division.AllStar;
+                else if (divisionString.Contains("Allstar"))
+                    div = Division.AllStar;
                 else if (divisionString.Contains("Champion"))
                     div = Division.Champion;
                 else
@@ -390,7 +397,7 @@ namespace Impartial
         }
         private string GetFinalsDocByDivision(Division division)
         {
-            for (int c = 1; c < 20; c++)
+            for (int c = 1; c < 30; c++)
             {
                 Division div;
                 var finals = Util.GetSubStringN(

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ImpartialUI.ViewModels
@@ -172,6 +173,8 @@ namespace ImpartialUI.ViewModels
         public ICommand SelectPrelimsPathCommand { get; set; }
         public ICommand SelectSemisPathCommand { get; set; }
         public ICommand SelectFinalsPathCommand { get; set; }
+        public ICommand RefreshCacheCommand { get; set; }
+
 
         public AddCompetitionViewModel()
         {
@@ -201,6 +204,7 @@ namespace ImpartialUI.ViewModels
             SelectSemisPathCommand = new DelegateCommand(SelectSemisPath);
             SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
             ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
+            RefreshCacheCommand = new DelegateCommand(RefreshCache);
             CancelCommand = new DelegateCommand(Clear);
 
             _databaseProvider = App.DatabaseProvider;
@@ -215,16 +219,16 @@ namespace ImpartialUI.ViewModels
             Competitors = competitors;
             Judges = judges;
 
-            Initialize();
+            RefreshCache();
 
-            //ScoresheetSelector = ScoresheetSelector.EEPro;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-11-26 us open\prelims.html";
+            //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-04-01 city of angels\prelims.html";
             //SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\semis.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-11-26 us open\finals.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-04-01 city of angels\finals.html";
             //ParseScoreSheets();
         }
 
-        private async void Initialize()
+        private async void RefreshCache()
         {
             Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
             Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
@@ -345,6 +349,8 @@ namespace ImpartialUI.ViewModels
             PrelimsPath = string.Empty;
             FinalsPath = string.Empty;
             ScoresheetSelector = ScoresheetSelector.Auto;
+
+            ClearException();
         }
 
         private async void AddCompetitor()
@@ -417,6 +423,7 @@ namespace ImpartialUI.ViewModels
 
         private async void ParseScoreSheets()
         {
+            ClearException();
             _parseProgress.Report(0);
 
             if (ScoresheetSelector == ScoresheetSelector.Auto)
@@ -446,7 +453,15 @@ namespace ImpartialUI.ViewModels
             if (!_scoresheetParser.GetDivisions().Contains(Division.AllStar))
                 return;
 
-            var comp = _scoresheetParser.GetCompetition(Division.AllStar);
+            Competition comp;
+            try
+            {
+                comp = _scoresheetParser.GetCompetition(Division.AllStar);
+            } catch (DivisionNotFoundException e)
+            {
+                Exception = e;
+                return;
+            }
 
             // prelims rounds
             foreach (int round in comp.Rounds)
@@ -454,6 +469,10 @@ namespace ImpartialUI.ViewModels
                 foreach (var competitor in comp.PrelimLeaders(round))
                 {
                     var serverCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, Competitors);
+                    if (serverCompetitor == null)
+                    {
+                        serverCompetitor = await App.DatabaseProvider.GetCompetitorByNameAsync(competitor.FirstName, competitor.LastName);
+                    }
 
                     if (serverCompetitor != null)
                     {
@@ -484,6 +503,10 @@ namespace ImpartialUI.ViewModels
                 foreach (var competitor in comp.PrelimFollowers(round))
                 {
                     var serverCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, Competitors);
+                    if (serverCompetitor == null)
+                    {
+                        serverCompetitor = await App.DatabaseProvider.GetCompetitorByNameAsync(competitor.FirstName, competitor.LastName);
+                    }
 
                     if (serverCompetitor != null)
                     {
@@ -546,6 +569,10 @@ namespace ImpartialUI.ViewModels
             foreach (var judge in comp.Judges)
             {
                 var serverJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, Judges);
+                if (serverJudge == null)
+                {
+                    serverJudge = await App.DatabaseProvider.GetJudgeByNameAsync(judge.FirstName, judge.LastName);
+                }
 
                 if (serverJudge != null)
                 {
@@ -565,6 +592,10 @@ namespace ImpartialUI.ViewModels
             foreach (var couple in comp.Couples)
             {
                 var serverLeader = Util.FindCompetitorInCache(couple.Leader.FirstName, couple.Leader.LastName, Competitors);
+                if (serverLeader == null)
+                {
+                    serverLeader = await App.DatabaseProvider.GetCompetitorByNameAsync(couple.Leader.FirstName, couple.Leader.LastName);
+                }
 
                 if (serverLeader != null)
                 {
@@ -592,6 +623,10 @@ namespace ImpartialUI.ViewModels
                 }
 
                 var serverFollower = Util.FindCompetitorInCache(couple.Follower.FirstName, couple.Follower.LastName, Competitors);
+                if (serverFollower == null)
+                {
+                    serverFollower = await App.DatabaseProvider.GetCompetitorByNameAsync(couple.Follower.FirstName, couple.Follower.LastName);
+                }
 
                 if (serverFollower != null)
                 {

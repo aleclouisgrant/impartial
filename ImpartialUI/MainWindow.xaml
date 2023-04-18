@@ -6,13 +6,23 @@
         xmlns:v="clr-namespace:ImpartialUI.Views"
         xmlns:vm="clr-namespace:ImpartialUI.ViewModels"
         xmlns:local="clr-namespace:ImpartialUI"
+        xmlns:converter="clr-namespace:ImpartialUI.Converters"
         mc:Ignorable="d"
         x:Name="View"
         Title="Impartial" Height="1000" Width="1600"
         WindowState="Maximized"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}">
+    <Window.Resources>
+        <converter:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter"/>
+    </Window.Resources>
+    
     <Grid>
-        <TabControl Margin="0 20 0 0" BorderThickness="0 2 0 0">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        
+        <TabControl Grid.Row="0" Margin="0 20 0 0" BorderThickness="0 2 0 0">
             <TabItem Header="Ratings" IsSelected="True">
                 <v:RatingsView DataContext="{Binding RatingsViewModel, Mode=OneWay}"/>
             </TabItem>
@@ -23,5 +33,11 @@
                 <v:ViewCompetitionView Margin="30" DataContext="{Binding ViewCompetitionViewModel, Mode=TwoWay}"/>
             </TabItem>
         </TabControl>
+
+        <Grid Grid.Row="1" Background="Gray">
+            <TextBlock Foreground="Red" VerticalAlignment="Center" Margin="30 0" Visibility="Visible">
+                <Run Text="{Binding Exception, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ExceptionToMessageConverter}}"/>
+            </TextBlock>
+        </Grid>
     </Grid>
 </Window>

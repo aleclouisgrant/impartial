@@ -37,6 +37,10 @@ namespace ImpartialUI.Controls
             var judges = competition?.Judges.OrderBy(j => j.FullName);
             var couples = competition?.Couples.OrderBy(c => c.ActualPlacement);
 
+            DateTime date = DateTime.Now;
+            if (competition != null)
+                date = competition.Date;
+
             viewer.Clear();
 
             if (judges != null)
@@ -55,6 +59,7 @@ namespace ImpartialUI.Controls
                 }
             }
 
+            viewer.CompDatePicker.DisplayDate = date;
             viewer.UpdateCompetition();
         }
         #endregion
@@ -342,7 +347,7 @@ namespace ImpartialUI.Controls
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
-            CompDatePicker.SelectedDate = DateTime.Now;
+            //CompDatePicker.SelectedDate = DateTime.Now;
 
             var placeBorder = new Border()
             {
@@ -450,6 +455,7 @@ namespace ImpartialUI.Controls
                 return;
 
             Competition.ClearFinals();
+            Competition.Date = CompDatePicker.DisplayDate;
 
             for (int placement = 1; placement <= ScoreGrid.RowDefinitions.Count - 2; placement++)
             {

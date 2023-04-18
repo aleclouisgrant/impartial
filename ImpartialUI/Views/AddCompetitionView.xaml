@@ -29,7 +29,6 @@
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
-                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -87,7 +86,7 @@
                     <RadioButton Content="World Dance Registry" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.WorldDanceRegistry}}"/>
                 </StackPanel>
             </StackPanel>
-
+            
             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
                 <Button 
                     Width="150" Height="20"
@@ -254,14 +253,23 @@
             </TabItem>
         </TabControl>
 
-        <Button 
-            Grid.Row="2"
-            Content="Add Competition To Database"
-            Width="200" Height="20"
-            FontWeight="Bold"
-            Command="{Binding AddCompetitionCommand}"
-            IsDefault="True"
-            Margin="20"
-            VerticalAlignment="Bottom"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+            <Button 
+                Content="Add Competition To Database"
+                Width="200" Height="20"
+                FontWeight="Bold"
+                Command="{Binding AddCompetitionCommand}"
+                IsDefault="True"
+                Margin="20"/>
+            
+            <Button 
+                Content="Refresh Cache"
+                Width="200" Height="20"
+                FontWeight="Bold"
+                Command="{Binding RefreshCacheCommand}"
+                IsDefault="True"
+                Margin="20"/>
+        </StackPanel>
+
     </Grid>
 </UserControl>

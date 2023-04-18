@@ -7,9 +7,10 @@ namespace Impartial
 {
     public class EloRatingService
     {
-        const int k1 = 1000; //scales the probability that A wins over B at the same difference in rating. 
+        const int k1 = 2000; //scales the probability that A wins over B at the same difference in rating. 
                              //example: k = 300 sets +200 points to be a 75% win rate
-        const int k2 = 40; //scales the magnitude of the amount of points won/lost
+
+        const int k2 = 20; //scales the magnitude of the amount of points won/lost in prelims
 
         const int k3 = 40; //scales the magnitude of points won/lost in finals
 
@@ -75,7 +76,7 @@ namespace Impartial
                 int ratingDifference = 0;
 
                 double score = prelimScores.Where(s => s.Competitor.Id == competitor.Id).Sum(s => (int)s.CallbackScore) / 10;
-                double normalizedScore = (score / maxScore) + ((double)(round - 1) * 0.2);
+                double normalizedScore = (score / maxScore) + ((double)(round - 1) * 0.3);
 
                 if (role == Role.Leader)
                 {
@@ -108,12 +109,11 @@ namespace Impartial
             return competitors;
         }
 
-        public static List<Couple> CalculateFinalsRating(List<Couple> couples)
+        public static List<Couple> CalculateFinalsRating(List<Couple> couples, bool straightToFinals = false)
         {
             //first put the couples in order of average ranking 
             List<Couple> couplesPlaced = couples.OrderBy(o => o.ActualPlacement).ToList();
 
-            int i = couplesPlaced.Count() + 1;
             //then compare the probability that their actual placement is their expected placement
             foreach (Couple coupleA in couplesPlaced)
             {
@@ -128,7 +128,12 @@ namespace Impartial
                     }
                 }
 
-                int ratingDifference = UpdateRatingFinals(coupleA.CombinedRating, 2, expectedScore / i) - coupleA.CombinedRating;
+                expectedScore = (expectedScore / couplesPlaced.Count());
+                double score = (((double)couplesPlaced.Count() - (double)coupleA.ActualPlacement + 1) / (double)couplesPlaced.Count());
+                if (!straightToFinals)
+                    score = score + 0.4;
+
+                int ratingDifference = UpdateRatingFinals(coupleA.CombinedRating, score, expectedScore) - coupleA.CombinedRating;
 
                 string ratingChange;
                 if (ratingDifference > 0)
@@ -145,10 +150,8 @@ namespace Impartial
                     coupleA.Leader.LeadStats.Rating + ") (" + ratingChange + ") & " + 
                     coupleA.Follower.FullName + " (" + (coupleA.Follower.FollowStats.Rating - ratingDifference).ToString() + " => " + 
                     coupleA.Follower.FollowStats.Rating + " ) (" +  ratingChange + ")");
-                Trace.WriteLine("Expected Score: " + expectedScore + "  Actual Score: " + i);
+                Trace.WriteLine("Expected Score: " + expectedScore + "  Actual Score: " + score);
                 Trace.WriteLine("Combined Rating: " + coupleA.CombinedRating);
-
-                i--;
             }
 
             return couples;

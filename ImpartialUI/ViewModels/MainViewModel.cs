@@ -1,4 +1,5 @@
 ﻿using Impartial;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -48,8 +49,19 @@ namespace ImpartialUI.ViewModels
             //PopulateCaches();
 
             ViewCompetitionViewModel = new ViewCompetitionViewModel(CompetitionsCache);
+            ViewCompetitionViewModel.PropertyChanged += ExceptionPropertyChanged;
+
             AddCompetitionViewModel = new AddCompetitionViewModel(CompetitorsCache, JudgesCache);
+            AddCompetitionViewModel.PropertyChanged += ExceptionPropertyChanged;
+
             RatingsViewModel = new RatingsViewModel(CompetitorsCache, CompetitionsCache);
+            RatingsViewModel.PropertyChanged += ExceptionPropertyChanged;
+        }
+
+        private void ExceptionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Exception))
+                Exception = ((BaseViewModel)sender).Exception;
         }
 
         private async void PopulateCaches()

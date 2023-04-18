@@ -1,5 +1,6 @@
 ﻿using Impartial;
 using ImpartialUI.Commands;
+using iText.Layout.Properties;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ImpartialUI.ViewModels
 {
@@ -122,6 +124,21 @@ namespace ImpartialUI.ViewModels
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(LeadCompetitors));
                 OnPropertyChanged(nameof(FollowCompetitors));
+            }
+        }
+
+        private CompetitorDataModel _selectedCompetitor;
+        public CompetitorDataModel SelectedCompetitor
+        {
+            get { return _selectedCompetitor; }
+            set
+            {
+                if (_selectedCompetitor != value)
+                {
+                    _selectedCompetitor = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedCompetitor.Competitor));
+                }
             }
         }
 
@@ -246,6 +263,8 @@ namespace ImpartialUI.ViewModels
             double totalProgress = _competitions.Count;
             int count = 1;
 
+            CompDm = (await App.DatabaseProvider.GetCompetitorDataModelsAsync()).ToList();
+
             foreach (var competition in _competitions)
             {
                 // prelim rounds
@@ -256,16 +275,63 @@ namespace ImpartialUI.ViewModels
                         // update the ratings of all competitors in the scores
                         foreach (var score in competition.LeaderPrelimScores.Where(s => s.Round == round))
                         {
-                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
+                            var competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
+                            score.Competitor = competitor;
+
+                            var compDm = CompDm.Where(c => c.CompetitorId == competitor.Id).FirstOrDefault();
+                            if (compDm == null)
+                            {
+                                compDm = new CompetitorDataModel(competitor, 0);
+                                CompDm.Add(compDm);
+                            }
+
+                            if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
+                                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.LeadStats.Rating, 0, score.Round, score.RawScore, competition.TotalLeaders));
                         }
                         foreach (var score in competition.FollowerPrelimScores.Where(s => s.Round == round))
                         {
-                            score.Competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
+                            var competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
+                            score.Competitor = competitor;
+
+                            var compDm = CompDm.Where(c => c.CompetitorId == competitor.Id).FirstOrDefault();
+                            if (compDm == null)
+                            {
+                                compDm = new CompetitorDataModel(competitor, 0);
+                                CompDm.Add(compDm);
+                            }
+
+                            if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
+                                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.FollowStats.Rating, 0, score.Round, score.RawScore, competition.TotalFollowers));
                         }
 
                         // calculating the new ratings
-                        EloRatingService.PrelimRatings(competition.LeaderPrelimScores.Where(s => s.Round == round).ToList(), Role.Leader, competition.PrelimLeaderJudges(round));
-                        EloRatingService.PrelimRatings(competition.FollowerPrelimScores.Where(s => s.Round == round).ToList(), Role.Follower, competition.PrelimFollowerJudges(round));
+                        var leaders = EloRatingService.PrelimRatings(competition.LeaderPrelimScores.Where(s => s.Round == round).ToList(), Role.Leader, competition.PrelimLeaderJudges(round));
+
+                        foreach (var leader in leaders)
+                        {
+                            var compDmLeader = CompDm.Where(c => c.CompetitorId == leader.Id)?.FirstOrDefault();
+                            if (compDmLeader != null)
+                            {
+                                compDmLeader.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == round).FirstOrDefault()
+                                .RatingAfter = leader.LeadStats.Rating;
+                            }
+                            else
+                            {
+                                compDmLeader = new CompetitorDataModel(leader.Id, 0);
+                            }
+                        }
+
+                        var followers = EloRatingService.PrelimRatings(competition.FollowerPrelimScores.Where(s => s.Round == round).ToList(), Role.Follower, competition.PrelimFollowerJudges(round));
+
+                        foreach (var follower in followers)
+                        {
+                            var compDmFollower = CompDm.Where(c => c.CompetitorId == follower.Id)?.FirstOrDefault();
+                            if (compDmFollower != null)
+                            {
+                                compDmFollower.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == round).FirstOrDefault()
+                                .RatingAfter = follower.FollowStats.Rating;
+                            }
+                        }
                     }
                 }
 
@@ -279,18 +345,55 @@ namespace ImpartialUI.ViewModels
                         score.Follower = Competitors.Where(c => c.Id == score.Follower.Id).FirstOrDefault();
                     }
 
+                    foreach (var couple in competition.Couples)
+                    {
+                        var leader = Competitors.Where(c => c.Id == couple.Leader.Id).FirstOrDefault();
+                        var compDmLeader = CompDm.Where(c => c.CompetitorId == leader.Id)?.FirstOrDefault();
+                        if (compDmLeader == null)
+                        {
+                            compDmLeader = new CompetitorDataModel(leader, 0);
+                            CompDm.Add(compDmLeader);
+                        }
+                        compDmLeader.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, leader.LeadStats.Rating, 0, 0, couple.ActualPlacement, competition.TotalCouples));
+
+                        var follower = Competitors.Where(c => c.Id == couple.Follower.Id).FirstOrDefault();
+                        var compDmFollower = CompDm.Where(c => c.CompetitorId == follower.Id)?.FirstOrDefault();
+                        if (compDmFollower == null)
+                        {
+                            compDmFollower = new CompetitorDataModel(follower, 0);
+                            CompDm.Add(compDmFollower);
+                        }
+                        compDmFollower.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, follower.FollowStats.Rating, 0, 0, couple.ActualPlacement, competition.TotalCouples));
+                    }
+
                     // calculate the new ratings
-                    EloRatingService.CalculateFinalsRating(competition.Couples);
+                    var couples = EloRatingService.CalculateFinalsRating(competition.Couples, !competition.HasRound(1));
+
+                    foreach (var couple in couples)
+                    {
+                        var compDmLeader = CompDm.Where(c => c.CompetitorId == couple.Leader.Id)?.FirstOrDefault();
+                        if (compDmLeader != null)
+                        {
+                            compDmLeader.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == 0).FirstOrDefault()
+                            .RatingAfter = couple.Leader.LeadStats.Rating;
+                        }
+
+                        var compDmFollower = CompDm.Where(c => c.CompetitorId == couple.Follower.Id)?.FirstOrDefault();
+                        if (compDmFollower != null)
+                        {
+                            compDmFollower.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == 0).FirstOrDefault()
+                            .RatingAfter = couple.Follower.FollowStats.Rating;
+                        }
+                    }
                 }
 
                 _crunchProgress.Report(Math.Round((double)count / totalProgress * 100));
                 count++;
             }
 
-            CompDm = (await App.DatabaseProvider.GetCompetitorDataModelsAsync()).ToList();
             foreach (var compDm in CompDm)
             {
-                compDm.Competitor = Competitors.Where(c => c.Id == compDm.CompetitorId).First();
+                compDm.Competitor = Competitors.Where(c => c.Id == compDm.CompetitorId)?.FirstOrDefault();
             }
 
             CompDm = CompDm.OrderBy(c => c.Competitor.FullName).ToList();
