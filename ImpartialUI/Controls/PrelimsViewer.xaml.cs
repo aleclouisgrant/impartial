@@ -92,12 +92,6 @@ namespace ImpartialUI.Controls
             // judge names
             foreach (var judge in judges)
             {
-                List<PrelimScore> scores = new List<PrelimScore>();
-                if (control.Role == Role.Leader)
-                    scores = competition.LeaderPrelimScores.Where(s => s.Judge.Id == judge.Id).ToList();
-                else if (control.Role == Role.Follower)
-                    scores = competition.FollowerPrelimScores.Where(s => s.Judge.Id == judge.Id).ToList();
-
                 control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
                 var border = new Border()

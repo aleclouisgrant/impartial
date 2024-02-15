@@ -7,20 +7,17 @@ namespace Impartial
     {
         public Guid CompetitorId { get; set; }
         public Competitor Competitor { get; set; }
-        public int WsdcPoints { get; set; }
         public List<CompetitionHistory> CompetitionHistory { get; set; } = new();
 
-        public CompetitorDataModel(Competitor competitor, int points) 
+        public CompetitorDataModel(Competitor competitor) 
         {
             CompetitorId = competitor.Id;
             Competitor = competitor;
-            WsdcPoints = points;
         }
 
-        public CompetitorDataModel(Guid competitorId, int wsdcPoints)
+        public CompetitorDataModel(Guid competitorId)
         {
             CompetitorId = competitorId;
-            WsdcPoints = wsdcPoints;
         }
     }
 }

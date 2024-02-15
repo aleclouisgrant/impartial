@@ -1,215 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Impartial
 {
+    public class PairedPrelimCompetition
+    {
+        public Round Round { get; set; }
+        public PrelimCompetition LeaderPrelimCompetition { get; set; }
+        public PrelimCompetition FollowerPrelimCompetition { get; set; }
+    }
+
     public class Competition
     {
         public Guid Id { get; }
-
-        public string Name { get; set; }
-
-        public DateTime Date { get; set; }
-
         public Division Division { get; set; }
 
-        public List<Score> Scores { get; set; } = new List<Score>();
+        public Guid DanceConventionId { get; set; }
+        public string Name { get; }
+        public DateTime Date { get; }
 
-        public List<PrelimScore> LeaderPrelimScores { get; set; } = new List<PrelimScore>();
-        public List<PrelimScore> FollowerPrelimScores { get; set; } = new List<PrelimScore>();
+        public Tier LeaderTier => PairedPrelimCompetitions.Count > 0 ?
+            Util.GetTier(PairedPrelimCompetitions[0].LeaderPrelimCompetition.Competitors.Count) :
+            Util.GetTier(FinalCompetition.Leaders.Count);
 
-        public IEnumerable<int> Rounds => GetRounds();
-        public bool HasRound(int round) => LeaderPrelimScores.Any(s => s.Round == round);
-        public bool HasSemis => HasRound(2);
+        public Tier FollowerTier => PairedPrelimCompetitions.Count > 0 ?
+            Util.GetTier(PairedPrelimCompetitions[0].FollowerPrelimCompetition.Competitors.Count) :
+            Util.GetTier(FinalCompetition.Followers.Count);
 
-        public int TotalCouples => Couples?.Count ?? 0;
-        public int TotalLeaders
-        {
-            get
-            {
-                try
-                {
-                    return LeaderPrelimScores?.Count() / PrelimLeaderJudges(1)?.Count() ?? 0;
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-        }
-        public int TotalFollowers
-        {
-            get
-            {
-                try
-                {
-                    return FollowerPrelimScores?.Count() / PrelimFollowerJudges(1)?.Count() ?? 0;
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-        }
-
-        public List<Couple> Couples => GetCouples();
-        public List<Judge> Judges => GetJudges();
-        public List<Judge> PrelimLeaderJudges(int round = 1) => GetPrelimJudges(Role.Leader, round);
-        public List<Judge> PrelimFollowerJudges(int round = 1) => GetPrelimJudges(Role.Follower, round);
-        public List<Competitor> PrelimLeaders(int round = 1) => GetPrelimCompetitors(Role.Leader, round);
-        public List<Competitor> FinalLeaders => GetFinalCompetitors(Role.Leader);
-        public List<Competitor> PrelimFollowers(int round = 1) => GetPrelimCompetitors(Role.Follower, round);
-        public List<Competitor> FinalFollowers => GetFinalCompetitors(Role.Follower);
-
+        public List<PairedPrelimCompetition> PairedPrelimCompetitions { get; set; } = new();
+        public FinalCompetition FinalCompetition { get; set; }
+        
         public Competition() 
         { 
             Id = Guid.NewGuid();
         }
 
-        public Competition(string name, DateTime date)
+        public Competition(Guid danceConventionId, string name, DateTime date, Division division, Guid? id = null)
         {
-            Id = Guid.NewGuid();
-            
+            Id = id ?? Guid.NewGuid();
+
+            Division = division;
+
+            DanceConventionId = danceConventionId;
             Name = name;
             Date = date;
-        }
-
-        public Competition(Division division)
-        {
-            Id = Guid.NewGuid();
-
-            Division = division;
-        }
-
-        public Competition(string name, Division division)
-        {
-            Id = Guid.NewGuid();
-
-            Name = name;
-            Division = division;
-        }
-
-        public Competition(Guid id, string name, DateTime date, Division division)
-        {
-            Id = id;
-            Name = name;
-            Date = date;
-            Division = division;
-        }
-
-        private List<Judge> GetJudges()
-        {
-            var judges = new List<Judge>();
-
-            foreach (var score in Scores)
-            {
-                if (!judges.Any(j => j.Id == score.Judge.Id))
-                    judges.Add(score.Judge);
-            }
-
-            return judges;
-        }
-        private List<Judge> GetPrelimJudges(Role role, int round = 1)
-        {
-            var judges = new List<Judge>();
-
-            if (role == Role.Leader)
-            {
-                foreach (var score in LeaderPrelimScores)
-                {
-                    if (!judges.Any(j => j.Id == score.Judge.Id) && score.Round == round)
-                        judges.Add(score.Judge);
-                }
-            }
-            else if (role == Role.Follower)
-            {
-                foreach (var score in FollowerPrelimScores)
-                {
-                    if (!judges.Any(j => j.Id == score.Judge.Id) && score.Round == round)
-                        judges.Add(score.Judge);
-                }
-            }
-
-            return judges;
-        }
-        private List<Competitor> GetPrelimCompetitors(Role role, int round = 1)
-        {
-            var competitors = new List<Competitor>();
-
-            if (role == Role.Leader)
-            {
-                foreach (var score in LeaderPrelimScores)
-                {
-                    if (!competitors.Any(s => s.Id == score.Competitor.Id) && score.Round == round)
-                        competitors.Add(score.Competitor);
-                }
-            }
-            else if (role == Role.Follower)
-            {
-                foreach (var score in FollowerPrelimScores)
-                {
-                    if (!competitors.Any(s => s.Id == score.Competitor.Id) && score.Round == round)
-                        competitors.Add(score.Competitor);
-                }
-            }
-
-            return competitors;
-        }
-        private List<Competitor> GetFinalCompetitors(Role role)
-        {
-            var competitors = new List<Competitor>();
-
-            foreach (Score score in Scores)
-            {
-                if (role == Role.Leader)
-                {
-                    if (!competitors.Any(c => c.Id == score.Leader.Id))
-                        competitors.Add(score.Leader);
-                }
-                else if (role == Role.Follower)
-                {
-                    if (!competitors.Any(c => c.Id == score.Follower.Id))
-                        competitors.Add(score.Follower);
-                }
-            }
-
-            return competitors;
-        }
-        private List<Couple> GetCouples()
-        {
-            var couples = new List<Couple>();
-
-            foreach (Score score in Scores)
-            {
-                if (!couples.Any(c => c.ActualPlacement == score.ActualPlacement))
-                {
-                    var couple = new Couple(score.Leader, score.Follower, score.ActualPlacement);
-                    couples.Add(couple);
-                    couple.Scores.Add(score);
-                }
-                else
-                {
-                    var couple = couples.Find(c => c.ActualPlacement == score.ActualPlacement);
-                    couple.Scores.Add(score);
-                }
-            }
-
-            return couples;
-        }
-
-        private IEnumerable<int> GetRounds()
-        {
-            var rounds = new List<int>();
-
-            for (int i = 1; i < 10; i++)
-            {
-                if (LeaderPrelimScores.Any(s => s.Round == i))
-                    rounds.Add(i);
-            }
-
-            return rounds;
         }
 
         public override string ToString()
@@ -218,237 +53,39 @@ namespace Impartial
         }
         public string ToLongString()
         {
-            string str = Name + " " + Division + " Jack & Jill (" + Date.ToShortDateString() + ", " + TotalCouples + " couples)";
+            string str = ToString();
+            
+            str += Environment.NewLine;
 
-            str += System.Environment.NewLine + "JUDGES: ";
-            foreach (Judge judge in Judges)
+            foreach (var pairedPrelimCompetition in PairedPrelimCompetitions)
             {
-                str += judge.ToString() + ", ";
-            }
-            str = str.Remove(str.Length - 2, 2);
-
-            str += System.Environment.NewLine + "PLACEMENTS:";
-
-            for (int placement = 1; placement <= TotalCouples; placement++)
-            {
-                var couple = Couples[placement - 1];
-
-                if (couple.Leader is null || couple.Follower is null)
-                    return str;
-
-                str += System.Environment.NewLine + placement + ": " +
-                    couple.Leader.FullName + " & " +
-                    couple.Follower.FullName;
-
-                var scores = new List<int>();
-
-                foreach (var score in Scores)
-                {
-                    if (score.Leader == couple.Leader && score.Follower == couple.Follower)
-                    {
-                        scores.Add(score.Placement);
-                    }
-                }
-
-                if (scores.Count > 0)
-                {
-                    str += " (";
-
-                    scores = scores.OrderBy(s => s).ToList();
-
-                    for (int i = 0; i < scores.Count; i++)
-                    {
-                        str += scores[i] + " ";
-                    }
-
-                    str = str.Remove(str.Length - 1);
-                    str += ")";
-                }
-            }
-
-            if (HasRound(2))
-            {
-                str += System.Environment.NewLine + "----------";
-                str += System.Environment.NewLine + "SEMIS:";
-                str += System.Environment.NewLine + System.Environment.NewLine + "LEADERS:";
-                str += System.Environment.NewLine + "JUDGES: ";
-                foreach (Judge judge in PrelimLeaderJudges(2))
-                {
-                    str += judge.ToString() + ", ";
-                }
-                str = str.Remove(str.Length - 2, 2);
-
-                List<Competitor> leads = GetPrelimCompetitors(Role.Leader, 2);
-                foreach (var lead in leads)
-                {
-                    List<PrelimScore> scores = LeaderPrelimScores.Where(s => s.Competitor == lead && s.Round == 2).ToList();
-
-                    str += System.Environment.NewLine + lead.FullName + ": ";
-                    foreach (var score in scores)
-                    {
-                        switch (score.CallbackScore)
-                        {
-                            case Enums.CallbackScore.Alt1:
-                                str += "A1";
-                                break;
-                            case Enums.CallbackScore.Alt2:
-                                str += "A2";
-                                break;
-                            case Enums.CallbackScore.Alt3:
-                                str += "A3";
-                                break;
-                            case Enums.CallbackScore.Yes:
-                                str += " Y";
-                                break;
-                            default:
-                            case Enums.CallbackScore.No:
-                                str += " N";
-                                break;
-                        }
-                        str += " ";
-                    }
-                }
-
-                str += System.Environment.NewLine + System.Environment.NewLine + "FOLLOWERS:";
-                str += System.Environment.NewLine + "JUDGES: ";
-                foreach (Judge judge in PrelimFollowerJudges(2))
-                {
-                    str += judge.ToString() + ", ";
-                }
-                str = str.Remove(str.Length - 2, 2);
-
-                List<Competitor> follows = GetPrelimCompetitors(Role.Follower, 2);
-                foreach (var follow in follows)
-                {
-                    List<PrelimScore> scores = FollowerPrelimScores.Where(s => s.Competitor == follow && s.Round == 2).ToList();
-
-                    str += System.Environment.NewLine + follow.FullName + ": ";
-                    foreach (var score in scores)
-                    {
-                        switch (score.CallbackScore)
-                        {
-                            case Enums.CallbackScore.Alt1:
-                                str += "A1";
-                                break;
-                            case Enums.CallbackScore.Alt2:
-                                str += "A2";
-                                break;
-                            case Enums.CallbackScore.Alt3:
-                                str += "A3";
-                                break;
-                            case Enums.CallbackScore.Yes:
-                                str += " Y";
-                                break;
-                            default:
-                            case Enums.CallbackScore.No:
-                                str += " N";
-                                break;
-                        }
-                        str += " ";
-                    }
-                }
+                str += pairedPrelimCompetition.LeaderPrelimCompetition.ToLongString();
+                str += Environment.NewLine;
+                str += pairedPrelimCompetition.FollowerPrelimCompetition.ToLongString();
             }
             
-            if (HasRound(1))
+            str += Environment.NewLine;
+
+            if (FinalCompetition != null) 
             {
-                str += System.Environment.NewLine + "----------";
-                str += System.Environment.NewLine + "PRELIMS:";
-                str += System.Environment.NewLine + System.Environment.NewLine + "LEADERS:";
-                str += System.Environment.NewLine + "JUDGES: ";
-                foreach (Judge judge in PrelimLeaderJudges(1))
-                {
-                    str += judge.ToString() + ", ";
-                }
-                str = str.Remove(str.Length - 2, 2);
-
-                List<Competitor> leads = GetPrelimCompetitors(Role.Leader, 1);
-                foreach (var lead in leads)
-                {
-                    List<PrelimScore> scores = LeaderPrelimScores.Where(s => s.Competitor == lead && s.Round == 1).ToList();
-
-                    str += System.Environment.NewLine + lead.FullName + ": ";
-                    foreach (var score in scores)
-                    {
-                        switch (score.CallbackScore)
-                        {
-                            case Enums.CallbackScore.Alt1:
-                                str += "A1";
-                                    break;
-                            case Enums.CallbackScore.Alt2:
-                                str += "A2";
-                                break;
-                            case Enums.CallbackScore.Alt3:
-                                str += "A3";
-                                break;
-                            case Enums.CallbackScore.Yes:
-                                str += " Y";
-                                break;
-                            default:
-                            case Enums.CallbackScore.No:
-                                str += " N";
-                                break;
-                        }
-                        str += " ";
-                    }
-                }
-
-                str += System.Environment.NewLine + System.Environment.NewLine + "FOLLOWERS:";
-                str += System.Environment.NewLine + "JUDGES: ";
-                foreach (Judge judge in PrelimFollowerJudges(1))
-                {
-                    str += judge.ToString() + ", ";
-                }
-                str = str.Remove(str.Length - 2, 2);
-
-                List<Competitor> follows = GetPrelimCompetitors(Role.Follower, 1);
-                foreach (var follow in follows)
-                {
-                    List<PrelimScore> scores = FollowerPrelimScores.Where(s => s.Competitor == follow && s.Round == 1).ToList();
-
-                    str += System.Environment.NewLine + follow.FullName + ": ";
-                    foreach (var score in scores)
-                    {
-                        switch (score.CallbackScore)
-                        {
-                            case Enums.CallbackScore.Alt1:
-                                str += "A1";
-                                break;
-                            case Enums.CallbackScore.Alt2:
-                                str += "A2";
-                                break;
-                            case Enums.CallbackScore.Alt3:
-                                str += "A3";
-                                break;
-                            case Enums.CallbackScore.Yes:
-                                str += " Y";
-                                break;
-                            default:
-                            case Enums.CallbackScore.No:
-                                str += " N";
-                                break;
-                        }
-                        str += " ";
-                    }
-                }
+                str += FinalCompetition.ToLongString();
             }
-
+            
             return str;
         }
 
         public void Clear()
         {
-            Scores.Clear();
-            LeaderPrelimScores.Clear();
-            FollowerPrelimScores.Clear();
+            ClearPrelims();
+            ClearFinals();
         }
         public void ClearFinals()
         {
-            Scores.Clear();
+            FinalCompetition = null;
         }
         public void ClearPrelims()
         {
-            LeaderPrelimScores.Clear();
-            FollowerPrelimScores.Clear();
+            PairedPrelimCompetitions.Clear();
         }
     }
 }

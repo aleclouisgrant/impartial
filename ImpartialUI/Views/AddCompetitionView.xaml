@@ -149,9 +149,14 @@
                         Width="200" Height="20"
                         FontWeight="Bold"
                         Command="{Binding AddCompetitorCommand}"
-                        Click="AddCompetitorButton_Click"
                         IsDefault="True"
-                        Margin="20"/>
+                        Margin="10 10 5 10"/>
+
+                    <c:SearchTextBox 
+                        Grid.Row="1"
+                        ItemsSource="{Binding Competitors}"
+                        HorizontalAlignment="Center"
+                        />
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Grid.Column="1" Width="400" Margin="20">
@@ -173,7 +178,6 @@
                         Width="200" Height="20"
                         FontWeight="Bold"
                         Command="{Binding AddJudgeCommand}"
-                        Click="AddJudgeButton_Click"
                         IsDefault="True"
                         Margin="20"/>
                 </StackPanel>
@@ -190,8 +194,19 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder x:Name="LeaderPrelimsAdder" Grid.Column="2" Role="Leader" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsViewer 
+                            Grid.Column="0" 
+                            Role="Leader" 
+                            Round="1" 
+                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder 
+                            x:Name="LeaderPrelimsAdder" 
+                            Grid.Column="2" 
+                            Round="1" 
+                            Role="Leader" 
+                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>
@@ -204,8 +219,19 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Follower" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder x:Name="FollowersPrelimsAdder" Grid.Column="2" Role="Follower" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsViewer 
+                            Grid.Column="0" 
+                            Role="Follower" 
+                            Round="1" 
+                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder 
+                            x:Name="FollowersPrelimsAdder" 
+                            Grid.Column="2" 
+                            Round="1" 
+                            Role="Follower" 
+                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>
@@ -219,8 +245,19 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder x:Name="LeaderSemisAdder" Grid.Column="2" Role="Leader" Round="2" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsViewer 
+                            Grid.Column="0" 
+                            Role="Leader" 
+                            Round="2" 
+                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder 
+                            x:Name="LeaderSemisAdder" 
+                            Grid.Column="2" 
+                            Role="Leader" 
+                            Round="2" 
+                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>
@@ -233,8 +270,19 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Follower" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder x:Name="FollowerSemisAdder" Grid.Column="2" Role="Follower" Round="2" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsViewer 
+                            Grid.Column="0" 
+                            Role="Follower" 
+                            Round="2" 
+                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimsAdder 
+                            x:Name="FollowerSemisAdder" 
+                            Grid.Column="2" 
+                            Role="Follower" 
+                            Round="2" 
+                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>
@@ -246,8 +294,17 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <c:CompetitionViewer Grid.Row="0" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="10"/>
-                        <c:CompetitionAdder x:Name="FinalsCompetitionAdder" Grid.Row="1" Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10"/>
+                        <c:CompetitionViewer 
+                            Grid.Row="0" 
+                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                            Margin="10"/>
+                        <c:CompetitionAdder 
+                            x:Name="FinalsCompetitionAdder" 
+                            Grid.Row="1" 
+                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="10"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>

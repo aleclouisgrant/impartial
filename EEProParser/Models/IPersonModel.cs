@@ -12,7 +12,6 @@ namespace Impartial
         string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
     }
 
-
     public abstract class PersonModel : IPersonModel 
     {
         public Guid Id { get; set; }

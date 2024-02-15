@@ -31,27 +31,26 @@ namespace ImpartialUI.Views
 
         private void MakePlot()
         {
-            var compDm = ((RatingsViewModel)DataContext).CompDm;
-            var leads = compDm.Where(c => c.Competitor.LeadStats.Rating != 1000);
-            var follows = compDm.Where(c => c.Competitor.FollowStats.Rating != 1000);
+            //var compDm = ((RatingsViewModel)DataContext).CompDm;
+            //var leads = compDm.Where(c => c.Competitor.LeadStats.Rating != 1000);
+            //var follows = compDm.Where(c => c.Competitor.FollowStats.Rating != 1000);
 
-            int xMax = compDm.Max(c => c.Competitor.LeadStats.Rating);
-            int xMin = compDm.Min(c => c.Competitor.LeadStats.Rating);
-            int yMax = compDm.Max(c => c.WsdcPoints);
+            //int xMax = compDm.Max(c => c.Competitor.LeadStats.Rating);
+            //int xMin = compDm.Min(c => c.Competitor.LeadStats.Rating);
 
-            Plot.Plot.SetAxisLimitsX(Math.Round((double)xMin / 100d, 0) * 100 - 100, Math.Round((double)xMax / 100d, 0) * 100 + 100);
-            Plot.Plot.SetAxisLimitsY(-1, Math.Round((double)yMax / 100d, 0) * 100);
+            //Plot.Plot.SetAxisLimitsX(Math.Round((double)xMin / 100d, 0) * 100 - 100, Math.Round((double)xMax / 100d, 0) * 100 + 100);
+            //Plot.Plot.SetAxisLimitsY(-1, Math.Round((double)yMax / 100d, 0) * 100);
 
-            foreach (var comp in leads)
-            {
-                Plot.Plot.AddPoint(comp.Competitor.LeadStats.Rating, comp.WsdcPoints, label: comp.Competitor.FullName, color: System.Drawing.Color.Blue);
-            }
-            foreach (var comp in follows)
-            {
-                Plot.Plot.AddPoint(comp.Competitor.FollowStats.Rating, comp.WsdcPoints, label: comp.Competitor.FullName, color: System.Drawing.Color.Red);
-            }
+            //foreach (var comp in leads)
+            //{
+            //    Plot.Plot.AddPoint(comp.Competitor.LeadStats.Rating, comp.WsdcPoints, label: comp.Competitor.FullName, color: System.Drawing.Color.Blue);
+            //}
+            //foreach (var comp in follows)
+            //{
+            //    Plot.Plot.AddPoint(comp.Competitor.FollowStats.Rating, comp.WsdcPoints, label: comp.Competitor.FullName, color: System.Drawing.Color.Red);
+            //}
 
-            Plot.Refresh();
+            //Plot.Refresh();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

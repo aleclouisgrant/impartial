@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Impartial
 {
-    public class LocalDatabaseProvider
+    public class LocalDatabaseProvider 
     {
-        private List<SdcEvent> _events = new List<SdcEvent>();
+        private List<DanceConvention> _events = new List<DanceConvention>();
         private List<Competition> _competitions = new List<Competition>();
         private List<Competitor> _competitors = new List<Competitor>();
         private List<Judge> _judges = new List<Judge>();
 
         public LocalDatabaseProvider() { }
 
-        public void InsertSdcEvent(SdcEvent sdcEvent)
+        public void InsertSdcEvent(DanceConvention sdcEvent)
         {
             _events.Add(sdcEvent);
         }
-        public void UpdateSdcEvent(Guid id, SdcEvent sdcEvent)
+        public void UpdateSdcEvent(Guid id, DanceConvention sdcEvent)
         {
             var evt = _events.Find(e => e.Id == id);
             if (evt != null)
@@ -24,15 +25,15 @@ namespace Impartial
 
             _events.Add(sdcEvent);
         }
-        public SdcEvent GetSdcEventById(Guid id)
+        public DanceConvention GetSdcEventById(Guid id)
         {
             return _events.Find(e => id == e.Id);
         }
-        public List<SdcEvent> GetAllSdcEvents()
+        public List<DanceConvention> GetAllSdcEvents()
         {
             return _events;
         }
-        public void DeleteSdcEvent(SdcEvent sdcEvent)
+        public void DeleteSdcEvent(DanceConvention sdcEvent)
         {
             _events.Remove(sdcEvent);
         }
@@ -131,5 +132,87 @@ namespace Impartial
         {
             _judges.Clear();
         }
+
+        //public Task UpsertCompetitionAsync(Competition competition)
+        //{
+            
+        //}
+
+        //public Task<Competition> GetCompetitionByIdAsync(Guid id)
+        //{
+        //    return Task.FromResult(0);
+        //}
+
+        //public Task DeleteCompetitionAsync(Competition competition)
+        //{
+        //    return Task.FromResult(0);
+        //}
+
+        //public Task<IEnumerable<Competition>> GetAllCompetitionsAsync()
+        //{
+        //    return Task.FromResult(0);
+        //}
+
+        //public Task DeleteAllCompetitionsAsync()
+        //{
+        //    return Task.FromResult(0);
+        //}
+
+        //public Task UpsertCompetitorAsync(Competitor competitor)
+        //{
+        //    return Task.FromResult(0);
+        //}
+
+        //public Task<Competitor> GetCompetitorByIdAsync(Guid id)
+        //{
+        //}
+
+        //public Task<Competitor> GetCompetitorByNameAsync(string firstName, string lastName)
+        //{
+        //}
+
+        //public Task DeleteCompetitorAsync(Competitor competitor)
+        //{
+        //}
+
+        //public Task<IEnumerable<Competitor>> GetAllCompetitorsAsync()
+        //{
+        //}
+
+        //public Task DeleteAllCompetitorsAsync()
+        //{
+        //}
+
+        //public Task UpsertJudgeAsync(Judge judge)
+        //{
+        //}
+
+        //public Task<Judge> GetJudgeByIdAsync(Guid id)
+        //{
+        //}
+
+        //public Task<Judge> GetJudgeByNameAsync(string firstName, string lastName)
+        //{
+        //}
+
+        //public Task DeleteJudgeAsync(Judge judge)
+        //{
+        //}
+
+        //public Task<IEnumerable<Judge>> GetAllJudgesAsync()
+        //{
+        //}
+
+        //public Task DeleteAllJudgesAsync()
+        //{
+        //}
+
+        //public Task<IEnumerable<CompetitorDataModel>> GetCompetitorDataModelsAsync()
+        //{
+        //}
+
+        //public Task UpsertCompetitorDataModelAsync(CompetitorDataModel competitorDataModel)
+        //{
+        //}
     }
 }

@@ -42,7 +42,23 @@ namespace Impartial
                     to: "</tr></tbody></table><p>",
                     n: c++);
 
-                var divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+                string divisionString = "";
+
+                try
+                {
+                    divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+                } 
+                catch
+                {
+                    try
+                    {
+                        divisionString = Util.GetSubString(finals, "<td colspan=\"15\">Division", "</td></tr><tr>");
+                    }
+                    catch
+                    {
+                        return divisions;
+                    }
+                }
 
                 if (divisionString.Contains("Masters"))
                     continue;
@@ -126,7 +142,21 @@ namespace Impartial
                 bool finaled = node[5 + leadJudges.Count].InnerText == "X" && node[6 + leadJudges.Count].InnerText == "";
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
-                var competitor = new Competitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
+
+                string firstName = "";
+                string lastName = "";
+
+                if (pos == -1)
+                {
+                    firstName = name;
+                }
+                else
+                {
+                    firstName = name.Substring(0, pos).Trim();
+                    lastName = name.Substring(pos + 1).Trim();
+                }
+
+                var competitor = new Competitor(firstName, lastName);
 
                 CallbackScore callbackScore;
                 int offset = 2;
@@ -190,7 +220,7 @@ namespace Impartial
 
             return new Tuple<List<PrelimScore>, List<PrelimScore>>(leaderPrelimScores, followerPrelimScores);
         }
-        private List<Score> GetFinalScores(Division division)
+        private List<FinalScore> GetFinalScores(Division division)
         {
             var sub = GetFinalsDocByDivision(division);
             var judges = GetFinalsJudgesByDivision(division);
@@ -203,7 +233,7 @@ namespace Impartial
             var leaders = new List<Competitor>();
             var followers = new List<Competitor>();
 
-            var scores = new List<Score>();
+            var scores = new List<FinalScore>();
             for (int i = 1; i < nodes.Count; i++)
             {
                 var node = nodes[i].SelectNodes("td");
@@ -246,7 +276,7 @@ namespace Impartial
                         followers.Add(follower);
                     }
 
-                    var score = new Score(judges[j - 2], placement, actualPlacement)
+                    var score = new FinalScore(judges[j - 2], placement, actualPlacement)
                     {
                         Leader = leader,
                         Follower = follower,
@@ -255,7 +285,7 @@ namespace Impartial
                     scores.Add(score);
 
                     if (judges[j - 2].Scores == null)
-                        judges[j - 2].Scores = new List<Score>();
+                        judges[j - 2].Scores = new List<FinalScore>();
 
                     judges[j - 2].Scores.Add(score);
                 }
@@ -348,7 +378,24 @@ namespace Impartial
                     to: "</tr></tbody></table><p>",
                     n: c);
 
-                string divisionString = Util.GetSubString(prelims, "<td colspan=\"11\">", "</td></tr><tr>");
+                string divisionString = "";
+
+                try
+                {
+                    divisionString = Util.GetSubString(prelims, "<td colspan=\"11\">Jack", "</td></tr><tr>");
+                }
+                catch
+                {
+                    try
+                    {
+                        divisionString = Util.GetSubString(prelims, "<td colspan=\"13\">Jack", "</td></tr><tr>");
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+
                 if (divisionString == string.Empty)
                     return "";
 
@@ -406,7 +453,23 @@ namespace Impartial
                     to: "</tr></tbody></table><p>",
                     n: c);
 
-                var divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+                string divisionString = "";
+
+                try
+                {
+                    divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
+                }
+                catch
+                {
+                    try
+                    {
+                        divisionString = Util.GetSubString(finals, "<td colspan=\"15\">Division", "</td></tr><tr>");
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
 
                 if (divisionString.Contains("Masters"))
                     continue;
@@ -420,6 +483,10 @@ namespace Impartial
                 else if (divisionString.Contains("Advanced"))
                     div = Division.Advanced;
                 else if (divisionString.Contains("All-Star"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("Allstar"))
+                    div = Division.AllStar;
+                else if (divisionString.Contains("AllStar"))
                     div = Division.AllStar;
                 else if (divisionString.Contains("All Star"))
                     div = Division.AllStar;

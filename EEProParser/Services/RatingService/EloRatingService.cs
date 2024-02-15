@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace Impartial
 {
-    public class EloRatingService
+    public static class EloRatingService
     {
         const int k1 = 2000; //scales the probability that A wins over B at the same difference in rating. 
                              //example: k = 300 sets +200 points to be a 75% win rate
 
         const int k2 = 20; //scales the magnitude of the amount of points won/lost in prelims
 
-        const int k3 = 40; //scales the magnitude of points won/lost in finals
+        const int k3 = 20; //scales the magnitude of points won/lost in finals
 
         public static double ExpectedScore(int ratingA, int ratingB)
         {
@@ -76,18 +76,20 @@ namespace Impartial
                 int ratingDifference = 0;
 
                 double score = prelimScores.Where(s => s.Competitor.Id == competitor.Id).Sum(s => (int)s.CallbackScore) / 10;
-                double normalizedScore = (score / maxScore) + ((double)(round - 1) * 0.3);
+                double normalizedScore = (score / maxScore);
+                double bonus = ((double)(round - 1) * 0.3);
+                bonus = 0; //taking out bonus for now
 
                 if (role == Role.Leader)
                 {
                     double expectedScore = ExpectedScore(competitor.LeadStats.Rating, averageRating);
-                    ratingDifference = UpdateRating(competitor.LeadStats.Rating, normalizedScore, expectedScore) - competitor.LeadStats.Rating;
+                    ratingDifference = UpdateRating(competitor.LeadStats.Rating, normalizedScore + bonus, expectedScore) - competitor.LeadStats.Rating;
                     competitor.LeadStats.Rating = competitor.LeadStats.Rating + ratingDifference;
                 }
                 else if (role == Role.Follower)
                 {
                     double expectedScore = ExpectedScore(competitor.FollowStats.Rating, averageRating);
-                    ratingDifference = UpdateRating(competitor.FollowStats.Rating, normalizedScore, expectedScore) - competitor.FollowStats.Rating;
+                    ratingDifference = UpdateRating(competitor.FollowStats.Rating, normalizedScore + bonus, expectedScore) - competitor.FollowStats.Rating;
                     competitor.FollowStats.Rating = competitor.FollowStats.Rating + ratingDifference;
                 }
 
@@ -131,7 +133,7 @@ namespace Impartial
                 expectedScore = (expectedScore / couplesPlaced.Count());
                 double score = (((double)couplesPlaced.Count() - (double)coupleA.ActualPlacement + 1) / (double)couplesPlaced.Count());
                 if (!straightToFinals)
-                    score = score + 0.4;
+                    score = score + 0.2; // BONUS
 
                 int ratingDifference = UpdateRatingFinals(coupleA.CombinedRating, score, expectedScore) - coupleA.CombinedRating;
 

@@ -18,29 +18,29 @@ namespace Impartial
             _helper = new MongoHelper(databaseString);
         }
 
-        public void InsertSdcEvent(SdcEvent sdcEvent)
+        public void InsertSdcEvent(DanceConvention sdcEvent)
         {
             _helper.Insert(SDCEVENTS_TABLE_STRING, sdcEvent);
         }
-        public void UpdateSdcEvent(Guid id, SdcEvent sdcEvent)
+        public void UpdateSdcEvent(Guid id, DanceConvention sdcEvent)
         {
             _helper.UpsertById(SDCEVENTS_TABLE_STRING, id, sdcEvent);
         }
-        public SdcEvent GetSdcEventById(Guid id)
+        public DanceConvention GetSdcEventById(Guid id)
         {
-            return _helper.LoadById<SdcEvent>(SDCEVENTS_TABLE_STRING, id);
+            return _helper.LoadById<DanceConvention>(SDCEVENTS_TABLE_STRING, id);
         }
-        public List<SdcEvent> GetAllSdcEvents()
+        public List<DanceConvention> GetAllSdcEvents()
         {
-            return _helper.LoadAll<SdcEvent>(SDCEVENTS_TABLE_STRING);
+            return _helper.LoadAll<DanceConvention>(SDCEVENTS_TABLE_STRING);
         }
-        public void DeleteSdcEvent(SdcEvent sdcEvent)
+        public void DeleteSdcEvent(DanceConvention sdcEvent)
         {
-            _helper.DeleteById<SdcEvent>(SDCEVENTS_TABLE_STRING, sdcEvent.Id);
+            _helper.DeleteById<DanceConvention>(SDCEVENTS_TABLE_STRING, sdcEvent.Id);
         }
         public void DeleteAllSdcEvents()
         {
-            _helper.DeleteAll<SdcEvent>(SDCEVENTS_TABLE_STRING);
+            _helper.DeleteAll<DanceConvention>(SDCEVENTS_TABLE_STRING);
         }
 
         public void InsertCompetition(Competition competition)

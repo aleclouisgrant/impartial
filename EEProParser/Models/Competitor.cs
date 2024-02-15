@@ -44,7 +44,7 @@ namespace Impartial
     public class Competitor : PersonModel
     {
         // personal info
-        public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
+        public new string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
 
         public int WsdcId { get; set; }
 

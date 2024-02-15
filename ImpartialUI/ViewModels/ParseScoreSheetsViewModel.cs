@@ -266,7 +266,7 @@ namespace ImpartialUI.ViewModels
                 foreach (var score in competition.Scores)
                 {
                     if (score.Judge.Scores == null)
-                        score.Judge.Scores = new List<Score>();
+                        score.Judge.Scores = new List<FinalScore>();
 
                     //_databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
                 }

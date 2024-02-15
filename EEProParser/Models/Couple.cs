@@ -10,7 +10,7 @@ namespace Impartial
 
         public int CombinedRating => Leader.LeadStats.Rating + Follower.FollowStats.Rating;
 
-        public List<Score> Scores { get; set; } = new List<Score>();
+        public List<FinalScore> Scores { get; set; } = new List<FinalScore>();
 
         public Couple(Competitor leader, Competitor follower, int placement)
         {

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Impartial.Enums;
 using System.Linq;
+using iText.Barcodes.Dmcode;
 
 namespace Impartial
 {
@@ -23,6 +24,26 @@ namespace Impartial
 
     public static class Util
     {
+        public static Tier GetTier(int numberOfCompetitors)
+        {
+            if (numberOfCompetitors < 5 && numberOfCompetitors >= 1)
+                return Tier.Tier0;
+            else if (numberOfCompetitors >= 5 && numberOfCompetitors <= 10)
+                return Tier.Tier1;
+            else if (numberOfCompetitors >= 11 && numberOfCompetitors <= 19)
+                return Tier.Tier2;
+            else if (numberOfCompetitors >= 20 && numberOfCompetitors <= 39)
+                return Tier.Tier3;
+            else if (numberOfCompetitors >= 40 && numberOfCompetitors <= 79)
+                return Tier.Tier4;
+            else if (numberOfCompetitors >= 80 && numberOfCompetitors <= 129)
+                return Tier.Tier5;
+            else if (numberOfCompetitors >= 130)
+                return Tier.Tier6;
+            else
+                return 0;
+        }
+
         public static int GetAwardedPoints(int numberOfCompetitors, int placement)
         {
             if (numberOfCompetitors < 5 && numberOfCompetitors >= 1)
@@ -43,8 +64,11 @@ namespace Impartial
                 return 0;
         }
 
-        public static int GetAwardedPoints(Tier tier, int placement)
+        public static int GetAwardedPoints(Tier tier, int placement, DateTime? date = null)
         {
+            if (date == null)
+                date = DateTime.Now;
+
             switch (tier)
             {
                 case Tier.Tier0:
@@ -83,7 +107,9 @@ namespace Impartial
                         return 4;
                     else if (placement == 5)
                         return 2;
-                    else if (placement > 5 && placement <= 12)
+                    else if (placement > 5 && placement <= 10 && date >= DateTime.Parse("2023-01-01"))
+                        return 1;
+                    else if (placement > 5 && placement <= 12 && date < DateTime.Parse("2023-01-01"))
                         return 1;
                     else
                         return 0;
@@ -113,7 +139,7 @@ namespace Impartial
                         return 12;
                     else if (placement == 5)
                         return 10;
-                    else if (placement > 5 && placement <= 12)
+                    else if (placement > 5 && placement <= 15)
                         return 2;
                     else
                         return 0;
@@ -128,7 +154,7 @@ namespace Impartial
                         return 15;
                     else if (placement == 5)
                         return 12;
-                    else if (placement > 5 && placement <= 12)
+                    else if (placement > 5 && placement <= 15)
                         return 2;
                     else
                         return 0;
@@ -147,9 +173,11 @@ namespace Impartial
                     return "A3";
                 case CallbackScore.Yes:
                     return "Y";
-                default:
                 case CallbackScore.No:
                     return "N";
+                default:
+                case CallbackScore.NoScore:
+                    return "";
             }
         }
 
@@ -176,11 +204,12 @@ namespace Impartial
                 case "Yes":
                 case "100":
                     return CallbackScore.Yes;
-                default:
                 case "N":
                 case "No":
                 case "0":
                     return CallbackScore.No;
+                default:
+                    return CallbackScore.NoScore;
             }
         }
 
@@ -208,10 +237,10 @@ namespace Impartial
                     return CallbackScore.Alt2;
                 case 4.2:
                     return CallbackScore.Alt3;
-
-                default:
                 case 0:
                     return CallbackScore.No;
+                default:
+                    return CallbackScore.NoScore;
             }
         }
 
@@ -357,6 +386,27 @@ namespace Impartial
             return -1;
         }
 
+        public static Division GetDivisionFromString(string s)
+        {
+            switch (s)
+            {
+                case "Newcomer":
+                    return Division.Newcomer;
+                case "Novice":
+                    return Division.Novice;
+                case "Intermediate":
+                    return Division.Intermediate;
+                case "Advanced":
+                    return Division.Advanced;
+                case "AllStar":
+                    return Division.AllStar;
+                case "Champion":
+                    return Division.Champion;
+                default:
+                    return Division.Open;
+            }
+        }
+
         public static IEnumerable<T> RemoveWhere<T>(this IEnumerable<T> query, Predicate<T> predicate)
         {
             return query.Where(e => !predicate(e));
@@ -416,6 +466,7 @@ namespace Impartial
                 case "Jade Ruiz":
                     return competitors.Where(c => c.FullName == "Jade Bryan")?.FirstOrDefault();
                 case "Julie Edwards-Auclair":
+                case "Julie Edwards Auclair":
                     return competitors.Where(c => c.FullName == "Julie Auclair")?.FirstOrDefault();
                 case "Vincent van Mierlo":
                     return competitors.Where(c => c.FullName == "Vincent Van Mierlo")?.FirstOrDefault();
@@ -436,6 +487,36 @@ namespace Impartial
                 case "Jung Won Choe":
                 case "Jung Won Cho":
                     return competitors.Where(c => c.FullName == "Jung Choe")?.FirstOrDefault();
+                case "Joanna Mienl":
+                    return competitors.Where(c => c.FullName == "Joanna Meinl")?.FirstOrDefault();
+                case "Amber O'connell":
+                    return competitors.Where(c => c.FullName == "Amber O'Connell")?.FirstOrDefault();
+                case "Savannah Harris-read":
+                    return competitors.Where(c => c.FullName == "Savannah Harris-Read")?.FirstOrDefault();
+                case "Branden Stong":
+                    return competitors.Where(c => c.FullName == "Branden Strong")?.FirstOrDefault();
+                case "Ashley Daniels":
+                    return competitors.Where(c => c.FullName == "Ashley Snow")?.FirstOrDefault();
+                case "Jeff Wingo":
+                    return competitors.Where(c => c.FullName == "Jeffrey Wingo")?.FirstOrDefault();
+                case "Aris ":
+                    return competitors.Where(c => c.FullName == "Aris DeMarco")?.FirstOrDefault();
+                case "Estelle Bonaire":
+                    return competitors.Where(c => c.FullName == "Estelle Bonnaire")?.FirstOrDefault();
+                case "Wee Tze Yi":
+                    return competitors.Where(c => c.FullName == "Tze Yi Wee")?.FirstOrDefault();
+                case "Rob I":
+                    return competitors.Where(c => c.FullName == "Rob Ingenthron")?.FirstOrDefault();
+                case "Ray Byun":
+                    return competitors.Where(c => c.FullName == "Raymond Byun")?.FirstOrDefault();
+                case "Marie-pascale Cote":
+                    return competitors.Where(c => c.FullName == "Marie-Pascale Cote")?.FirstOrDefault();
+                case "Mikaila Finley Pittman":
+                case "Mikaila Finley":
+                    return competitors.Where(c => c.FullName == "Mikaila Pittman")?.FirstOrDefault();
+                case "Lisa M Picard":
+                    return competitors.Where(c => c.FullName == "Lisa Picard")?.FirstOrDefault();
+
                 default:
                     return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
             }
@@ -464,6 +545,10 @@ namespace Impartial
                     return judges.Where(c => c.FullName == "Patty Vo")?.FirstOrDefault();
                 case "Sharole Lashe":
                     return judges.Where(c => c.FullName == "Sharole Negrete")?.FirstOrDefault();
+                case "Jessica Mccurdy":
+                    return judges.Where(c => c.FullName == "Jessica McCurdy")?.FirstOrDefault();
+                case "Phillipe Berne":
+                    return judges.Where(c => c.FullName == "Philippe Berne")?.FirstOrDefault();
 
                 default:
                     return judges.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();

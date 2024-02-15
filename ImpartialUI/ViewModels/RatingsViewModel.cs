@@ -215,32 +215,6 @@ namespace ImpartialUI.ViewModels
             Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
-        private async void UploadWsdcPoints()
-        {
-            _plotProgress.Report(0);
-            double total = Competitors.Count();
-            double completed = 0;
-
-            List<CompetitorDataModel> compDm = new();
-            foreach (var competitor in Competitors)
-            {
-                int points = await GetWsdcPoints(competitor);
-                compDm.Add(new CompetitorDataModel(competitor, points));
-
-                completed++;
-                _plotProgress.Report(Math.Round((completed / total) * 100));
-            }
-            _plotProgress.Report(0);
-
-            CompDm = compDm;
-            OnPropertyChanged(nameof(CompDm));
-
-            foreach (var comp in CompDm)
-            {
-                await App.DatabaseProvider.UpsertCompetitorDataModelAsync(comp);
-            }
-        }
-
         private void ReportProgress(double progress)
         {
             CrunchProgressPercentage = progress;
@@ -263,7 +237,7 @@ namespace ImpartialUI.ViewModels
             double totalProgress = _competitions.Count;
             int count = 1;
 
-            CompDm = (await App.DatabaseProvider.GetCompetitorDataModelsAsync()).ToList();
+            CompDm = new();
 
             foreach (var competition in _competitions)
             {
@@ -281,12 +255,12 @@ namespace ImpartialUI.ViewModels
                             var compDm = CompDm.Where(c => c.CompetitorId == competitor.Id).FirstOrDefault();
                             if (compDm == null)
                             {
-                                compDm = new CompetitorDataModel(competitor, 0);
+                                compDm = new CompetitorDataModel(competitor);
                                 CompDm.Add(compDm);
                             }
 
                             if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
-                                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.LeadStats.Rating, 0, score.Round, score.RawScore, competition.TotalLeaders));
+                                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.LeadStats.Rating, 0, score.Round, score.RawScore, competition.PrelimLeaders(round).Count));
                         }
                         foreach (var score in competition.FollowerPrelimScores.Where(s => s.Round == round))
                         {
@@ -296,12 +270,12 @@ namespace ImpartialUI.ViewModels
                             var compDm = CompDm.Where(c => c.CompetitorId == competitor.Id).FirstOrDefault();
                             if (compDm == null)
                             {
-                                compDm = new CompetitorDataModel(competitor, 0);
+                                compDm = new CompetitorDataModel(competitor);
                                 CompDm.Add(compDm);
                             }
 
                             if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
-                                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.FollowStats.Rating, 0, score.Round, score.RawScore, competition.TotalFollowers));
+                                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.FollowStats.Rating, 0, score.Round, score.RawScore, competition.PrelimFollowers(round).Count));
                         }
 
                         // calculating the new ratings
@@ -317,7 +291,7 @@ namespace ImpartialUI.ViewModels
                             }
                             else
                             {
-                                compDmLeader = new CompetitorDataModel(leader.Id, 0);
+                                compDmLeader = new CompetitorDataModel(leader.Id);
                             }
                         }
 
@@ -351,7 +325,7 @@ namespace ImpartialUI.ViewModels
                         var compDmLeader = CompDm.Where(c => c.CompetitorId == leader.Id)?.FirstOrDefault();
                         if (compDmLeader == null)
                         {
-                            compDmLeader = new CompetitorDataModel(leader, 0);
+                            compDmLeader = new CompetitorDataModel(leader);
                             CompDm.Add(compDmLeader);
                         }
                         compDmLeader.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, leader.LeadStats.Rating, 0, 0, couple.ActualPlacement, competition.TotalCouples));
@@ -360,7 +334,7 @@ namespace ImpartialUI.ViewModels
                         var compDmFollower = CompDm.Where(c => c.CompetitorId == follower.Id)?.FirstOrDefault();
                         if (compDmFollower == null)
                         {
-                            compDmFollower = new CompetitorDataModel(follower, 0);
+                            compDmFollower = new CompetitorDataModel(follower);
                             CompDm.Add(compDmFollower);
                         }
                         compDmFollower.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, follower.FollowStats.Rating, 0, 0, couple.ActualPlacement, competition.TotalCouples));

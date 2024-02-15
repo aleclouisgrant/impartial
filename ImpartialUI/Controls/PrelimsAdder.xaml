@@ -19,7 +19,7 @@
                 <Run Text="Prelims ("/>
                 <Run Text="{Binding Role, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Run Text="("/>
-                <Run Text="{Binding Count, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding CountString, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Run Text="))"/>
             </TextBlock>
         </Border>
@@ -28,9 +28,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
+                <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
@@ -44,6 +46,16 @@
                 <TextBlock
                     Text="Competitor" 
                     FontWeight="Bold" FontStyle="Italic" Margin="1"/>
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Margin="1" x:Name="AddRowBorder">
+                <Button 
+                    Content="+"
+                    Click="AddRow_Click"/>
+            </Border>
+
+            <Border Grid.Row="0" Grid.Column="2">
+                <Button HorizontalAlignment="Left" Content="+" Width="20" Margin="1" Click="AddColumn_Click"/>
             </Border>
         </Grid>
     </Grid>

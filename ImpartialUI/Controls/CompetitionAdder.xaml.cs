@@ -1,16 +1,11 @@
 ﻿using Impartial;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace ImpartialUI.Controls
@@ -18,7 +13,6 @@ namespace ImpartialUI.Controls
     public partial class CompetitionAdder : UserControl
     {
         #region DependencyProperties
-
         public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
             nameof(Competition),
             typeof(Competition),
@@ -55,6 +49,7 @@ namespace ImpartialUI.Controls
             {
                 foreach (var couple in couples)
                 {
+                    viewer._coupleCount++;
                     viewer.AddCouple(couple);
                 }
             }
@@ -62,37 +57,43 @@ namespace ImpartialUI.Controls
             viewer.CompDatePicker.DisplayDate = date;
             viewer.UpdateCompetition();
         }
-        #endregion
 
-        private List<Competitor> _competitors;
+        public static readonly DependencyProperty CompetitorsProperty = DependencyProperty.Register(
+            nameof(Competitors),
+            typeof(List<Competitor>),
+            typeof(CompetitionAdder),
+            new FrameworkPropertyMetadata(1, OnCompetitorsPropertyChanged));
         public List<Competitor> Competitors
         {
-            get { return _competitors; }
-            set
-            {
-                _competitors = value;
-                OnPropertyChanged();
-            }
+            get { return (List<Competitor>)GetValue(CompetitorsProperty); }
+            set { SetValue(CompetitorsProperty, value); }
+        }
+        private static void OnCompetitorsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
         }
 
-        private List<Judge> _judges;
+        public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
+            nameof(Judges),
+            typeof(List<Judge>),
+            typeof(CompetitionAdder),
+            new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
         public List<Judge> Judges
         {
-            get { return _judges; }
-            set
-            {
-                _judges = value;
-                OnPropertyChanged();
-            }
+            get { return (List<Judge>)GetValue(JudgesProperty); }
+            set { SetValue(JudgesProperty, value); }
         }
+        private static void OnJudgesPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+        }
+        #endregion
 
         private List<SearchTextBox> _competitorBoxes = new List<SearchTextBox>();
         private List<SearchTextBox> _judgeBoxes = new List<SearchTextBox>();
 
-        public ObservableCollection<Couple> Couples { get; set; } = new ObservableCollection<Couple>();
-
         private Border _addRowBorder;
         private Button _addColumnButton;
+
+        private int _coupleCount = 0;
 
         public CompetitionAdder()
         {
@@ -104,9 +105,9 @@ namespace ImpartialUI.Controls
             UpdateJudges();
         }
 
-        public async void UpdateCompetitors()
+        public void UpdateCompetitors()
         {
-            Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
+            return; //the following may not be necessary - testing
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
@@ -116,13 +117,9 @@ namespace ImpartialUI.Controls
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
             }
         }
-        public async void UpdateJudges()
+        public void UpdateJudges()
         {
-            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).OrderBy(j => j.FirstName).ToList();
-            
-            // filter out anonymous judges
-            //Judges = Judges.RemoveAll(j => Int32.TryParse(j.LastName, out int res) == true);
-
+            return; //the following may not be necessary - testing
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
@@ -171,7 +168,8 @@ namespace ImpartialUI.Controls
             {
                 Margin = new Thickness(1),
                 ItemsSource = Competitors,
-                SelectedPerson = null
+                SelectedPerson = null,
+                Placement = Competition.Couples.Count + 1
             };
 
             if (couple?.Leader != null)
@@ -187,7 +185,10 @@ namespace ImpartialUI.Controls
             leaderBorder.Child = leaderSearchBox;
             leaderSearchBox.SelectionChanged += (s, e) =>
             {
-                UpdateCompetition();
+                if (e.AddedItems.Count > 0)
+                {
+                    UpdateCompetitor((Competitor)e.AddedItems[0], e.Placement, Role.Leader);
+                }
             };
 
             ScoreGrid.Children.Add(leaderBorder);
@@ -206,8 +207,19 @@ namespace ImpartialUI.Controls
             {
                 Margin = new Thickness(1),
                 ItemsSource = Competitors,
-                SelectedPerson = null
+                SelectedPerson = null,
             };
+
+            if (couple != null)
+            {
+                leaderSearchBox.Placement = couple.ActualPlacement; 
+                followerSearchBox.Placement = couple.ActualPlacement;
+            }
+            else
+            {
+                leaderSearchBox.Placement = Competition.Couples.Count;
+                followerSearchBox.Placement = Competition.Couples.Count;
+            }
 
             if (couple?.Follower != null)
             {
@@ -222,7 +234,10 @@ namespace ImpartialUI.Controls
             followerBorder.Child = followerSearchBox;
             followerSearchBox.SelectionChanged += (s, e) =>
             {
-                UpdateCompetition();
+                if (e.AddedItems.Count > 0)
+                {
+                    UpdateCompetitor((Competitor)e.AddedItems[0], e.Placement, Role.Follower);
+                }
             };
             
             ScoreGrid.Children.Add(followerBorder);
@@ -267,7 +282,7 @@ namespace ImpartialUI.Controls
 
             Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
 
-            Couples.Add(new Couple(
+            Competition.Couples.Add(new Couple(
                 (Competitor)leaderSearchBox.SelectedPerson, 
                 (Competitor)followerSearchBox.SelectedPerson, 
                 ScoreGrid.RowDefinitions.Count - 2));
@@ -475,13 +490,35 @@ namespace ImpartialUI.Controls
 
                     try
                     {
-                        Competition.Scores.Add(new Score(Competition, judge, leader, follower, Int32.Parse(scoreBox.Text), placement));
+                        Competition.Scores.Add(new FinalScore(Competition, judge, leader, follower, Int32.Parse(scoreBox.Text), placement));
                     }
                     catch { }
                 }
             }
 
             OnPropertyChanged(nameof(Competition));
+        }
+
+        private void UpdateCompetitor(Competitor competitor, int placement, Role role)
+        {
+            if (placement < 1 || placement > Competition.Couples.Count)
+                return;
+
+            if (role == Role.Leader)
+            {
+                var scores = Competition.Scores.Where(s => s.ActualPlacement == placement).ToList();
+                foreach (var score in scores)
+                {
+                    score.Leader = competitor;
+                }
+            } else if (role == Role.Follower)
+            {
+                var scores = Competition.Scores.Where(s => s.ActualPlacement == placement).ToList();
+                foreach (var score in scores)
+                {
+                    score.Follower = competitor;
+                }
+            }
         }
 
         private void RefreshItemSources()
@@ -512,7 +549,7 @@ namespace ImpartialUI.Controls
         }
 
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
-        public void OnPropertyChanged([CallerMemberName] String propertyName = "")
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

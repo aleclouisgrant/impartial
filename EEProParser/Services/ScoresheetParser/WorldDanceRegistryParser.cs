@@ -206,7 +206,7 @@ namespace Impartial.Services.ScoresheetParser
 
             return new Tuple<List<PrelimScore>, List<PrelimScore>>(leaderPrelimScores, followerPrelimScores);
         }
-        private List<Score> GetFinalScores(Division division)
+        private List<FinalScore> GetFinalScores(Division division)
         {
             var sub = GetFinalsDocByDivision(division);
             var judges = GetFinalsJudgesByDivision(division);
@@ -219,7 +219,7 @@ namespace Impartial.Services.ScoresheetParser
             var leaders = new List<Competitor>();
             var followers = new List<Competitor>();
 
-            var scores = new List<Score>();
+            var scores = new List<FinalScore>();
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i].SelectNodes("td");
@@ -264,7 +264,7 @@ namespace Impartial.Services.ScoresheetParser
                         placement = Int32.Parse(node[j].InnerText.Substring(0, 1));
                     }
 
-                    var score = new Score(judges[j - offset], placement, actualPlacement)
+                    var score = new FinalScore(judges[j - offset], placement, actualPlacement)
                     {
                         Leader = leader,
                         Follower = follower,
@@ -273,7 +273,7 @@ namespace Impartial.Services.ScoresheetParser
                     scores.Add(score);
 
                     if (judges[j - offset].Scores == null)
-                        judges[j - offset].Scores = new List<Score>();
+                        judges[j - offset].Scores = new List<FinalScore>();
 
                     judges[j - offset].Scores.Add(score);
                 }

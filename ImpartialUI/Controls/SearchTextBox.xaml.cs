@@ -101,22 +101,29 @@ namespace ImpartialUI.Controls
             }
         }
 
+        public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register(
+            nameof(Placement),
+            typeof(int),
+            typeof(SearchTextBox),
+            new FrameworkPropertyMetadata(0));
+        public int Placement
+        {
+            get { return (int)GetValue(PlacementProperty); }
+            set { SetValue(PlacementProperty, value); }
+        }
         #endregion
 
         public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent(
             "SelectionChanged", 
             RoutingStrategy.Bubble, 
-            typeof(SelectionChangedEventHandler), 
+            typeof(SearchTextBoxSelectionChangedEventHandler), 
             typeof(SearchTextBox));
 
-        public event SelectionChangedEventHandler SelectionChanged
+        public event SearchTextBoxSelectionChangedEventHandler SelectionChanged;
+
+        protected virtual void OnSelectionChanged(SearchTextBoxSelectionChangedEventArgs eventArgs)
         {
-            add { AddHandler(SelectionChangedEvent, value); }
-            remove { RemoveHandler(SelectionChangedEvent, value); }
-        }
-        protected virtual void OnSelectionChanged(SelectionChangedEventArgs eventArgs)
-        {
-            RaiseEvent(eventArgs);
+            SelectionChanged?.Invoke(this, eventArgs);
         }
 
         private string _cancelledPersonFirstName = "";
@@ -252,7 +259,7 @@ namespace ImpartialUI.Controls
                 (Competitor)ComboBoxItems.SelectedValue
             };
 
-            OnSelectionChanged(new SelectionChangedEventArgs(SearchTextBox.SelectionChangedEvent, removedItems, addedItems));
+            OnSelectionChanged(new SearchTextBoxSelectionChangedEventArgs(SearchTextBox.SelectionChangedEvent, removedItems, addedItems, Placement));
         }
         private void ShowAddPersonButton_Click(object sender, RoutedEventArgs e)
         {
@@ -271,19 +278,21 @@ namespace ImpartialUI.Controls
 
         private void ComboBoxItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            SearchTextBoxSelectionChangedEventArgs eventArgs;
+
             if (_wasCancelled)
             {
                 var removedItems = new List<PersonModel> {
                     new Competitor(_cancelledPersonFirstName, _cancelledPersonLastName) };
 
-                e = new SelectionChangedEventArgs(SelectionChangedEvent, removedItems, e.AddedItems);
+                eventArgs = new SearchTextBoxSelectionChangedEventArgs(SelectionChangedEvent, removedItems, e.AddedItems, Placement);
             }
             else 
             {
-                e = new SelectionChangedEventArgs(SelectionChangedEvent, e.RemovedItems, e.AddedItems);
+                eventArgs = new SearchTextBoxSelectionChangedEventArgs(SelectionChangedEvent, e.RemovedItems, e.AddedItems, Placement);
             }
 
-            OnSelectionChanged(e);
+            OnSelectionChanged(eventArgs);
         }
     }
 }

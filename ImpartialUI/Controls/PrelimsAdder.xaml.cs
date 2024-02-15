@@ -1,9 +1,13 @@
 ﻿using Impartial;
+using Impartial.Enums;
+using ScottPlot.Renderable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,7 +17,6 @@ namespace ImpartialUI.Controls
     public partial class PrelimsAdder : UserControl
     {
         #region DependencyProperties
-
         public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
             nameof(Competition),
             typeof(Competition),
@@ -42,7 +45,6 @@ namespace ImpartialUI.Controls
                 {
                     c.Add(new(competitor, competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == control.Round).OrderBy(c => c.Judge.FullName).ToList()));
                 }
-
                 judges = competition.PrelimLeaderJudges(control.Round).OrderBy(j => j.FullName).ToList();
             }
             else if (control.Role == Role.Follower)
@@ -57,23 +59,6 @@ namespace ImpartialUI.Controls
 
             c = c.OrderBy(cc => cc.Item2.FirstOrDefault().RawScore).ToList();
 
-            control.Clear();
-
-            foreach (var judge in judges)
-            {
-                if (control.Role == Role.Leader)
-                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.LeaderPrelimScores.Where(s => s.Judge.Id == judge.Id && s.Round == control.Round).ToList()));
-                else if (control.Role == Role.Follower)
-                    control._judgeScores.Add(new Tuple<Judge, List<PrelimScore>>(judge, competition.FollowerPrelimScores.Where(s => s.Judge.Id == judge.Id && s.Round == control.Round).ToList()));
-
-                control.AddJudge(judge);
-            }
-
-            foreach (var competitor in c)
-            {
-                control.AddCompetitor(competitor.Item1, competitor.Item2);
-            }
-
             foreach (var score in competition.LeaderPrelimScores)
             {
                 score.Competition = competition;
@@ -81,6 +66,28 @@ namespace ImpartialUI.Controls
             foreach (var score in competition.FollowerPrelimScores)
             {
                 score.Competition = competition;
+            }
+
+            control.Clear();
+
+            control._scores = new PrelimScore[c.Count, judges.Count];
+
+            for (int competitorIndex = 0; competitorIndex < c.Count; competitorIndex++)
+            {
+                for (int judgeIndex = 0; judgeIndex < judges.Count; judgeIndex++)
+                {
+                    control._scores[competitorIndex, judgeIndex] = c[competitorIndex].Item2.ElementAt(judgeIndex);
+                }
+            }
+
+            foreach (var judge in judges)
+            {
+                control.AddJudge(judge);
+            }
+
+            foreach (var competitor in c)
+            {
+                control.AddCompetitor(competitor.Item1, competitor.Item2);
             }
         }
 
@@ -122,9 +129,36 @@ namespace ImpartialUI.Controls
                     ((PrelimsAdder)source).Competition));
         }
 
+        public static readonly DependencyProperty CompetitorsProperty = DependencyProperty.Register(
+            nameof(Competitors),
+            typeof(List<Competitor>),
+            typeof(PrelimsAdder),
+            new FrameworkPropertyMetadata(1, OnCompetitorsPropertyChanged));
+        public List<Competitor> Competitors
+        {
+            get { return (List<Competitor>)GetValue(CompetitorsProperty); }
+            set { SetValue(CompetitorsProperty, value); }
+        }
+        private static void OnCompetitorsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+        }
+
+        public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
+            nameof(Judges),
+            typeof(List<Judge>),
+            typeof(PrelimsAdder),
+            new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
+        public List<Judge> Judges
+        {
+            get { return (List<Judge>)GetValue(JudgesProperty); }
+            set { SetValue(JudgesProperty, value); }
+        }
+        private static void OnJudgesPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+        }
         #endregion
 
-        public string Count
+        public string CountString
         {
             get
             {
@@ -137,61 +171,34 @@ namespace ImpartialUI.Controls
             }
         }
 
-        private LinkedList<Tuple<Competitor, List<PrelimScore>>> _prelimScores;
-        public LinkedList<Tuple<Competitor, List<PrelimScore>>> PrelimScores
+        public int Count
         {
-            get { return _prelimScores; }
-            set
+            get
             {
-                _prelimScores = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private List<Competitor> _competitors;
-        public List<Competitor> Competitors
-        {
-            get { return _competitors; }
-            set
-            {
-                _competitors = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private List<Judge> _judges;
-        public List<Judge> Judges
-        {
-            get { return _judges; }
-            set
-            {
-                _judges = value;
-                OnPropertyChanged();
+                if (Role == Role.Leader)
+                    return Competition.TotalLeaders;
+                else if (Role == Role.Follower)
+                    return Competition.TotalFollowers;
+                else
+                    return 0;
             }
         }
 
         private List<SearchTextBox> _competitorBoxes = new List<SearchTextBox>();
         private List<SearchTextBox> _judgeBoxes = new List<SearchTextBox>();
 
-        private List<Tuple<Judge, List<PrelimScore>>> _judgeScores = new();
-
-        // not used right now
         private Border _addRowBorder;
         private Button _addColumnButton;
+
+        private PrelimScore[,] _scores;
 
         public PrelimsAdder()
         {
             InitializeComponent();
-
-            PrelimScores = new();
-
-            UpdateCompetitors();
-            UpdateJudges();
         }
 
-        public async void UpdateCompetitors()
+        public void UpdateCompetitors()
         {
-            Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
@@ -201,13 +208,8 @@ namespace ImpartialUI.Controls
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
             }
         }
-        public async void UpdateJudges()
+        public void UpdateJudges()
         {
-            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).OrderBy(j => j.FirstName).ToList();
-
-            // filter out anonymous judges
-            //Judges = Judges.RemoveAll(j => Int32.TryParse(j.LastName, out int res) == true);
-
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
@@ -222,7 +224,7 @@ namespace ImpartialUI.Controls
         {
             ScoreGrid.RowDefinitions.Add(new RowDefinition());
 
-            if (competitorPrelimScores == null)
+            if (competitorPrelimScores == null && competitor != null)
             {
                 competitorPrelimScores = new();
                 
@@ -231,9 +233,13 @@ namespace ImpartialUI.Controls
                 else if (Role == Role.Follower)
                     competitorPrelimScores = Competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == Round).OrderBy(c => c.Judge.FullName).ToList();
             }
-            else
+            else if (competitorPrelimScores != null)
             {
                 competitorPrelimScores = competitorPrelimScores.OrderBy(c => c.Judge.FullName).ToList();
+            }
+            else
+            {
+                competitorPrelimScores = new();
             }
 
             bool finaled = false;
@@ -252,7 +258,7 @@ namespace ImpartialUI.Controls
 
             var countTextBlock = new TextBlock()
             {
-                Text = (ScoreGrid.RowDefinitions.Count - 1).ToString(),
+                Text = (ScoreGrid.RowDefinitions.Count - 2).ToString(),
                 Margin = new Thickness(1)
             };
 
@@ -263,7 +269,7 @@ namespace ImpartialUI.Controls
 
             ScoreGrid.Children.Add(countBorder);
             Grid.SetColumn(countBorder, 0);
-            Grid.SetRow(countBorder, ScoreGrid.RowDefinitions.Count - 1);
+            Grid.SetRow(countBorder, ScoreGrid.RowDefinitions.Count - 2);
 
             // names
             var competitorBorder = new Border()
@@ -278,16 +284,16 @@ namespace ImpartialUI.Controls
             {
                 Margin = new Thickness(1),
                 ItemsSource = Competitors,
-                SelectedPerson = null
+                SelectedPerson = null,
+                Placement = _competitorBoxes.Count() + 1
             };
 
             competitorSearchBox.SelectionChanged += (o, e) =>
             {
-                if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0)
-                    UpdateCompetitorScores((Competitor)e.RemovedItems[0], (Competitor)e.AddedItems[0]);
+                if (e.AddedItems.Count > 0 && e.RemovedItems.Count <= 0)
+                    UpdateCompetitorInScores(e.Placement, (Competitor)e.AddedItems[0]);
             };
 
-            bool competitorFound = false;
             if (competitor != null)
             {
                 competitorSearchBox.SelectedPerson = competitorSearchBox.ItemsSource.Where(c => c.Id == competitor.Id).FirstOrDefault();
@@ -298,7 +304,6 @@ namespace ImpartialUI.Controls
                 }
                 else
                 {
-                    competitorFound = true;
                     foreach (var prelimScore in competitorPrelimScores)
                     {
                         prelimScore.Competitor = (Competitor)competitorSearchBox.SelectedPerson;
@@ -311,58 +316,39 @@ namespace ImpartialUI.Controls
 
             ScoreGrid.Children.Add(competitorBorder);
             Grid.SetColumn(competitorBorder, 1);
-            Grid.SetRow(competitorBorder, ScoreGrid.RowDefinitions.Count - 1);
+            Grid.SetRow(competitorBorder, ScoreGrid.RowDefinitions.Count - 2);
 
             // scores
-            int i = 2;
-            foreach (var score in competitorPrelimScores)
+            for (int i = 2; i < _judgeBoxes.Count() + 2; i++)
             {
-                var border = new Border()
+                PrelimScore prelimScore;
+
+                if (competitorPrelimScores != null && competitorPrelimScores?.Count > i - 2)
                 {
-                    BorderBrush = Brushes.Gray,
-                    BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1),
-                    Height = 24
-                };
-
-                var textBlock = new TextBlock()
+                    prelimScore = competitorPrelimScores[i - 2];
+                }
+                else
                 {
-                    Text = Util.CallbackScoreToString(score.CallbackScore),
-                    Margin = new Thickness(1)
-                };
+                    int judgeIndex = i - 2;
+                    int competitorIndex = _competitorBoxes.Count() - 1;
 
-                if (finaled)
-                    textBlock.FontWeight = FontWeights.Bold;
+                    prelimScore = _scores[competitorIndex, judgeIndex];
+                }
+                
+                Border scoreBorder = MakeScoreBorder(prelimScore);
 
-                border.Child = textBlock;
-
-                ScoreGrid.Children.Add(border);
-                Grid.SetColumn(border, i);
-                Grid.SetRow(border, ScoreGrid.RowDefinitions.Count() - 1);
-                i++;
+                ScoreGrid.Children.Add(scoreBorder);
+                Grid.SetColumn(scoreBorder, i);
+                Grid.SetRow(scoreBorder, ScoreGrid.RowDefinitions.Count() - 2);
             }
 
-            //Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
-
-            if (competitorFound)
-            {
-                PrelimScores.AddLast(new Tuple<Competitor, List<PrelimScore>>(
-                    (Competitor)competitorSearchBox.SelectedPerson,
-                    competitorPrelimScores));
-            }
-            else
-            {
-                PrelimScores.AddLast(new Tuple<Competitor, List<PrelimScore>>(
-                    new Competitor(competitor.FirstName, competitor.LastName),
-                    competitorPrelimScores));
-            }
+            Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
 
             OnPropertyChanged(nameof(Competition));
         }
         private void AddJudge(Judge judge = null)
         {
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            //ScoreGrid.ColumnDefinitions[ScoreGrid.ColumnDefinitions.Count - 2].Width = new GridLength(1.0, GridUnitType.Star);
 
             Border judgeBorder = new Border()
             {
@@ -374,16 +360,17 @@ namespace ImpartialUI.Controls
 
             SearchTextBox judgeSearchBox = new SearchTextBox()
             {
-                ItemsSource = Judges
+                ItemsSource = Judges,                
             };
+
             _judgeBoxes.Add(judgeSearchBox);
 
             judgeSearchBox.SelectionChanged += (o, e) =>
             {
                 if (e.AddedItems.Count > 0)
                 {
-                    int index = _judgeBoxes.IndexOf(judgeSearchBox);
-                    UpdateJudgeScores(index, (Judge)e.AddedItems[0]);
+                    int judgeIndex = _judgeBoxes.IndexOf(judgeSearchBox);
+                    UpdateJudgeInScores(judgeIndex, (Judge)e.AddedItems[0]);
                 }
             };
 
@@ -393,72 +380,199 @@ namespace ImpartialUI.Controls
 
                 if (judgeSearchBox.SelectedPerson != null)
                 {
-                    UpdateJudgeScores(_judgeBoxes.IndexOf(judgeSearchBox), (Judge)judgeSearchBox.SelectedPerson);
+                    UpdateJudgeInScores(_judgeBoxes.IndexOf(judgeSearchBox), (Judge)judgeSearchBox.SelectedPerson);
                 }
             }
 
             judgeBorder.Child = judgeSearchBox;
 
             ScoreGrid.Children.Add(judgeBorder);
-            Grid.SetColumn(judgeBorder, ScoreGrid.ColumnDefinitions.Count() - 1);
+            Grid.SetColumn(judgeBorder, ScoreGrid.ColumnDefinitions.Count() - 2);
 
             for (int i = 1; i < ScoreGrid.RowDefinitions.Count - 1; i++)
             {
-                Border scoreBorder = new Border()
-                {
-                    BorderBrush = Brushes.Gray,
-                    BorderThickness = new Thickness(1),
-                    Margin = new Thickness(1),
-                    Height = 24
-                };
+                Competitor competitor = _competitorBoxes.Where(c => c.Placement == i).FirstOrDefault().SelectedPerson as Competitor;
 
-                TextBox scoreTextBox = new TextBox()
-                {
-                    Margin = new Thickness(1)
-                };
+                int competitorIndex = i - 1;
+                int judgeIndex = _judgeBoxes.Count() - 1;
 
-                scoreBorder.Child = scoreTextBox;
+                PrelimScore prelimScore = _scores[competitorIndex, judgeIndex];
+
+                Border scoreBorder = MakeScoreBorder(prelimScore);
 
                 ScoreGrid.Children.Add(scoreBorder);
                 Grid.SetRow(scoreBorder, i);
-                Grid.SetColumn(scoreBorder, ScoreGrid.ColumnDefinitions.Count() - 1);
+                Grid.SetColumn(scoreBorder, ScoreGrid.ColumnDefinitions.Count() - 2);
             }
 
-            //Grid.SetColumn(_addColumnButton, ScoreGrid.ColumnDefinitions.Count() - 1);
+            Grid.SetColumn(_addColumnButton, ScoreGrid.ColumnDefinitions.Count() - 1);
             OnPropertyChanged(nameof(Competition));
         }
 
-        private void UpdateCompetitorScores(Competitor oldCompetitor, Competitor newCompetitor)
+        private void UpdateCompetitorInScores(int placement, Competitor newCompetitor)
         {
-            List<PrelimScore> c = 
-                PrelimScores.Where(s => s.Item1?.FullName == oldCompetitor.FullName).
-                FirstOrDefault()?.Item2.ToList();
+            List<PrelimScore> prelimScores = new();
 
-            if (c == null) //this shouldn't really happen
+            if (Role == Role.Leader)
+                prelimScores = Competition.LeaderPrelimScores.Where(s => s.RawScore == placement && s.Round == Round).ToList();
+            else if (Role == Role.Follower)
+                prelimScores = Competition.FollowerPrelimScores.Where(s => s.RawScore == placement && s.Round == Round).ToList();
+
+            if (prelimScores == null) //this shouldn't really happen
                 return;
 
-            foreach (PrelimScore score in c)
+            foreach (PrelimScore score in prelimScores)
             {
                 score.Competitor = newCompetitor;
             }
 
             OnPropertyChanged(nameof(Competition));
         }
-        private void UpdateJudgeScores(int index, Judge judge)
+        private void UpdateJudgeInScores(int judgeIndex, Judge newJudge)
         {
-            foreach (var prelimScore in _judgeScores[index].Item2)
+            for (int i = 0; i < _competitorBoxes.Count(); i++)
             {
-                prelimScore.Judge = judge;
+                _scores[i, judgeIndex].Judge = newJudge;
             }
 
             OnPropertyChanged(nameof(Competition));
         }
 
+        private void UpdateScore(int competitorIndex, int judgeIndex, CallbackScore newScore)
+        {
+             _scores[competitorIndex, judgeIndex].CallbackScore = newScore;
+            OnPropertyChanged(nameof(Competition));
+        }
+
+        private void AddBlankCompetitorToScores()
+        {
+            PrelimScore[,] scores = new PrelimScore[_scores.GetLength(0) + 1, _scores.GetLength(1)];
+
+            // transfer prelim scores from current array
+            for (int competitorIndex = 0; competitorIndex < _scores.GetLength(0); competitorIndex++)
+            {
+                for (int judgeIndex = 0; judgeIndex < _scores.GetLength(1); judgeIndex++)
+                {
+                    scores[competitorIndex, judgeIndex] = _scores[competitorIndex, judgeIndex];
+                }
+            }
+
+            List<PrelimScore> newScores = new();
+
+            // add new set of prelim scores for the new competitor
+            for (int judgeIndex = 0; judgeIndex < _scores.GetLength(1); judgeIndex++)
+            {
+                var newPrelimScore = new PrelimScore(
+                    Competition,
+                    _judgeBoxes.ElementAt(judgeIndex).SelectedPerson as Judge,
+                    null,
+                    Role,
+                    false,
+                    CallbackScore.NoScore,
+                    scores.GetLength(0),
+                    Round);
+
+                scores[scores.GetLength(0) - 1, judgeIndex] = newPrelimScore;
+                newScores.Add(newPrelimScore);
+            }
+
+            if (Role == Role.Leader)
+            {
+                Competition.LeaderPrelimScores.AddRange(newScores);
+            }
+            else if (Role == Role.Follower)
+            {
+                Competition.FollowerPrelimScores.AddRange(newScores);
+            }
+
+            _scores = scores;
+            OnPropertyChanged(nameof(Competition));
+        }
+        private void AddBlankJudgeToScores()
+        {
+            PrelimScore[,] scores = new PrelimScore[_scores.GetLength(0), _scores.GetLength(1) + 1];
+
+            // transfer prelim scores from current array
+            for (int competitorIndex = 0; competitorIndex < _scores.GetLength(0); competitorIndex++)
+            {
+                for (int judgeIndex = 0; judgeIndex < _scores.GetLength(1); judgeIndex++)
+                {
+                    scores[competitorIndex, judgeIndex] = _scores[competitorIndex, judgeIndex];
+                }
+            }
+
+            List<PrelimScore> newScores = new();
+
+            // add new set of prelim scores for the new judge
+            for (int competitorIndex = 0; competitorIndex < _scores.GetLength(0); competitorIndex++)
+            {
+                var newPrelimScore = new PrelimScore(
+                    Competition,
+                    null,
+                    _competitorBoxes.ElementAt(competitorIndex).SelectedPerson as Competitor,
+                    Role,
+                    false,
+                    CallbackScore.NoScore,
+                    scores.GetLength(0),
+                    Round);
+
+                scores[competitorIndex, scores.GetLength(1) - 1] = newPrelimScore;
+                newScores.Add(newPrelimScore);
+            }
+
+            if (Role == Role.Leader)
+            {
+                Competition.LeaderPrelimScores.AddRange(newScores);
+            }
+            else if (Role == Role.Follower)
+            {
+                Competition.FollowerPrelimScores.AddRange(newScores);
+            }
+
+            _scores = scores;
+            OnPropertyChanged(nameof(Competition));
+        }
+
+        private Border MakeScoreBorder(PrelimScore score)
+        {
+            Border scoreBorder = new Border()
+            {
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(1),
+                Height = 24
+            };
+
+            ComboBox scoreComboBox = new ComboBox()
+            {
+                Margin = new Thickness(1),
+                ItemsSource = Enum.GetValues(typeof(CallbackScore)),
+                SelectedValue = score.CallbackScore
+            };
+
+            scoreComboBox.SelectionChanged += (s, e) =>
+            {
+                int competitorIndex = Grid.GetRow(((ComboBox)s).Parent as Border) - 1;
+                int judgeIndex = Grid.GetColumn(((ComboBox)s).Parent as Border) - 2;
+
+                var val = (CallbackScore)((ComboBox)s).SelectedValue;
+
+                UpdateScore(competitorIndex, judgeIndex, val);
+            };
+
+            if (score.Finaled)
+                scoreComboBox.FontWeight = FontWeights.Bold;
+
+            scoreBorder.Child = scoreComboBox;
+
+            return scoreBorder;
+        }
+
         private void Clear()
         {
-            _judgeScores.Clear();
+            _scores = new PrelimScore[0, 0];
+
             _judgeBoxes.Clear();
-            _prelimScores.Clear();
             _competitorBoxes.Clear();
 
             ScoreGrid.Children.Clear();
@@ -466,9 +580,11 @@ namespace ImpartialUI.Controls
             ScoreGrid.ColumnDefinitions.Clear();
 
             ScoreGrid.RowDefinitions.Add(new RowDefinition());
+            ScoreGrid.RowDefinitions.Add(new RowDefinition());
 
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
             var placeBorder = new Border()
             {
@@ -512,52 +628,54 @@ namespace ImpartialUI.Controls
             Grid.SetRow(competitorBorder, 0);
             Grid.SetColumn(competitorBorder, 1);
 
-            //var addColumnButton = new Button()
-            //{
-            //    Content = "+",
-            //    HorizontalAlignment = HorizontalAlignment.Left,
-            //    Width = 20,
-            //    Margin = new Thickness(1)
-            //};
-            //addColumnButton.Click += AddColumn_Click;
+            var addColumnButton = new Button()
+            {
+                Content = "+",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Width = 20,
+                Margin = new Thickness(1)
+            };
+            addColumnButton.Click += AddColumn_Click;
 
-            //ScoreGrid.Children.Add(addColumnButton);
-            //Grid.SetRow(addColumnButton, 0);
-            //Grid.SetColumn(addColumnButton, 3);
+            ScoreGrid.Children.Add(addColumnButton);
+            Grid.SetRow(addColumnButton, 0);
+            Grid.SetColumn(addColumnButton, 2);
 
-            //var addRowBorder = new Border()
-            //{
-            //    BorderThickness = new Thickness(0),
-            //    BorderBrush = Brushes.Gray,
-            //    Margin = new Thickness(1)
-            //};
+            var addRowBorder = new Border()
+            {
+                BorderThickness = new Thickness(0),
+                BorderBrush = Brushes.Gray,
+                Margin = new Thickness(1)
+            };
 
-            //var addRowButton = new Button()
-            //{
-            //    Content = "+"
-            //};
-            //addRowButton.Click += AddRow_Click;
-            //addRowBorder.Child = addRowButton;
+            var addRowButton = new Button()
+            {
+                Content = "+"
+            };
+            addRowButton.Click += AddRow_Click;
+            addRowBorder.Child = addRowButton;
 
-            //ScoreGrid.Children.Add(addRowBorder);
-            //Grid.SetRow(addRowBorder, 1);
-            //Grid.SetColumn(addRowBorder, 0);
+            ScoreGrid.Children.Add(addRowBorder);
+            Grid.SetRow(addRowBorder, 1);
+            Grid.SetColumn(addRowBorder, 0);
 
-            //_addColumnButton = addColumnButton;
-            //_addRowBorder = addRowBorder;
+            _addColumnButton = addColumnButton;
+            _addRowBorder = addRowBorder;
         }
 
         private void AddRow_Click(object sender, RoutedEventArgs e)
         {
+            AddBlankCompetitorToScores();
             AddCompetitor();
         }
         private void AddColumn_Click(object sender, RoutedEventArgs e)
         {
+            AddBlankJudgeToScores();
             AddJudge();
         }
 
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
-        public void OnPropertyChanged([CallerMemberName] String propertyName = "")
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
