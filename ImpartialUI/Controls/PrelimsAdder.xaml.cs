@@ -1,5 +1,6 @@
 ﻿using Impartial;
 using Impartial.Enums;
+using ImpartialUI.Implementations.Models;
 using ScottPlot.Renderable;
 using System;
 using System.Collections.Generic;
@@ -19,23 +20,23 @@ namespace ImpartialUI.Controls
         #region DependencyProperties
         public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
             nameof(Competition),
-            typeof(Competition),
+            typeof(ICompetition),
             typeof(PrelimsAdder),
-            new FrameworkPropertyMetadata(new Competition(), OnCompetitionPropertyChanged));
-        public Competition Competition
+            new FrameworkPropertyMetadata(new ICompetition(), OnCompetitionPropertyChanged));
+        public ICompetition Competition
         {
-            get { return (Competition)GetValue(CompetitionProperty); }
+            get { return (ICompetition)GetValue(CompetitionProperty); }
             set { SetValue(CompetitionProperty, value); }
         }
         private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var control = (PrelimsAdder)source;
-            var competition = (Competition)e.NewValue;
+            var competition = (ICompetition)e.NewValue;
 
             if (competition == null)
                 return;
 
-            var judges = new List<Judge>();
+            var judges = new List<IJudge>();
             List<Tuple<Competitor, List<PrelimScore>>> c = new();
 
             if (control.Role == Role.Leader)
@@ -145,12 +146,12 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
             nameof(Judges),
-            typeof(List<Judge>),
+            typeof(List<IJudge>),
             typeof(PrelimsAdder),
             new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
-        public List<Judge> Judges
+        public List<IJudge> Judges
         {
-            get { return (List<Judge>)GetValue(JudgesProperty); }
+            get { return (List<IJudge>)GetValue(JudgesProperty); }
             set { SetValue(JudgesProperty, value); }
         }
         private static void OnJudgesPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -346,7 +347,7 @@ namespace ImpartialUI.Controls
 
             OnPropertyChanged(nameof(Competition));
         }
-        private void AddJudge(Judge judge = null)
+        private void AddJudge(IJudge judge = null)
         {
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
@@ -370,7 +371,7 @@ namespace ImpartialUI.Controls
                 if (e.AddedItems.Count > 0)
                 {
                     int judgeIndex = _judgeBoxes.IndexOf(judgeSearchBox);
-                    UpdateJudgeInScores(judgeIndex, (Judge)e.AddedItems[0]);
+                    UpdateJudgeInScores(judgeIndex, (IJudge)e.AddedItems[0]);
                 }
             };
 
@@ -380,7 +381,7 @@ namespace ImpartialUI.Controls
 
                 if (judgeSearchBox.SelectedPerson != null)
                 {
-                    UpdateJudgeInScores(_judgeBoxes.IndexOf(judgeSearchBox), (Judge)judgeSearchBox.SelectedPerson);
+                    UpdateJudgeInScores(_judgeBoxes.IndexOf(judgeSearchBox), (IJudge)judgeSearchBox.SelectedPerson);
                 }
             }
 
@@ -428,7 +429,7 @@ namespace ImpartialUI.Controls
 
             OnPropertyChanged(nameof(Competition));
         }
-        private void UpdateJudgeInScores(int judgeIndex, Judge newJudge)
+        private void UpdateJudgeInScores(int judgeIndex, IJudge newJudge)
         {
             for (int i = 0; i < _competitorBoxes.Count(); i++)
             {
@@ -464,7 +465,7 @@ namespace ImpartialUI.Controls
             {
                 var newPrelimScore = new PrelimScore(
                     Competition,
-                    _judgeBoxes.ElementAt(judgeIndex).SelectedPerson as Judge,
+                    _judgeBoxes.ElementAt(judgeIndex).SelectedPerson as IJudge,
                     null,
                     Role,
                     false,

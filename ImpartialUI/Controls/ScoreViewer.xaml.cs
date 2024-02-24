@@ -16,12 +16,12 @@ namespace ImpartialUI.Controls
     {
         public static readonly DependencyProperty ScoresProperty = DependencyProperty.Register(
             nameof(Scores),
-            typeof(FinalScore),
+            typeof(IFinalScore),
             typeof(ScoreViewer),
             new FrameworkPropertyMetadata(null, OnScorePropertyChanged));
-        public List<FinalScore> Scores
+        public List<IFinalScore> Scores
         {
-            get { return (List<FinalScore>)GetValue(ScoresProperty); }
+            get { return (List<IFinalScore>)GetValue(ScoresProperty); }
             set { SetValue(ScoresProperty, value); }
         }
         private static void OnScorePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -71,13 +71,13 @@ namespace ImpartialUI.Controls
             Grid.SetRow(competitorBorder, 0);
             Grid.SetColumn(competitorBorder, 1);
 
-            var scores = (List<FinalScore>)e.NewValue;
+            var scores = (List<IFinalScore>)e.NewValue;
             if (scores == null)
                 return;
 
-            List<Judge> judges = new();
+            List<IJudge> judges = new();
 
-            foreach (FinalScore score in scores)
+            foreach (IFinalScore score in scores)
             {
                 judges.Add(score.Judge);
             }

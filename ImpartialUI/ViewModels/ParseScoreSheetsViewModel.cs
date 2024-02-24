@@ -19,10 +19,10 @@ namespace ImpartialUI.ViewModels
         private bool sort = true;
 
         public List<SelectJudgeViewModel> SelectJudges { get; set; }
-        public List<Judge> Judges { get; set; }
-        public List<Judge> JudgesDb { get; set; }
+        public List<IJudge> Judges { get; set; }
+        public List<IJudge> JudgesDb { get; set; }
 
-        public List<Competition> Competitions { get; set; }
+        public List<ICompetition> Competitions { get; set; }
 
         private string prelimsPath;
         public string PrelimsPath
@@ -129,13 +129,13 @@ namespace ImpartialUI.ViewModels
 
             foreach (var judge in SelectJudges)
             {
-                judge.SelectedJudge = (Judge)Util.GetClosestPersonByFirstName(judge.Judge.FirstName, JudgesDb);
+                judge.SelectedJudge = (IJudge)Util.GetClosestPersonByFirstName(judge.Judge.FirstName, JudgesDb);
             }
         }
 
         private async void AddJudge()
         {
-            await _databaseProvider.UpsertJudgeAsync(new Judge(FirstName, LastName));
+            await _databaseProvider.UpsertJudgeAsync(new IJudge(FirstName, LastName));
             RefreshJudgesDatabase();
 
             // clear the name fields
@@ -143,7 +143,7 @@ namespace ImpartialUI.ViewModels
         }
         private void DeleteJudge(object obj)
         {
-            _databaseProvider.DeleteJudgeAsync((Judge)obj);
+            _databaseProvider.DeleteJudgeAsync((IJudge)obj);
             RefreshJudgesDatabase();
         }
         private void ClearJudgesDatabase()
@@ -209,7 +209,7 @@ namespace ImpartialUI.ViewModels
             var selectJudges = new List<SelectJudgeViewModel>();
             foreach (var judge in Judges)
             {
-                selectJudges.Add(new SelectJudgeViewModel(judge) { SelectedJudge = (Judge)Util.GetClosestPersonByFirstName(judge.FirstName, JudgesDb) });
+                selectJudges.Add(new SelectJudgeViewModel(judge) { SelectedJudge = (IJudge)Util.GetClosestPersonByFirstName(judge.FirstName, JudgesDb) });
             }
 
             SelectJudges = selectJudges;
@@ -226,8 +226,8 @@ namespace ImpartialUI.ViewModels
         {
             _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
 
-            Competitions = new List<Competition>();
-            Judges = new List<Judge>();
+            Competitions = new List<ICompetition>();
+            Judges = new List<IJudge>();
 
             var divisions = _scoresheetParser.GetDivisions();
 
@@ -266,7 +266,7 @@ namespace ImpartialUI.ViewModels
                 foreach (var score in competition.Scores)
                 {
                     if (score.Judge.Scores == null)
-                        score.Judge.Scores = new List<FinalScore>();
+                        score.Judge.Scores = new List<IFinalScore>();
 
                     //_databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
                 }

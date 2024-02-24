@@ -26,12 +26,12 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
             nameof(Competition),
-            typeof(Competition),
+            typeof(ICompetition),
             typeof(CompetitionViewer),
-            new FrameworkPropertyMetadata(new Competition(), OnCompetitionPropertyChanged));
-        public Competition Competition
+            new FrameworkPropertyMetadata(new ICompetition(), OnCompetitionPropertyChanged));
+        public ICompetition Competition
         {
-            get { return (Competition)GetValue(CompetitionProperty); }
+            get { return (ICompetition)GetValue(CompetitionProperty); }
             set { SetValue(CompetitionProperty, value); }
         }
         private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -81,7 +81,7 @@ namespace ImpartialUI.Controls
             Grid.SetRow(competitorBorder, 0);
             Grid.SetColumn(competitorBorder, 1);
 
-            var competition = (Competition)e.NewValue;
+            var competition = (ICompetition)e.NewValue;
             if (competition == null)
                 return;
 

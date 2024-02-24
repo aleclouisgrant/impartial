@@ -1,24 +1,25 @@
-﻿using System;
+﻿using Impartial;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Impartial
+namespace ImpartialUI
 {
-    public class PrelimCompetition
+    public class PrelimCompetition : IPrelimCompetition
     {
         public Guid Id { get; set; }
         public DateTime DateTime { get; set; }
 
-        public List<PrelimScore> PrelimScores { get; set; } = new List<PrelimScore>();
+        public List<IPrelimScore> PrelimScores { get; set; } = new();
 
         public Division Division { get; set; }
         public Round Round { get; set; }
         public Role Role { get; set; }
 
-        public List<Competitor> Competitors { get; set; } = new List<Competitor>();
-        public List<Judge> Judges { get; set; } = new List<Judge>();
+        public List<ICompetitor> Competitors { get; set; } = new();
+        public List<IJudge> Judges { get; set; } = new();
 
-        public List<Competitor> PromotedCompetitors { get; set; } = new List<Competitor>();
+        public List<ICompetitor> PromotedCompetitors { get; set; } = new();
 
         public PrelimCompetition(Guid? id = null)
         {
@@ -26,14 +27,14 @@ namespace Impartial
         }
 
         public PrelimCompetition(
-            DateTime dateTime, 
-            Division division, 
-            Round round, 
-            Role role, 
-            IEnumerable<PrelimScore> prelimScores,
-            IEnumerable<Competitor> competitors,
-            IEnumerable<Judge> judges,
-            IEnumerable<Competitor> promotedCompetitors,
+            DateTime dateTime,
+            Division division,
+            Round round,
+            Role role,
+            IEnumerable<IPrelimScore> prelimScores,
+            IEnumerable<ICompetitor> competitors,
+            IEnumerable<IJudge> judges,
+            IEnumerable<ICompetitor> promotedCompetitors,
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
@@ -54,7 +55,7 @@ namespace Impartial
         {
             string str = string.Empty;
             str += Environment.NewLine + "----------";
-            
+
             switch (Round)
             {
                 case Round.Quarterfinals:
@@ -79,7 +80,7 @@ namespace Impartial
             }
 
             str += Environment.NewLine + "JUDGES: ";
-            foreach (Judge judge in Judges)
+            foreach (IJudge judge in Judges)
             {
                 str += judge.ToString() + ", ";
             }
@@ -87,27 +88,27 @@ namespace Impartial
 
             foreach (var competitor in Competitors)
             {
-                List<PrelimScore> scores = PrelimScores.Where(s => s.Competitor == competitor).ToList();
+                List<IPrelimScore> scores = PrelimScores.Where(s => s.Competitor == competitor).ToList();
 
                 str += Environment.NewLine + competitor.FullName + ": ";
                 foreach (var score in scores)
                 {
                     switch (score.CallbackScore)
                     {
-                        case Enums.CallbackScore.Alt1:
+                        case Impartial.Enums.CallbackScore.Alt1:
                             str += "A1";
                             break;
-                        case Enums.CallbackScore.Alt2:
+                        case Impartial.Enums.CallbackScore.Alt2:
                             str += "A2";
                             break;
-                        case Enums.CallbackScore.Alt3:
+                        case Impartial.Enums.CallbackScore.Alt3:
                             str += "A3";
                             break;
-                        case Enums.CallbackScore.Yes:
+                        case Impartial.Enums.CallbackScore.Yes:
                             str += " Y";
                             break;
                         default:
-                        case Enums.CallbackScore.No:
+                        case Impartial.Enums.CallbackScore.No:
                             str += " N";
                             break;
                     }

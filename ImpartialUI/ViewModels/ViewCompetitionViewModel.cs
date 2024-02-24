@@ -9,8 +9,8 @@ namespace ImpartialUI.ViewModels
 {
     public class ViewCompetitionViewModel : BaseViewModel
     {
-        private Competition _competition;
-        public Competition Competition 
+        private ICompetition _competition;
+        public ICompetition Competition 
         { 
             get { return _competition; }
             set 
@@ -20,8 +20,8 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private List<Competition> _competitions;
-        public List<Competition> Competitions
+        private List<ICompetition> _competitions;
+        public List<ICompetition> Competitions
         {
             get { return _competitions; }
             set
@@ -42,7 +42,7 @@ namespace ImpartialUI.ViewModels
             DeleteCompetitionCommand = new DelegateCommand(DeleteCompetition);
         }
 
-        public ViewCompetitionViewModel(List<Competition> competitions)
+        public ViewCompetitionViewModel(List<ICompetition> competitions)
         {
             Competitions = competitions;
 

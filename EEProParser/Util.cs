@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Impartial.Enums;
 using System.Linq;
-using iText.Barcodes.Dmcode;
 
 namespace Impartial
 {
@@ -406,13 +400,45 @@ namespace Impartial
                     return Division.Open;
             }
         }
+        public static Role GetRoleFromString(string s)
+        {
+            switch (s)
+            {
+                case "Leader":
+                case "leader":
+                    return Role.Leader;
+                case "Follower":
+                case "follower":
+                    return Role.Follower;
+                default:
+                    return Role.None;
+            }
+        }
+        public static Round GetRoundFromString(string s)
+        {
+            switch (s)
+            {
+                case "Prelims":
+                case "Preliminaries":
+                    return Round.Prelims;
+                case "Quarters":
+                case "Quarterfinals":
+                    return Round.Quarterfinals;
+                case "Semis":
+                case "Semifinals":
+                    return Round.Semifinals;
+                default:
+                case "Finals":
+                    return Round.Finals;
+            }
+        }
 
         public static IEnumerable<T> RemoveWhere<T>(this IEnumerable<T> query, Predicate<T> predicate)
         {
             return query.Where(e => !predicate(e));
         }
 
-        public static Competitor FindCompetitorInCache(string firstName, string lastName, IEnumerable<Competitor> competitors)
+        public static ICompetitor FindCompetitorInCache(string firstName, string lastName, IEnumerable<ICompetitor> competitors)
         {
             //correcting some frequent misspellings
             switch (firstName + " " + lastName)
@@ -522,7 +548,7 @@ namespace Impartial
             }
         }
 
-        public static Judge FindJudgeInCache(string firstName, string lastName, IEnumerable<Judge> judges)
+        public static IJudge FindJudgeInCache(string firstName, string lastName, IEnumerable<IJudge> judges)
         {
             //correcting some frequent misspellings
             switch ((firstName.Trim() + " " + lastName.Trim()).Trim())

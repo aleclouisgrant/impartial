@@ -21,8 +21,8 @@ namespace ImpartialUI.ViewModels
         private bool sort = true;
 
         public List<SelectJudgeViewModel> SelectJudges { get; set; }
-        public List<Judge> Judges { get; set; }
-        public List<Judge> JudgesDb { get; set; }
+        public List<IJudge> Judges { get; set; }
+        public List<IJudge> JudgesDb { get; set; }
 
         public List<Division> Divisions { get; } = new List<Division> {
             Division.Newcomer,
@@ -239,7 +239,7 @@ namespace ImpartialUI.ViewModels
             foreach (var score in competition.Scores)
             {
                 if (score.Judge.Scores == null)
-                    score.Judge.Scores = new List<FinalScore>();
+                    score.Judge.Scores = new List<IFinalScore>();
 
                 //await _databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
             }
@@ -252,12 +252,12 @@ namespace ImpartialUI.ViewModels
             OnPropertyChanged(nameof(SelectJudges));
         }
 
-        private Judge GetClosestJudgeByFirstName(string input, List<Judge> list)
+        private IJudge GetClosestJudgeByFirstName(string input, List<IJudge> list)
         {
             int leastDistance = 10000;
-            Judge match = null;
+            IJudge match = null;
 
-            foreach (Judge j in list)
+            foreach (IJudge j in list)
             {
                 int d = GetEditDistance(input, j.FirstName);
                 if (d == 0)

@@ -28,7 +28,7 @@ namespace ImpartialUI.Views
 
                 CompetitionComboBox.IsEnabled = false;
 
-                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(1))
+                if (((ICompetition)CompetitionComboBox.SelectedValue).HasRound(1))
                 {
                     PrelimsEditorGrid.Visibility = Visibility.Visible;
                 }
@@ -37,7 +37,7 @@ namespace ImpartialUI.Views
                     PrelimsEditorGrid.Visibility = Visibility.Collapsed;
                 }
 
-                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(2))
+                if (((ICompetition)CompetitionComboBox.SelectedValue).HasRound(2))
                 {
                     SemisEditorGrid.Visibility = Visibility.Visible;
                 }
@@ -65,7 +65,7 @@ namespace ImpartialUI.Views
             {
                 CompetitionViewerGrid.Visibility = Visibility.Visible;
 
-                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(1))
+                if (((ICompetition)CompetitionComboBox.SelectedValue).HasRound(1))
                 {
                     PrelimsViewerGrid.Visibility = Visibility.Visible;
                 }
@@ -74,7 +74,7 @@ namespace ImpartialUI.Views
                     PrelimsViewerGrid.Visibility = Visibility.Collapsed;
                 }
 
-                if (((Competition)CompetitionComboBox.SelectedValue).HasRound(2))
+                if (((ICompetition)CompetitionComboBox.SelectedValue).HasRound(2))
                 {
                     SemisViewerGrid.Visibility = Visibility.Visible;
                 }
@@ -91,7 +91,7 @@ namespace ImpartialUI.Views
             {
                 CompetitionViewerGrid.Visibility = Visibility.Visible;
                 
-                if (((Competition)e.AddedItems[0]).HasRound(1))
+                if (((ICompetition)e.AddedItems[0]).HasRound(1))
                 {
                     PrelimsViewerGrid.Visibility = Visibility.Visible;
                 }
@@ -100,7 +100,7 @@ namespace ImpartialUI.Views
                     PrelimsViewerGrid.Visibility = Visibility.Collapsed;
                 }
 
-                if (((Competition)e.AddedItems[0]).HasRound(2))
+                if (((ICompetition)e.AddedItems[0]).HasRound(2))
                 {
                     SemisViewerGrid.Visibility = Visibility.Visible;
                 }

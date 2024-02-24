@@ -1,8 +1,7 @@
 ﻿using Impartial.Enums;
 using System;
-using System.Collections.Generic;
 
-namespace Impartial.Models.PgModels
+namespace ImpartialUI.Models.PgModels
 {
     public class PgUserModel
     {

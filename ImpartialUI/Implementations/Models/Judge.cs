@@ -1,18 +1,16 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using Impartial;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Impartial
+namespace ImpartialUI
 {
-    public class Judge : PersonModel
+    public class Judge : PersonModel, IJudge 
     {
-        public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
-
-        public List<FinalScore> Scores { get; set; }
+        public List<IFinalScore> Scores { get; set; }
 
         public double Accuracy => Scores == null ? 0 : Math.Round(Scores.Sum(s => s.Accuracy) / Scores.Count, 2);
-        
+
         public double Top5Accuracy
         {
             get

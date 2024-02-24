@@ -6,29 +6,29 @@ namespace Impartial
 {
     public interface IDatabaseProvider
     {
-        Task UpsertCompetitorAsync(Competitor competitor);
-        Task<Competitor?> GetCompetitorAsync(Guid id);
-        Task<Competitor?> GetCompetitorAsync(string firstName, string lastName);
-        Task<IEnumerable<Competitor>> GetAllCompetitorsAsync();
+        Task UpsertCompetitorAsync(ICompetitor competitor);
+        Task<ICompetitor?> GetCompetitorAsync(Guid id);
+        Task<ICompetitor?> GetCompetitorAsync(string firstName, string lastName);
+        Task<IEnumerable<ICompetitor>> GetAllCompetitorsAsync();
         Task DeleteCompetitorAsync(Guid id);
         Task DeleteAllCompetitorsAsync();
 
-        Task UpsertJudgeAsync(Judge judge);
-        Task<Judge?> GetJudgeAsync(Guid id);
-        Task<Judge?> GetJudgeAsync(string firstName, string lastName);
-        Task<IEnumerable<Judge>> GetAllJudgesAsync();
-        Task DeleteJudgeAsync(Judge judge);
+        Task UpsertJudgeAsync(IJudge judge);
+        Task<IJudge?> GetJudgeAsync(Guid id);
+        Task<IJudge?> GetJudgeAsync(string firstName, string lastName);
+        Task<IEnumerable<IJudge>> GetAllJudgesAsync();
+        Task DeleteJudgeAsync(IJudge judge);
         Task DeleteAllJudgesAsync();
 
-        Task UpsertDanceConventionAsync(DanceConvention convention);
-        Task<DanceConvention?> GetDanceConventionAsync(Guid id);
-        Task<IEnumerable<DanceConvention>> GetAllDanceConventionsAsync();
+        Task UpsertDanceConventionAsync(IDanceConvention convention);
+        Task<IDanceConvention?> GetDanceConventionAsync(Guid id);
+        Task<IEnumerable<IDanceConvention>> GetAllDanceConventionsAsync();
         Task DeleteDanceConventionAsync(Guid id);
         Task DeleteAllDanceConventionsAsync();
 
-        Task UpsertCompetitionAsync(Competition competition, Guid danceConventionId);
-        Task<Competition?> GetCompetitionAsync(Guid id);
-        Task<IEnumerable<Competition>> GetAllCompetitionsAsync();
+        Task UpsertCompetitionAsync(ICompetition competition, Guid danceConventionId);
+        Task<ICompetition?> GetCompetitionAsync(Guid id);
+        Task<IEnumerable<ICompetition>> GetAllCompetitionsAsync();
         Task DeleteCompetitionAsync(Guid id);
         Task DeleteAllCompetitionsAsync();
     }

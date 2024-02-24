@@ -23,8 +23,8 @@ namespace ImpartialUI.ViewModels
         private IScoresheetParser _scoresheetParser;
         private HttpClient _client;
 
-        private List<Competitor> _competitors = new List<Competitor>();
-        public List<Competitor> Competitors
+        private List<ICompetitor> _competitors = new List<ICompetitor>();
+        public List<ICompetitor> Competitors
         {
             get { return _competitors; }
             set { 
@@ -33,8 +33,8 @@ namespace ImpartialUI.ViewModels
             }
         }
         
-        private List<Judge> _judges = new List<Judge>();
-        public List<Judge> Judges
+        private List<IJudge> _judges = new List<IJudge>();
+        public List<IJudge> Judges
         {
             get { return _judges; }
             set
@@ -141,8 +141,8 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private Competition _competition;
-        public Competition Competition
+        private ICompetition _competition;
+        public ICompetition Competition
         {
             get { return _competition; }
             set
@@ -194,7 +194,7 @@ namespace ImpartialUI.ViewModels
 
             _parseProgress = new Progress<double>(ReportProgress);
         }
-        public AddCompetitionViewModel(List<Competitor> competitors, List<Judge> judges)
+        public AddCompetitionViewModel(List<ICompetitor> competitors, List<IJudge> judges)
         {
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             AddJudgeCommand = new DelegateCommand(AddJudge);
@@ -235,44 +235,44 @@ namespace ImpartialUI.ViewModels
 
         private async void TestData()
         {
-            var competition = new Competition()
+            var competition = new ICompetition()
             {
                 Date = DateTime.Parse("1-1-2023"),
                 Name = "Countdown Swing Boston",
                 Division = Division.AllStar,
-                Scores = new List<FinalScore>()
+                Scores = new List<IFinalScore>()
             };
 
-            Judge anne = await _databaseProvider.GetJudgeAsync("Anne", "Fleming");
-            Judge arjay = await _databaseProvider.GetJudgeAsync("Arjay", "Centeno");
-            Judge bryn = await _databaseProvider.GetJudgeAsync("Bryn", "Anderson");
-            Judge john = await _databaseProvider.GetJudgeAsync("John", "Lindo");
-            Judge lemery = await _databaseProvider.GetJudgeAsync("Lemery", "Rollinscott");
+            IJudge anne = await _databaseProvider.GetJudgeAsync("Anne", "Fleming");
+            IJudge arjay = await _databaseProvider.GetJudgeAsync("Arjay", "Centeno");
+            IJudge bryn = await _databaseProvider.GetJudgeAsync("Bryn", "Anderson");
+            IJudge john = await _databaseProvider.GetJudgeAsync("John", "Lindo");
+            IJudge lemery = await _databaseProvider.GetJudgeAsync("Lemery", "Rollinscott");
 
-            Competitor brandon = await _databaseProvider.GetCompetitorAsync("Brandon", "Rasmussen");
-            Competitor melodie = await _databaseProvider.GetCompetitorAsync("Melodie", "Paletta");
-            Competitor neil = await _databaseProvider.GetCompetitorAsync("Neil", "Joshi");
-            Competitor kristen = await _databaseProvider.GetCompetitorAsync("Kristen", "Wallace");
-            Competitor lucky = await _databaseProvider.GetCompetitorAsync("Lucky", "Sipin");
-            Competitor dimitri = await _databaseProvider.GetCompetitorAsync("Dimitri", "Hector");
-            Competitor maxwell = await _databaseProvider.GetCompetitorAsync("Maxwell", "Thew");
-            Competitor shanna = await _databaseProvider.GetCompetitorAsync("Shanna", "Porcari");
-            Competitor oscar = await _databaseProvider.GetCompetitorAsync("Oscar", "Hampton");
-            Competitor saya = await _databaseProvider.GetCompetitorAsync("Sayaka", "Suzaki");
-            Competitor joshu = await _databaseProvider.GetCompetitorAsync("Joshu", "Creel");
-            Competitor jen = await _databaseProvider.GetCompetitorAsync("Jen", "Ferreira");
-            Competitor edem = await _databaseProvider.GetCompetitorAsync("Edem", "Attikese");
-            Competitor jia = await _databaseProvider.GetCompetitorAsync("Jia", "Lu");
-            Competitor kyle = await _databaseProvider.GetCompetitorAsync("Kyle", "FitzGerald");
-            Competitor rachel = await _databaseProvider.GetCompetitorAsync("Rachel", "Shook");
-            Competitor sam = await _databaseProvider.GetCompetitorAsync("Sam", "Vaden");
-            Competitor elli = await _databaseProvider.GetCompetitorAsync("Elli", "Warner");
-            Competitor kaiano = await _databaseProvider.GetCompetitorAsync("Kaiano", "Levine");
-            Competitor liz = await _databaseProvider.GetCompetitorAsync("Liz", "Ravdin");
-            Competitor alec = await _databaseProvider.GetCompetitorAsync("Alec", "Grant");
-            Competitor olivia = await _databaseProvider.GetCompetitorAsync("Olivia", "Burnsed");
-            Competitor david = await _databaseProvider.GetCompetitorAsync("David", "Carrington");
-            Competitor jesann = await _databaseProvider.GetCompetitorAsync("Jes Ann", "Nail");
+            ICompetitor brandon = await _databaseProvider.GetCompetitorAsync("Brandon", "Rasmussen");
+            ICompetitor melodie = await _databaseProvider.GetCompetitorAsync("Melodie", "Paletta");
+            ICompetitor neil = await _databaseProvider.GetCompetitorAsync("Neil", "Joshi");
+            ICompetitor kristen = await _databaseProvider.GetCompetitorAsync("Kristen", "Wallace");
+            ICompetitor lucky = await _databaseProvider.GetCompetitorAsync("Lucky", "Sipin");
+            ICompetitor dimitri = await _databaseProvider.GetCompetitorAsync("Dimitri", "Hector");
+            ICompetitor maxwell = await _databaseProvider.GetCompetitorAsync("Maxwell", "Thew");
+            ICompetitor shanna = await _databaseProvider.GetCompetitorAsync("Shanna", "Porcari");
+            ICompetitor oscar = await _databaseProvider.GetCompetitorAsync("Oscar", "Hampton");
+            ICompetitor saya = await _databaseProvider.GetCompetitorAsync("Sayaka", "Suzaki");
+            ICompetitor joshu = await _databaseProvider.GetCompetitorAsync("Joshu", "Creel");
+            ICompetitor jen = await _databaseProvider.GetCompetitorAsync("Jen", "Ferreira");
+            ICompetitor edem = await _databaseProvider.GetCompetitorAsync("Edem", "Attikese");
+            ICompetitor jia = await _databaseProvider.GetCompetitorAsync("Jia", "Lu");
+            ICompetitor kyle = await _databaseProvider.GetCompetitorAsync("Kyle", "FitzGerald");
+            ICompetitor rachel = await _databaseProvider.GetCompetitorAsync("Rachel", "Shook");
+            ICompetitor sam = await _databaseProvider.GetCompetitorAsync("Sam", "Vaden");
+            ICompetitor elli = await _databaseProvider.GetCompetitorAsync("Elli", "Warner");
+            ICompetitor kaiano = await _databaseProvider.GetCompetitorAsync("Kaiano", "Levine");
+            ICompetitor liz = await _databaseProvider.GetCompetitorAsync("Liz", "Ravdin");
+            ICompetitor alec = await _databaseProvider.GetCompetitorAsync("Alec", "Grant");
+            ICompetitor olivia = await _databaseProvider.GetCompetitorAsync("Olivia", "Burnsed");
+            ICompetitor david = await _databaseProvider.GetCompetitorAsync("David", "Carrington");
+            ICompetitor jesann = await _databaseProvider.GetCompetitorAsync("Jes Ann", "Nail");
 
             competition.Scores.Add(new FinalScore(competition, anne, brandon, melodie, 1, 1));
             competition.Scores.Add(new FinalScore(competition, anne, neil, kristen, 4, 2));
@@ -356,7 +356,7 @@ namespace ImpartialUI.ViewModels
         private async void AddCompetitor()
         {
             if (int.TryParse(WsdcId, out int id)) {
-                var newCompetitor = new Competitor(FirstName, LastName, int.Parse(WsdcId));
+                var newCompetitor = new ICompetitor(FirstName, LastName, int.Parse(WsdcId));
 
                 await _databaseProvider.UpsertCompetitorAsync(newCompetitor);
                 Competitors.Add(newCompetitor);
@@ -368,7 +368,7 @@ namespace ImpartialUI.ViewModels
         }
         private async void AddJudge()
         {
-            var newJudge = new Judge(JudgeFirstName, JudgeLastName);
+            var newJudge = new IJudge(JudgeFirstName, JudgeLastName);
 
             await _databaseProvider.UpsertJudgeAsync(newJudge);
             Judges.Add(newJudge);
@@ -446,7 +446,7 @@ namespace ImpartialUI.ViewModels
             if (!_scoresheetParser.GetDivisions().Contains(Division.AllStar))
                 return;
 
-            Competition comp;
+            ICompetition comp;
             try
             {
                 comp = _scoresheetParser.GetCompetition(Division.AllStar);
@@ -469,7 +469,7 @@ namespace ImpartialUI.ViewModels
 
                     if (serverCompetitor != null)
                     {
-                        serverCompetitor = new Competitor(
+                        serverCompetitor = new ICompetitor(
                             serverCompetitor.Id, serverCompetitor.WsdcId,
                             serverCompetitor.FirstName, serverCompetitor.LastName,
                             serverCompetitor.LeadStats.Rating, serverCompetitor.LeadStats.Variance,
@@ -503,7 +503,7 @@ namespace ImpartialUI.ViewModels
 
                     if (serverCompetitor != null)
                     {
-                        serverCompetitor = new Competitor(
+                        serverCompetitor = new ICompetitor(
                             serverCompetitor.Id, serverCompetitor.WsdcId,
                             serverCompetitor.FirstName, serverCompetitor.LastName,
                             serverCompetitor.LeadStats.Rating, serverCompetitor.LeadStats.Variance,
@@ -592,7 +592,7 @@ namespace ImpartialUI.ViewModels
 
                 if (serverLeader != null)
                 {
-                    serverLeader = new Competitor(
+                    serverLeader = new ICompetitor(
                         serverLeader.Id, serverLeader.WsdcId,
                         serverLeader.FirstName, serverLeader.LastName,
                         serverLeader.LeadStats.Rating, serverLeader.LeadStats.Variance,
@@ -623,7 +623,7 @@ namespace ImpartialUI.ViewModels
 
                 if (serverFollower != null)
                 {
-                    serverFollower = new Competitor(
+                    serverFollower = new ICompetitor(
                         serverFollower.Id, serverFollower.WsdcId,
                         serverFollower.FirstName, serverFollower.LastName,
                         serverFollower.LeadStats.Rating, serverFollower.LeadStats.Variance,

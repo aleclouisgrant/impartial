@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Impartial;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Impartial
+namespace ImpartialUI
 {
-    public class PairedPrelimCompetition
+    public class PairedPrelimCompetition : IPairedPrelimCompetition
     {
         public Round Round { get; set; }
-        public PrelimCompetition LeaderPrelimCompetition { get; set; }
-        public PrelimCompetition FollowerPrelimCompetition { get; set; }
+        public IPrelimCompetition LeaderPrelimCompetition { get; set; }
+        public IPrelimCompetition FollowerPrelimCompetition { get; set; }
     }
 
-    public class Competition
+    public class Competition : ICompetition
     {
         public Guid Id { get; }
         public Division Division { get; set; }
@@ -28,11 +28,11 @@ namespace Impartial
             Util.GetTier(PairedPrelimCompetitions[0].FollowerPrelimCompetition.Competitors.Count) :
             Util.GetTier(FinalCompetition.Followers.Count);
 
-        public List<PairedPrelimCompetition> PairedPrelimCompetitions { get; set; } = new();
-        public FinalCompetition FinalCompetition { get; set; }
-        
-        public Competition() 
-        { 
+        public List<IPairedPrelimCompetition> PairedPrelimCompetitions { get; set; } = new();
+        public IFinalCompetition FinalCompetition { get; set; }
+
+        public Competition()
+        {
             Id = Guid.NewGuid();
         }
 
@@ -54,7 +54,7 @@ namespace Impartial
         public string ToLongString()
         {
             string str = ToString();
-            
+
             str += Environment.NewLine;
 
             foreach (var pairedPrelimCompetition in PairedPrelimCompetitions)
@@ -63,14 +63,14 @@ namespace Impartial
                 str += Environment.NewLine;
                 str += pairedPrelimCompetition.FollowerPrelimCompetition.ToLongString();
             }
-            
+
             str += Environment.NewLine;
 
-            if (FinalCompetition != null) 
+            if (FinalCompetition != null)
             {
                 str += FinalCompetition.ToLongString();
             }
-            
+
             return str;
         }
 

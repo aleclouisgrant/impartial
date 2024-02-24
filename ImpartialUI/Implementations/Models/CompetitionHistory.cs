@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impartial
+namespace ImpartialUI
 {
     public class CompetitionHistory
     {

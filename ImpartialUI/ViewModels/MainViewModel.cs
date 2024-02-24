@@ -7,8 +7,8 @@ namespace ImpartialUI.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        private List<Competition> _competitionsCache = new List<Competition>();
-        public List<Competition> CompetitionsCache
+        private List<ICompetition> _competitionsCache = new List<ICompetition>();
+        public List<ICompetition> CompetitionsCache
         {
             get { return _competitionsCache; }
             set
@@ -18,8 +18,8 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        public List<Competitor> _competitorsCache = new List<Competitor>();
-        public List<Competitor> CompetitorsCache
+        public List<ICompetitor> _competitorsCache = new List<ICompetitor>();
+        public List<ICompetitor> CompetitorsCache
         {
             get { return _competitorsCache; }
             set
@@ -29,8 +29,8 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private List<Judge> _judgeCache = new List<Judge>();
-        public List<Judge> JudgesCache
+        private List<IJudge> _judgeCache = new List<IJudge>();
+        public List<IJudge> JudgesCache
         {
             get { return _judgeCache; }
             set

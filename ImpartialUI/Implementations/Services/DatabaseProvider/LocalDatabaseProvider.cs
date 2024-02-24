@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Impartial;
 
-namespace Impartial
+namespace ImpartialUI.Implementations.Services.DatabaseProvider
 {
-    public class LocalDatabaseProvider 
+    public class LocalDatabaseProvider
     {
-        private List<DanceConvention> _events = new List<DanceConvention>();
-        private List<Competition> _competitions = new List<Competition>();
-        private List<Competitor> _competitors = new List<Competitor>();
-        private List<Judge> _judges = new List<Judge>();
+        private List<IDanceConvention> _events = new List<IDanceConvention>();
+        private List<ICompetition> _competitions = new List<ICompetition>();
+        private List<ICompetitor> _competitors = new List<ICompetitor>();
+        private List<IJudge> _judges = new List<IJudge>();
 
         public LocalDatabaseProvider() { }
 
-        public void InsertSdcEvent(DanceConvention sdcEvent)
+        public void InsertSdcEvent(IDanceConvention sdcEvent)
         {
             _events.Add(sdcEvent);
         }
-        public void UpdateSdcEvent(Guid id, DanceConvention sdcEvent)
+        public void UpdateSdcEvent(Guid id, IDanceConvention sdcEvent)
         {
             var evt = _events.Find(e => e.Id == id);
             if (evt != null)
@@ -25,15 +25,15 @@ namespace Impartial
 
             _events.Add(sdcEvent);
         }
-        public DanceConvention GetSdcEventById(Guid id)
+        public IDanceConvention GetSdcEventById(Guid id)
         {
             return _events.Find(e => id == e.Id);
         }
-        public List<DanceConvention> GetAllSdcEvents()
+        public List<IDanceConvention> GetAllSdcEvents()
         {
             return _events;
         }
-        public void DeleteSdcEvent(DanceConvention sdcEvent)
+        public void DeleteSdcEvent(IDanceConvention sdcEvent)
         {
             _events.Remove(sdcEvent);
         }
@@ -42,11 +42,11 @@ namespace Impartial
             _events.Clear();
         }
 
-        public void InsertCompetition(Competition competition)
+        public void InsertCompetition(ICompetition competition)
         {
             _competitions.Add(competition);
         }
-        public void UpdateCompetition(Guid id, Competition competition)
+        public void UpdateCompetition(Guid id, ICompetition competition)
         {
             var comp = _competitions.Find(c => c.Id == id);
             if (comp != null)
@@ -54,15 +54,15 @@ namespace Impartial
 
             _competitions.Add(competition);
         }
-        public Competition GetCompetitionById(Guid id)
+        public ICompetition GetCompetitionById(Guid id)
         {
             return _competitions.Find(c => id == c.Id);
         }
-        public List<Competition> GetAllCompetitions()
+        public List<ICompetition> GetAllCompetitions()
         {
             return _competitions;
         }
-        public void DeleteCompetition(Competition competition)
+        public void DeleteCompetition(ICompetition competition)
         {
             _competitions.Remove(competition);
         }
@@ -71,11 +71,11 @@ namespace Impartial
             _competitions.Clear();
         }
 
-        public void InsertCompetitor(Competitor competitor)
+        public void InsertCompetitor(ICompetitor competitor)
         {
             _competitors.Add(competitor);
         }
-        public void UpdateCompetitor(Guid id, Competitor competitor)
+        public void UpdateCompetitor(Guid id, ICompetitor competitor)
         {
             var comp = _competitors.Find(c => c.Id == id);
             if (comp != null)
@@ -83,15 +83,15 @@ namespace Impartial
 
             _competitors.Add(competitor);
         }
-        public Competitor GetCompetitorById(Guid id)
+        public ICompetitor GetCompetitorById(Guid id)
         {
             return _competitors.Find(c => c.Id == id);
         }
-        public List<Competitor> GetAllCompetitors()
+        public List<ICompetitor> GetAllCompetitors()
         {
             return _competitors;
         }
-        public void DeleteCompetitor(Competitor competitor)
+        public void DeleteCompetitor(ICompetitor competitor)
         {
             _competitors.Remove(competitor);
         }
@@ -100,11 +100,11 @@ namespace Impartial
             _competitors.Clear();
         }
 
-        public void InsertJudge(Judge judge)
+        public void InsertJudge(IJudge judge)
         {
             _judges.Add(judge);
         }
-        public void UpdateJudge(Guid id, Judge judge)
+        public void UpdateJudge(Guid id, IJudge judge)
         {
             var jud = _judges.Find(j => j.Id == id);
             if (jud != null)
@@ -112,19 +112,19 @@ namespace Impartial
 
             _judges.Add(judge);
         }
-        public Judge GetJudgeById(Guid id)
+        public IJudge GetJudgeById(Guid id)
         {
             return _judges.Find(j => j.Id == id);
         }
-        public Judge GetJudgeByName(string firstName, string lastName)
+        public IJudge GetJudgeByName(string firstName, string lastName)
         {
-            return _judges.Find(j => j.FirstName== firstName && j.LastName == lastName);
+            return _judges.Find(j => j.FirstName == firstName && j.LastName == lastName);
         }
-        public List<Judge> GetAllJudges()
+        public List<IJudge> GetAllJudges()
         {
             return _judges;
         }
-        public void DeleteJudge(Judge judge)
+        public void DeleteJudge(IJudge judge)
         {
             _judges.Remove(judge);
         }
@@ -135,7 +135,7 @@ namespace Impartial
 
         //public Task UpsertCompetitionAsync(Competition competition)
         //{
-            
+
         //}
 
         //public Task<Competition> GetCompetitionByIdAsync(Guid id)

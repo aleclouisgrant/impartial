@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Impartial;
+using System;
 using System.Collections.Generic;
 
-namespace Impartial
+namespace ImpartialUI
 {
-    public class DanceConvention
+    public class DanceConvention : IDanceConvention
     {
         public Guid Id { get; }
         public string Name { get; }
         public DateTime Date { get; }
-        public List<Competition> Competitions { get; set; }
+        public List<ICompetition> Competitions { get; set; }
 
         public DanceConvention(string name, DateTime date, Guid? id = null)
         {
@@ -17,10 +18,10 @@ namespace Impartial
             else
                 Id = (Guid)id;
 
-            Name = name; 
+            Name = name;
             Date = date;
 
-            Competitions = new List<Competition>();
+            Competitions = new List<ICompetition>();
         }
     }
 }

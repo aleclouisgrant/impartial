@@ -12,10 +12,10 @@ namespace ImpartialUI.ViewModels
         //public bool? Selected => SelectedJudge != null;
         public bool? Selected => true;
 
-        public Judge Judge { get; set; }
+        public IJudge Judge { get; set; }
 
-        private Judge selectedJudge;
-        public Judge SelectedJudge
+        private IJudge selectedJudge;
+        public IJudge SelectedJudge
         {
             get { return selectedJudge; }
             set
@@ -25,7 +25,7 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        public SelectJudgeViewModel(Judge judge)
+        public SelectJudgeViewModel(IJudge judge)
         {
             Judge = judge;
         }

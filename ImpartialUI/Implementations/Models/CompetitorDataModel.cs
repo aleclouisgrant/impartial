@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Impartial;
+using System;
 using System.Collections.Generic;
 
-namespace Impartial
+namespace ImpartialUI
 {
     public class CompetitorDataModel
     {
         public Guid CompetitorId { get; set; }
-        public Competitor Competitor { get; set; }
+        public ICompetitor Competitor { get; set; }
         public List<CompetitionHistory> CompetitionHistory { get; set; } = new();
 
-        public CompetitorDataModel(Competitor competitor) 
+        public CompetitorDataModel(ICompetitor competitor) 
         {
             CompetitorId = competitor.Id;
             Competitor = competitor;

@@ -1,22 +1,22 @@
-﻿using System;
+﻿using Impartial;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using static System.Formats.Asn1.AsnWriter;
 
-namespace Impartial
+namespace ImpartialUI
 {
-    public class FinalCompetition
+    public class FinalCompetition : IFinalCompetition
     {
         public Guid Id { get; set; }
         public DateTime DateTime { get; set; }
 
-        public List<FinalScore> FinalScores { get; set; } = new List<FinalScore>();
+        public List<IFinalScore> FinalScores { get; set; } = new List<IFinalScore>();
 
         public Division Division { get; set; }
 
-        public List<Competitor> Leaders { get; set; } = new List<Competitor>();
-        public List<Competitor> Followers { get; set; } = new List<Competitor>();
-        public List<Judge> Judges { get; set; } = new List<Judge>();
+        public List<ICompetitor> Leaders { get; set; } = new();
+        public List<ICompetitor> Followers { get; set; } = new();
+        public List<IJudge> Judges { get; set; } = new List<IJudge>();
 
         public FinalCompetition(Guid? id = null)
         {
@@ -26,13 +26,13 @@ namespace Impartial
                 Id = (Guid)id;
         }
 
-        public List<Couple> Couples => GetCouples();
+        public List<ICouple> Couples => GetCouples();
 
-        private List<Couple> GetCouples()
+        private List<ICouple> GetCouples()
         {
-            var couples = new List<Couple>();
+            var couples = new List<ICouple>();
 
-            foreach (FinalScore score in FinalScores)
+            foreach (IFinalScore score in FinalScores)
             {
                 if (!couples.Any(c => c.ActualPlacement == score.ActualPlacement))
                 {
@@ -54,7 +54,7 @@ namespace Impartial
         {
             string str = string.Empty;
             str += Environment.NewLine + "JUDGES: ";
-            foreach (Judge judge in Judges)
+            foreach (IJudge judge in Judges)
             {
                 str += judge.ToString() + ", ";
             }

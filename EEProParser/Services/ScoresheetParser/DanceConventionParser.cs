@@ -9,11 +9,11 @@ namespace Impartial.Services.ScoresheetParser
 {
     public class DanceConventionParser : IScoresheetParser
     {
-        private Competition _newcomerCompetition;
-        private Competition _noviceCompetition;
-        private Competition _intermediateCompetition;
-        private Competition _advancedCompetition;
-        private Competition _allStarCompetition;
+        private ICompetition _newcomerCompetition;
+        private ICompetition _noviceCompetition;
+        private ICompetition _intermediateCompetition;
+        private ICompetition _advancedCompetition;
+        private ICompetition _allStarCompetition;
 
         public DanceConventionParser(string prelimsPath, string filePath)
         {
@@ -33,7 +33,7 @@ namespace Impartial.Services.ScoresheetParser
         {
         }
 
-        public Competition GetCompetition(Division division)
+        public ICompetition GetCompetition(Division division)
         {
             throw new NotImplementedException();
         }
@@ -43,7 +43,7 @@ namespace Impartial.Services.ScoresheetParser
             throw new NotImplementedException();
         }
 
-        public List<Judge> GetFinalsJudgesByDivision(Division division)
+        public List<IJudge> GetFinalsJudgesByDivision(Division division)
         {
             throw new NotImplementedException();
         }

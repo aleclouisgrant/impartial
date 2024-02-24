@@ -54,7 +54,7 @@ namespace ImpartialUI.ViewModels
         }
 
         private HttpClient _client;
-        private List<Competition> _competitions = new List<Competition>();
+        private List<ICompetition> _competitions = new List<ICompetition>();
 
         private string _firstName;
         public string FirstName
@@ -114,8 +114,8 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private ObservableCollection<Competitor> _competitors = new ObservableCollection<Competitor>();
-        public ObservableCollection<Competitor> Competitors
+        private ObservableCollection<ICompetitor> _competitors = new ObservableCollection<ICompetitor>();
+        public ObservableCollection<ICompetitor> Competitors
         {
             get { return _competitors; }
             set
@@ -183,7 +183,7 @@ namespace ImpartialUI.ViewModels
             Initialize();
         }
 
-        public RatingsViewModel(List<Competitor> competitors, List<Competition> competitions)
+        public RatingsViewModel(List<ICompetitor> competitors, List<ICompetition> competitions)
         {
             _databaseProvider = App.DatabaseProvider;
             _client = new HttpClient();
@@ -197,7 +197,7 @@ namespace ImpartialUI.ViewModels
                 await Task.Run(CrunchRatings);
             }));
 
-            Competitors = new ObservableCollection<Competitor>(competitors);
+            Competitors = new ObservableCollection<ICompetitor>(competitors);
             _competitions = competitions;
 
             _crunchProgress = new Progress<double>(ReportProgress);
@@ -212,7 +212,7 @@ namespace ImpartialUI.ViewModels
         private async void Initialize()
         {
             _competitions = (await _databaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date).ToList();
-            Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
+            Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
         private void ReportProgress(double progress)
@@ -385,7 +385,7 @@ namespace ImpartialUI.ViewModels
         {
             if (int.TryParse(WsdcId, out int id))
             {
-                var newCompetitor = new Competitor(FirstName, LastName, int.Parse(WsdcId));
+                var newCompetitor = new ICompetitor(FirstName, LastName, int.Parse(WsdcId));
 
                 await _databaseProvider.UpsertCompetitorAsync(newCompetitor);
 
@@ -394,17 +394,17 @@ namespace ImpartialUI.ViewModels
                 WsdcId = string.Empty;
             }
 
-            Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
+            Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
         private async void RefreshCompetitors()
         {
-            Competitors = new ObservableCollection<Competitor>(await _databaseProvider.GetAllCompetitorsAsync());
+            Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
         private async void ResetRatings()
         {
-            foreach (Competitor competitor in Competitors)
+            foreach (ICompetitor competitor in Competitors)
             {
                 competitor.LeadStats.Rating = 1000;
                 competitor.FollowStats.Rating = 1000;
@@ -423,7 +423,7 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private async Task<int> GetWsdcPoints(Competitor competitor)
+        private async Task<int> GetWsdcPoints(ICompetitor competitor)
         {
             var response = await _client.PostAsync("/lookup/find?q=" + competitor.WsdcId, null);
             string sheet = await response.Content.ReadAsStringAsync();

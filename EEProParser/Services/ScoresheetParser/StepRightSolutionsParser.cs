@@ -61,7 +61,7 @@ namespace Impartial.Services.ScoresheetParser
             return divisions;
         }
 
-        public Competition GetCompetition(Division division)
+        public ICompetition GetCompetition(Division division)
         {
             var prelims = new Tuple<List<PrelimScore>, List<PrelimScore>>(null, null);
             if (_prelimsSheetDoc != null)
@@ -101,7 +101,7 @@ namespace Impartial.Services.ScoresheetParser
                 bool finaled = lead.GetClasses().Contains("adv");
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
-                var competitor = new Competitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
+                var competitor = new ICompetitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
 
                 CallbackScore callbackScore;
                 int offset = 2;
@@ -144,7 +144,7 @@ namespace Impartial.Services.ScoresheetParser
                 bool finaled = follow.GetClasses().Contains("adv");
                 string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
-                var competitor = new Competitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
+                var competitor = new ICompetitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
 
                 CallbackScore callbackScore;
                 int offset = 2;
@@ -176,7 +176,7 @@ namespace Impartial.Services.ScoresheetParser
             return new Tuple<List<PrelimScore>, List<PrelimScore>>(leaderPrelimScores, followerPrelimScores);
         }
 
-        private List<FinalScore> GetFinalScores(Division division)
+        private List<IFinalScore> GetFinalScores(Division division)
         {
             var sub = GetFinalsDocByDivision(division);
             var finalsJudges = GetFinalsJudgesByDivision(division);
@@ -186,10 +186,10 @@ namespace Impartial.Services.ScoresheetParser
 
             var nodes = doc.DocumentNode.SelectNodes("tr");
 
-            var leaders = new List<Competitor>();
-            var followers = new List<Competitor>();
+            var leaders = new List<ICompetitor>();
+            var followers = new List<ICompetitor>();
 
-            var scores = new List<FinalScore>();
+            var scores = new List<IFinalScore>();
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i].SelectNodes("td");
@@ -202,10 +202,10 @@ namespace Impartial.Services.ScoresheetParser
                 string leaderFirstName = leaderName.Substring(0, leadPos).Trim();
                 string leaderLastName = leaderName.Substring(leadPos + 1).Trim();
 
-                Competitor leader = leaders.Where(c => c.FullName == leaderFirstName + " " + leaderLastName)?.FirstOrDefault();
+                ICompetitor leader = leaders.Where(c => c.FullName == leaderFirstName + " " + leaderLastName)?.FirstOrDefault();
                 if (leader == null)
                 {
-                    leader = new Competitor(leaderFirstName, leaderLastName);
+                    leader = new ICompetitor(leaderFirstName, leaderLastName);
                     leaders.Add(leader);
                 }
 
@@ -214,10 +214,10 @@ namespace Impartial.Services.ScoresheetParser
                 string followerFirstName = followerName.Substring(0, followPos).Trim();
                 string followerLastName = followerName.Substring(followPos + 1).Trim();
 
-                Competitor follower = followers.Where(c => c.FullName == followerFirstName + " " + followerLastName)?.FirstOrDefault();
+                ICompetitor follower = followers.Where(c => c.FullName == followerFirstName + " " + followerLastName)?.FirstOrDefault();
                 if (follower == null)
                 {
-                    follower = new Competitor(followerFirstName, followerLastName);
+                    follower = new ICompetitor(followerFirstName, followerLastName);
                     followers.Add(follower);
                 }
 
@@ -244,7 +244,7 @@ namespace Impartial.Services.ScoresheetParser
                     scores.Add(score);
 
                     if (finalsJudges[j - offset].Scores == null)
-                        finalsJudges[j - offset].Scores = new List<FinalScore>();
+                        finalsJudges[j - offset].Scores = new List<IFinalScore>();
 
                     finalsJudges[j - offset].Scores.Add(score);
                 }
@@ -253,9 +253,9 @@ namespace Impartial.Services.ScoresheetParser
             return scores;
         }
 
-        private List<Judge> GetPrelimsJudgesByDivision(Division division, Role role, string doc)
+        private List<IJudge> GetPrelimsJudgesByDivision(Division division, Role role, string doc)
         {
-            var judges = new List<Judge>();
+            var judges = new List<IJudge>();
             string sub = string.Empty;
 
             if (role == Role.Leader)
@@ -286,11 +286,11 @@ namespace Impartial.Services.ScoresheetParser
                     //no last name was recorded
                     if (pos == -1)
                     {
-                        judges.Add(new Judge(name.Trim(), string.Empty));
+                        judges.Add(new IJudge(name.Trim(), string.Empty));
                     }
                     else
                     {
-                        judges.Add(new Judge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
+                        judges.Add(new IJudge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
                     }
                 }
 
@@ -300,14 +300,14 @@ namespace Impartial.Services.ScoresheetParser
             // otherwise, we are going to return anonymous judges
             for (int i = 1; i <= names.Count; i++)
             {
-                judges.Add(new Judge("Anonymous", i.ToString()));
+                judges.Add(new IJudge("Anonymous", i.ToString()));
             }
 
             return judges;
         }
-        private List<Judge> GetFinalsJudgesByDivision(Division division)
+        private List<IJudge> GetFinalsJudgesByDivision(Division division)
         {
-            var judges = new List<Judge>();
+            var judges = new List<IJudge>();
 
             string sub = Util.GetSubString(
                 s: _finalsSheetDoc,
@@ -327,11 +327,11 @@ namespace Impartial.Services.ScoresheetParser
                     //no last name was recorded
                     if (pos == -1)
                     {
-                        judges.Add(new Judge(name.Trim(), string.Empty));
+                        judges.Add(new IJudge(name.Trim(), string.Empty));
                     }
                     else
                     {
-                        judges.Add(new Judge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
+                        judges.Add(new IJudge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
                     }
                 }
 
@@ -341,7 +341,7 @@ namespace Impartial.Services.ScoresheetParser
             // otherwise, we are going to return anonymous judges
             for (int i = 1; i <= names.Count; i++)
             {
-                judges.Add(new Judge("Anonymous", i.ToString()));
+                judges.Add(new IJudge("Anonymous", i.ToString()));
             }
 
             return judges;

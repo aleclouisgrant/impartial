@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using ImpartialUI;
+using Impartial;
 
-namespace Impartial
+namespace ImpartialUI.Implementations.Services.DatabaseProvider
 {
     public class PgDatabaseProvider : IDatabaseProvider, IDisposable
     {
@@ -23,7 +25,7 @@ namespace Impartial
         const string PG_FINAL_SCORES_TABLE_NAME = "final_scores";
         const string PG_PROMOTED_COMPETITORS_TABLE_NAME = "promoted_competitors";
         const string PG_PLACEMENTS_TABLE_NAME = "placements";
-        
+
         string _connectionString;
         private NpgsqlDataSource _dataSource;
 
@@ -163,7 +165,7 @@ namespace Impartial
 
             return "SELECT " + columnNames + " FROM " + table;
         }
-        
+
         private async Task SaveDataAsync<U>(string table, U parameters)
         {
             PropertyInfo[] properties = typeof(U).GetProperties();
@@ -235,7 +237,7 @@ namespace Impartial
         }
         #endregion
 
-        public async Task UpsertCompetitorAsync(Competitor competitor)
+        public async Task UpsertCompetitorAsync(ICompetitor competitor)
         {
             var userModel = new PgUserModel
             {
@@ -258,10 +260,10 @@ namespace Impartial
 
             await transaction.CommitAsync();
         }
-        public async Task<Competitor?> GetCompetitorAsync(Guid id)
+        public async Task<ICompetitor> GetCompetitorAsync(Guid id)
         {
             string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
-                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id" 
+                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
                 + " WHERE competitor_profiles.id = " + id;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -276,13 +278,13 @@ namespace Impartial
                     int leaderRating = reader.GetInt32(4);
                     int followerRating = reader.GetInt32(5);
 
-                    return new Competitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
+                    return new ICompetitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
                 }
             }
 
             return null;
         }
-        public async Task<Competitor?> GetCompetitorAsync(string firstName, string lastName)
+        public async Task<ICompetitor> GetCompetitorAsync(string firstName, string lastName)
         {
             string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
@@ -300,18 +302,18 @@ namespace Impartial
                     int leaderRating = reader.GetInt32(4);
                     int followerRating = reader.GetInt32(5);
 
-                    return new Competitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
+                    return new ICompetitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
                 }
             }
 
             return null;
         }
-        public async Task<IEnumerable<Competitor>> GetAllCompetitorsAsync()
+        public async Task<IEnumerable<ICompetitor>> GetAllCompetitorsAsync()
         {
             string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
                 + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id";
 
-            var results = new List<Competitor>();
+            var results = new List<ICompetitor>();
 
             await using (var cmd = _dataSource.CreateCommand(query))
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -325,7 +327,7 @@ namespace Impartial
                     int leaderRating = reader.GetInt32(4);
                     int followerRating = reader.GetInt32(5);
 
-                    results.Add(new Competitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0));
+                    results.Add(new ICompetitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0));
                 }
             }
 
@@ -340,7 +342,7 @@ namespace Impartial
 
         }
 
-        public async Task UpsertJudgeAsync(Judge judge)
+        public async Task UpsertJudgeAsync(IJudge judge)
         {
             var userModel = new PgUserModel
             {
@@ -362,7 +364,7 @@ namespace Impartial
 
             await transaction.CommitAsync();
         }
-        public async Task<Judge?> GetJudgeAsync(Guid id)
+        public async Task<IJudge> GetJudgeAsync(Guid id)
         {
             string query = "SELECT judge_profiles.id, users.first_name, users.last_name"
                 + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
@@ -377,13 +379,13 @@ namespace Impartial
                     string judgeFirstName = reader.GetString(1);
                     string judgeLastName = reader.GetString(2);
 
-                    return new Judge(judgeFirstName, judgeLastName, judgeId);
+                    return new IJudge(judgeFirstName, judgeLastName, judgeId);
                 }
             }
 
             return null;
         }
-        public async Task<Judge?> GetJudgeAsync(string firstName, string lastName)
+        public async Task<IJudge> GetJudgeAsync(string firstName, string lastName)
         {
             string query = "SELECT users.id, users.first_name, users.last_name"
                 + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
@@ -398,18 +400,18 @@ namespace Impartial
                     string judgeFirstName = reader.GetString(1);
                     string judgeLastName = reader.GetString(2);
 
-                    return new Judge(judgeFirstName, judgeLastName, judgeId);
+                    return new IJudge(judgeFirstName, judgeLastName, judgeId);
                 }
             }
 
             return null;
         }
-        public async Task<IEnumerable<Judge>> GetAllJudgesAsync()
+        public async Task<IEnumerable<IJudge>> GetAllJudgesAsync()
         {
             string query = "SELECT judge_profiles.id, users.first_name, users.last_name"
                 + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id";
 
-            var results = new List<Judge>();
+            var results = new List<IJudge>();
 
             await using (var cmd = _dataSource.CreateCommand(query))
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -420,20 +422,20 @@ namespace Impartial
                     string judgeFirstName = reader.GetString(1);
                     string judgeLastName = reader.GetString(2);
 
-                    results.Add(new Judge(judgeFirstName, judgeLastName, judgeId));
+                    results.Add(new IJudge(judgeFirstName, judgeLastName, judgeId));
                 }
             }
 
             return results;
         }
-        public async Task DeleteJudgeAsync(Judge judge)
+        public async Task DeleteJudgeAsync(IJudge judge)
         {
         }
         public async Task DeleteAllJudgesAsync()
         {
         }
 
-        public async Task UpsertDanceConventionAsync(DanceConvention convention)
+        public async Task UpsertDanceConventionAsync(IDanceConvention convention)
         {
             var pgDanceConventionModel = new PgDanceConventionModel
             {
@@ -444,7 +446,7 @@ namespace Impartial
 
             await SaveDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, pgDanceConventionModel);
         }
-        public async Task<DanceConvention?> GetDanceConventionAsync(Guid id)
+        public async Task<IDanceConvention> GetDanceConventionAsync(Guid id)
         {
             string query = "SELECT id, name, date FROM dance_conventions"
                 + " WHERE id = " + id;
@@ -458,17 +460,17 @@ namespace Impartial
                     string danceConventionName = reader.GetString(1);
                     string danceConventionDateString = reader.GetString(2);
 
-                    return new DanceConvention(danceConventionName, DateTime.Parse(danceConventionDateString), danceConventionId);
+                    return new IDanceConvention(danceConventionName, DateTime.Parse(danceConventionDateString), danceConventionId);
                 }
             }
 
             return null;
         }
-        public async Task<IEnumerable<DanceConvention>> GetAllDanceConventionsAsync()
+        public async Task<IEnumerable<IDanceConvention>> GetAllDanceConventionsAsync()
         {
             string query = "SELECT id, name, date FROM dance_conventions";
 
-            var results = new List<DanceConvention>();
+            var results = new List<IDanceConvention>();
 
             await using (var cmd = _dataSource.CreateCommand(query))
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -479,7 +481,7 @@ namespace Impartial
                     string danceConventionName = reader.GetString(1);
                     string danceConventionDateString = reader.GetString(2);
 
-                    results.Add(new DanceConvention(danceConventionName, DateTime.Parse(danceConventionDateString), danceConventionId));
+                    results.Add(new IDanceConvention(danceConventionName, DateTime.Parse(danceConventionDateString), danceConventionId));
                 }
             }
 
@@ -496,7 +498,7 @@ namespace Impartial
                         string divisionString = reader.GetString(1);
                         var division = Util.GetDivisionFromString(divisionString);
 
-                        danceConvention.Competitions.Add(new Competition(danceConvention, division ,competitionId));
+                        danceConvention.Competitions.Add(new Competition(danceConvention, division, competitionId));
                     }
                 }
 
@@ -545,7 +547,7 @@ namespace Impartial
 
         }
 
-        public async Task UpsertCompetitionAsync(Competition competition, Guid danceConventionId)
+        public async Task UpsertCompetitionAsync(ICompetition competition, Guid danceConventionId)
         {
             var pgCompetitionModel = new PgCompetitionModel
             {
@@ -646,7 +648,7 @@ namespace Impartial
                     {
                         final_competition_id = competition.FinalCompetition.Id,
                         leader_id = couple.Leader.Id,
-                        follower_id= couple.Follower.Id,
+                        follower_id = couple.Follower.Id,
                         placement = couple.ActualPlacement
                     };
 
@@ -670,13 +672,13 @@ namespace Impartial
 
             await transaction.CommitAsync();
         }
-        public async Task<Competition?> GetCompetitionAsync(Guid id)
+        public async Task<ICompetition> GetCompetitionAsync(Guid id)
         {
-            Competition competition = null;
+            ICompetition competition = null;
 
-            string query = 
+            string query =
                 "SELECT dance_conventions.id, dance_conventions.name, dance_conventions.date, competitions.division"
-                + " FROM " + PG_COMPETITIONS_TABLE_NAME 
+                + " FROM " + PG_COMPETITIONS_TABLE_NAME
                 + " LEFT JOIN " + PG_DANCE_CONVENTIONS_TABLE_NAME + " ON dance_conventions.id = competitions.dance_convention_id"
                 + " WHERE competitions.id = " + id;
 
@@ -693,13 +695,13 @@ namespace Impartial
                     DateTime date = DateTime.Parse(danceConventionDateString);
                     Division division = Util.GetDivisionFromString(divisionString);
 
-                    competition = new Competition(danceConventionId, danceConventionName, date, division, id);
+                    competition = new ICompetition(danceConventionId, danceConventionName, date, division, id);
                 }
             }
 
-            List<PrelimCompetition> prelimCompetitions = new();
+            List<IPrelimCompetition> prelimCompetitions = new();
 
-            string prelimCompetitionQuery = 
+            string prelimCompetitionQuery =
                 "SELECT prelim_competitions.id, prelim_competitions.datetime, prelim_competitions.role, prelim_competitions.round"
                 + " FROM " + PG_PRELIM_COMPETITIONS_TABLE_NAME
                 + " WHERE prelim_competitions.competition_id = " + id;
@@ -731,38 +733,40 @@ namespace Impartial
                 }
             }
 
-            List<PrelimScore> prelimScores = new();
-
-            string prelimScoresQuery = 
-                "SELECT FROM prelim_scores"
-                + " WHERE id = " + id;
-
-            await using (var cmd = _dataSource.CreateCommand(query))
-            await using (var reader = await cmd.ExecuteReaderAsync())
+            foreach (var prelimCompetition in prelimCompetitions)
             {
-                while (await reader.ReadAsync())
-                {
-                    Guid danceConventionId = reader.GetGuid(0);
-                    string danceConventionName = reader.GetString(1);
-                    string danceConventionDateString = reader.GetString(2);
+                List<PrelimScore> prelimScores = new();
 
-                    prelimScores.Add(new PrelimScore(
-                        competition: ,
-                        judge: ,
-                        competitor: ,
-                        role: ,
-                        finaled: ,
-                        callbackScore: ,
-                        rawScore: ,
-                        round: ,
-                        id: ));
+                string prelimScoresQuery =
+                    "SELECT id, prelim_competition_id, judge_id, competitor_id, callbackscore"
+                    + " FROM prelim_scores"
+                    + " WHERE prelim_competition_id = " + prelimCompetition.Id;
+
+                await using (var cmd = _dataSource.CreateCommand(query))
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        Guid prelimScoreId = reader.GetGuid(0);
+                        Guid prelimCompetitionId = reader.GetGuid(1);
+                        Guid judgeId = reader.GetGuid(2);
+                        Guid competitorId = reader.GetGuid(3);
+                        string callbackScore = reader.GetString(3);
+
+                        prelimScores.Add(new PrelimScore(
+                            prelimCompetition: prelimCompetition,
+                            judgeId: judgeId,
+                            competitorId: competitorId,
+                            callbackScore: Util.StringToCallbackScore(callbackScore),
+                            id: prelimScoreId));
+                    }
                 }
             }
 
 
             return competition;
         }
-        public async Task<IEnumerable<Competition>> GetAllCompetitionsAsync()
+        public async Task<IEnumerable<ICompetition>> GetAllCompetitionsAsync()
         {
         }
         public async Task DeleteCompetitionAsync(Guid id)

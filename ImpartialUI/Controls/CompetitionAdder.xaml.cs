@@ -15,18 +15,18 @@ namespace ImpartialUI.Controls
         #region DependencyProperties
         public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
             nameof(Competition),
-            typeof(Competition),
+            typeof(ICompetition),
             typeof(CompetitionAdder),
-            new FrameworkPropertyMetadata(new Competition(), OnCompetitionPropertyChanged));
-        public Competition Competition
+            new FrameworkPropertyMetadata(new ICompetition(), OnCompetitionPropertyChanged));
+        public ICompetition Competition
         {
-            get { return (Competition)GetValue(CompetitionProperty); }
+            get { return (ICompetition)GetValue(CompetitionProperty); }
             set { SetValue(CompetitionProperty, value); }
         }
         private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var viewer = (CompetitionAdder)source;
-            var competition = (Competition)e.NewValue;
+            var competition = (ICompetition)e.NewValue;
 
             var judges = competition?.Judges.OrderBy(j => j.FullName);
             var couples = competition?.Couples.OrderBy(c => c.ActualPlacement);
@@ -60,12 +60,12 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty CompetitorsProperty = DependencyProperty.Register(
             nameof(Competitors),
-            typeof(List<Competitor>),
+            typeof(List<ICompetitor>),
             typeof(CompetitionAdder),
             new FrameworkPropertyMetadata(1, OnCompetitorsPropertyChanged));
-        public List<Competitor> Competitors
+        public List<ICompetitor> Competitors
         {
-            get { return (List<Competitor>)GetValue(CompetitorsProperty); }
+            get { return (List<ICompetitor>)GetValue(CompetitorsProperty); }
             set { SetValue(CompetitorsProperty, value); }
         }
         private static void OnCompetitorsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -74,12 +74,12 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
             nameof(Judges),
-            typeof(List<Judge>),
+            typeof(List<IJudge>),
             typeof(CompetitionAdder),
             new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
-        public List<Judge> Judges
+        public List<IJudge> Judges
         {
-            get { return (List<Judge>)GetValue(JudgesProperty); }
+            get { return (List<IJudge>)GetValue(JudgesProperty); }
             set { SetValue(JudgesProperty, value); }
         }
         private static void OnJudgesPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -130,7 +130,7 @@ namespace ImpartialUI.Controls
             }
         }
 
-        private void AddCouple(Couple couple = null)
+        private void AddCouple(ICouple couple = null)
         {
             ScoreGrid.RowDefinitions.Add(new RowDefinition());
 
@@ -187,7 +187,7 @@ namespace ImpartialUI.Controls
             {
                 if (e.AddedItems.Count > 0)
                 {
-                    UpdateCompetitor((Competitor)e.AddedItems[0], e.Placement, Role.Leader);
+                    UpdateCompetitor((ICompetitor)e.AddedItems[0], e.Placement, Role.Leader);
                 }
             };
 
@@ -236,7 +236,7 @@ namespace ImpartialUI.Controls
             {
                 if (e.AddedItems.Count > 0)
                 {
-                    UpdateCompetitor((Competitor)e.AddedItems[0], e.Placement, Role.Follower);
+                    UpdateCompetitor((ICompetitor)e.AddedItems[0], e.Placement, Role.Follower);
                 }
             };
             
@@ -282,12 +282,12 @@ namespace ImpartialUI.Controls
 
             Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
 
-            Competition.Couples.Add(new Couple(
-                (Competitor)leaderSearchBox.SelectedPerson, 
-                (Competitor)followerSearchBox.SelectedPerson, 
+            Competition.Couples.Add(new ICouple(
+                (ICompetitor)leaderSearchBox.SelectedPerson, 
+                (ICompetitor)followerSearchBox.SelectedPerson, 
                 ScoreGrid.RowDefinitions.Count - 2));
         }
-        private void AddJudge(Judge judge = null)
+        private void AddJudge(IJudge judge = null)
         {
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto } );
             //ScoreGrid.ColumnDefinitions[ScoreGrid.ColumnDefinitions.Count - 2].Width = new GridLength(1.0, GridUnitType.Star);
@@ -474,16 +474,16 @@ namespace ImpartialUI.Controls
 
             for (int placement = 1; placement <= ScoreGrid.RowDefinitions.Count - 2; placement++)
             {
-                var leader = (Competitor)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
+                var leader = (ICompetitor)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
                     First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == 1).Child).SelectedPerson;
-                var follower = (Competitor)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
+                var follower = (ICompetitor)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
                     First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == 2).Child).SelectedPerson;
 
-                Competition.Couples.Add(new Couple(leader, follower, placement));
+                Competition.Couples.Add(new ICouple(leader, follower, placement));
 
                 for (int i = 3; i < ScoreGrid.ColumnDefinitions.Count - 1; i++)
                 {
-                    var judge = (Judge)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
+                    var judge = (IJudge)((SearchTextBox)ScoreGrid.Children.OfType<Border>().
                         First(c => Grid.GetRow(c) == 0 && Grid.GetColumn(c) == i).Child).SelectedPerson;
                     var scoreBox = (TextBox)ScoreGrid.Children.OfType<Border>().
                         First(c => Grid.GetRow(c) == placement && Grid.GetColumn(c) == i).Child;
@@ -499,7 +499,7 @@ namespace ImpartialUI.Controls
             OnPropertyChanged(nameof(Competition));
         }
 
-        private void UpdateCompetitor(Competitor competitor, int placement, Role role)
+        private void UpdateCompetitor(ICompetitor competitor, int placement, Role role)
         {
             if (placement < 1 || placement > Competition.Couples.Count)
                 return;

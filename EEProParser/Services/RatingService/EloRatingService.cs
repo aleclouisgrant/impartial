@@ -29,11 +29,11 @@ namespace Impartial
             return (int)Math.Round(rating + k3 * (score - expectedScore));
         }
 
-        public static List<Competitor> PrelimRatings(List<PrelimScore> prelimScores, Role role, List<Judge> prelimJudges)
+        public static List<ICompetitor> PrelimRatings(List<PrelimScore> prelimScores, Role role, List<IJudge> prelimJudges)
         {
-            var competitors = new List<Competitor>();
-            var finalists = new List<Tuple<Competitor, List<PrelimScore>>>();
-            var notFinalists = new List<Tuple<Competitor, List<PrelimScore>>>();
+            var competitors = new List<ICompetitor>();
+            var finalists = new List<Tuple<ICompetitor, List<PrelimScore>>>();
+            var notFinalists = new List<Tuple<ICompetitor, List<PrelimScore>>>();
             int round = prelimScores.FirstOrDefault().Round;
 
             foreach (var score in prelimScores)
@@ -45,7 +45,7 @@ namespace Impartial
             {
                 if (!finalists.Any(c => c.Item1.Id == competitor.Id) || !notFinalists.Any(c => c.Item1.Id == competitor.Id))
                 {
-                    var tuple = new Tuple<Competitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList());
+                    var tuple = new Tuple<ICompetitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList());
                     if (tuple.Item2.First().Finaled)
                         finalists.Add(tuple);
                     else    
@@ -111,18 +111,18 @@ namespace Impartial
             return competitors;
         }
 
-        public static List<Couple> CalculateFinalsRating(List<Couple> couples, bool straightToFinals = false)
+        public static List<ICouple> CalculateFinalsRating(List<ICouple> couples, bool straightToFinals = false)
         {
             //first put the couples in order of average ranking 
-            List<Couple> couplesPlaced = couples.OrderBy(o => o.ActualPlacement).ToList();
+            List<ICouple> couplesPlaced = couples.OrderBy(o => o.ActualPlacement).ToList();
 
             //then compare the probability that their actual placement is their expected placement
-            foreach (Couple coupleA in couplesPlaced)
+            foreach (ICouple coupleA in couplesPlaced)
             {
                 double expectedScore = 0;
 
                 //sum up the probability of winning against each couple
-                foreach (Couple coupleB in couples)
+                foreach (ICouple coupleB in couples)
                 {
                     if (coupleA != coupleB)
                     {

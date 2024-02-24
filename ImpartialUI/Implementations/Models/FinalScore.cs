@@ -1,21 +1,22 @@
-﻿using System;
+﻿using Impartial;
+using System;
 
-namespace Impartial
+namespace ImpartialUI
 {
-    public class FinalScore
+    public class FinalScore : IFinalScore
     {
         public Guid Id { get; set; }
-        public FinalCompetition FinalCompetition { get; set; }
-        public Judge Judge { get; set; }
-        public Competitor Leader { get; set; }
-        public Competitor Follower { get; set; }
+        public IFinalCompetition FinalCompetition { get; set; }
+        public IJudge Judge { get; set; }
+        public ICompetitor Leader { get; set; }
+        public ICompetitor Follower { get; set; }
 
         public int Placement { get; set; }
         public int ActualPlacement { get; set; }
 
         public double Accuracy => Util.GetAccuracy(Placement, ActualPlacement);
 
-        public FinalScore(FinalCompetition competition, Judge judge, Competitor leader, Competitor follower, int placement, int actualPlacement, Guid? id = null)
+        public FinalScore(IFinalCompetition competition, IJudge judge, ICompetitor leader, ICompetitor follower, int placement, int actualPlacement, Guid? id = null)
         {
             if (id == null)
                 Id = Guid.NewGuid();
