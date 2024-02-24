@@ -1,7 +1,7 @@
 ﻿using Impartial;
 using System;
 
-namespace ImpartialUI
+namespace ImpartialUI.Models
 {
     public class Competitor : PersonModel, ICompetitor
     {
@@ -15,27 +15,27 @@ namespace ImpartialUI
 
         public Competitor(string firstName, string lastName)
         {
-            this.Id = Guid.NewGuid();
+            Id = Guid.NewGuid();
 
-            this.FirstName = firstName;
-            this.LastName = lastName;
+            FirstName = firstName;
+            LastName = lastName;
         }
 
         public Competitor(string firstName, string lastName, int wsdcId)
         {
-            this.Id = Guid.NewGuid();
+            Id = Guid.NewGuid();
 
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.WsdcId = wsdcId;
+            FirstName = firstName;
+            LastName = lastName;
+            WsdcId = wsdcId;
         }
 
         public Competitor(Guid id, int wsdcId, string firstName, string lastName, int leaderRating, double leaderVariance, int followerRating, double followerVariance)
         {
-            this.Id = id;
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.WsdcId = wsdcId;
+            Id = id;
+            FirstName = firstName;
+            LastName = lastName;
+            WsdcId = wsdcId;
 
             LeadStats = new RoleStats(leaderRating, leaderVariance);
             FollowStats = new RoleStats(followerRating, followerVariance);

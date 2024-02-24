@@ -6,12 +6,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Impartial;
+using ImpartialUI.Models;
+using ImpartialUI.Services.DatabaseProvider.Helpers;
 using MongoDB.Driver.Core.Configuration;
 using static System.Formats.Asn1.AsnWriter;
 using static iText.IO.Image.Jpeg2000ImageData;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
-namespace ImpartialUI.Implementations.Services.DatabaseProvider
+namespace ImpartialUI.Services.DatabaseProvider
 {
     public class SqlDatabaseProvider : IDatabaseProvider
     {

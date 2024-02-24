@@ -1,5 +1,6 @@
 ﻿using Impartial;
 using ImpartialUI.Implementations.Models;
+using ImpartialUI.Models;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,7 @@
 ﻿using Impartial;
 using System;
 
-namespace ImpartialUI
+namespace ImpartialUI.Models
 {
     public class FinalScore : IFinalScore
     {

@@ -3,7 +3,7 @@ using Impartial.Enums;
 using System;
 using System.Linq;
 
-namespace ImpartialUI
+namespace ImpartialUI.Models
 {
     internal class PrelimScore : IPrelimScore
     {

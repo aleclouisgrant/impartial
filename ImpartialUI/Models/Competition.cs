@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ImpartialUI
+namespace ImpartialUI.Models
 {
     public class PairedPrelimCompetition : IPairedPrelimCompetition
     {

@@ -1,7 +1,7 @@
 ﻿using Impartial;
 using System.Collections.Generic;
 
-namespace ImpartialUI
+namespace ImpartialUI.Models
 {
     public class Couple : ICouple
     {

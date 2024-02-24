@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using Impartial;
 
-namespace Impartial.Services.ScoresheetParser
+namespace ImpartialUI.Services.ScoresheetParser
 {
     public class DanceConventionParser : IScoresheetParser
     {

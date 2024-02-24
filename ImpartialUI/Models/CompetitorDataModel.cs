@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ImpartialUI
+namespace ImpartialUI.Models
 {
     public class CompetitorDataModel
     {
@@ -10,7 +10,7 @@ namespace ImpartialUI
         public ICompetitor Competitor { get; set; }
         public List<CompetitionHistory> CompetitionHistory { get; set; } = new();
 
-        public CompetitorDataModel(ICompetitor competitor) 
+        public CompetitorDataModel(ICompetitor competitor)
         {
             CompetitorId = competitor.Id;
             Competitor = competitor;

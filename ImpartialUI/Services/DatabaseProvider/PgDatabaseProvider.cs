@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using ImpartialUI;
 using Impartial;
+using ImpartialUI.Models;
 
-namespace ImpartialUI.Implementations.Services.DatabaseProvider
+namespace ImpartialUI.Services.DatabaseProvider
 {
     public class PgDatabaseProvider : IDatabaseProvider, IDisposable
     {

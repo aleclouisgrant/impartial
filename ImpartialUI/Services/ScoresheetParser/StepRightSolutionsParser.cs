@@ -1,39 +1,38 @@
 ﻿using HtmlAgilityPack;
+using Impartial;
 using Impartial.Enums;
+using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Impartial.Services.ScoresheetParser
+namespace ImpartialUI.Services.ScoresheetParser
 {
-    public class WorldDanceRegistryParser : IScoresheetParser
+    public class StepRightSolutionsParser : IScoresheetParser
     {
         private string _prelimsSheetDoc { get; set; }
+        private string _semisSheetDoc { get; set; }
         private string _finalsSheetDoc { get; set; }
 
-        public WorldDanceRegistryParser(string prelimsPath = null, string finalsPath = null)
+        public StepRightSolutionsParser(string prelimsPath = null, string semisPath = null, string finalsPath = null)
         {
-            bool prelimPathFound = !(prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath));
-            bool finalsPathFound = !(finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath));
+            bool prelimPathFound = !(prelimsPath == null || prelimsPath == string.Empty || !File.Exists(prelimsPath));
+            bool semisPathFound = !(semisPath == null || semisPath == string.Empty || !File.Exists(semisPath));
+            bool finalsPathFound = !(finalsPath == null || finalsPath == string.Empty || !File.Exists(finalsPath));
 
-            if (!prelimPathFound && !finalsPathFound)
+            if (!prelimPathFound && !semisPathFound && !finalsPathFound)
                 throw new FileNotFoundException();
 
             _prelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
+            _semisSheetDoc = semisPathFound ? File.ReadAllText(semisPath).Replace("\n", "").Replace("\r", "") : null;
             _finalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
         }
 
         public List<Division> GetDivisions()
         {
             var divisions = new List<Division>();
-
-            var finals = Util.GetSubString(
-                s: _finalsSheetDoc,
-                from: "<div class=\"pb-4\"><br>",
-                to: "</tbody></table></div>");
-
-            var divisionString = Util.GetSubString(finals, "<h3 class=\"text-center\">", "</h3>");
+            var divisionString = Util.GetSubString(_finalsSheetDoc, "<h3>", "</h3>");
 
             if (divisionString.Contains("Masters"))
                 return divisions;
@@ -59,13 +58,20 @@ namespace Impartial.Services.ScoresheetParser
 
             return divisions;
         }
-        
+
         public ICompetition GetCompetition(Division division)
         {
             var prelims = new Tuple<List<PrelimScore>, List<PrelimScore>>(null, null);
             if (_prelimsSheetDoc != null)
             {
-                prelims = GetPrelimScores(division);
+                prelims = GetPrelimScores(division, _prelimsSheetDoc, 1);
+            }
+
+            if (_semisSheetDoc != null)
+            {
+                var semis = GetPrelimScores(division, _semisSheetDoc, 2);
+                prelims.Item1.AddRange(semis.Item1);
+                prelims.Item2.AddRange(semis.Item2);
             }
 
             return new Competition(division)
@@ -77,57 +83,35 @@ namespace Impartial.Services.ScoresheetParser
             };
         }
 
-        private bool SemisExist(Division division)
+        private Tuple<List<PrelimScore>, List<PrelimScore>> GetPrelimScores(Division division, string doc, int round)
         {
-            return true;
-        }
-
-        private Tuple<List<PrelimScore>, List<PrelimScore>> GetPrelimScores(Division division)
-        {
-            var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader);
+            var leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader, doc);
             HtmlDocument leadsDoc = new HtmlDocument();
             leadsDoc.LoadHtml(leadsPrelims);
             var leadNodes = leadsDoc.DocumentNode.SelectNodes("tr");
-            var leaderJudges = GetPrelimsJudgesByDivision(division, Role.Leader);
-
-            int redactedLeads = 0;
+            var leaderJudges = GetPrelimsJudgesByDivision(division, Role.Leader, doc);
 
             List<PrelimScore> leaderPrelimScores = new List<PrelimScore>();
             int rawScore = 1;
             foreach (var lead in leadNodes)
             {
                 var node = lead.SelectNodes("td");
-                
-                bool finaled = node[0].InnerText == "Y";
-                string name = node[3].InnerText;
+                bool finaled = lead.GetClasses().Contains("adv");
+                string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
-
-                string firstName, lastName = string.Empty;
-
-                if (name == "***")
-                {
-                    firstName = "REDACTED";
-                    lastName = (++redactedLeads).ToString();
-                }
-                else
-                {
-                    firstName = name.Substring(0, pos).Trim();
-                    lastName = name.Substring(pos + 1).Trim();
-                }
-
-                var competitor = new ICompetitor(firstName, lastName);
+                var competitor = new ICompetitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
 
                 CallbackScore callbackScore;
-                int offset = 4;
+                int offset = 2;
                 for (int i = offset; i < leaderJudges.Count + offset; i++)
                 {
                     try
                     {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText));
+                        callbackScore = Util.NumberToCallbackScore(double.Parse(node[i].InnerText));
                     }
                     catch
                     {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
+                        callbackScore = Util.NumberToCallbackScore(double.Parse(node[i].InnerText.Substring(0, 1)));
                     }
 
                     var prelimScore = new PrelimScore(
@@ -137,57 +121,40 @@ namespace Impartial.Services.ScoresheetParser
                         finaled: finaled,
                         callbackScore: callbackScore,
                         rawScore: rawScore,
-                        round: 1);
+                        round: round);
 
                     leaderPrelimScores.Add(prelimScore);
                 }
                 rawScore++;
             }
 
-            var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower);
+            var followsPrelims = GetPrelimsDocByDivision(division, Role.Follower, doc);
             HtmlDocument followsDoc = new HtmlDocument();
             followsDoc.LoadHtml(followsPrelims);
             var followerNodes = followsDoc.DocumentNode.SelectNodes("tr");
-            var followerJudges = GetPrelimsJudgesByDivision(division, Role.Follower);
-
-            int redactedFollows = 0;
+            var followerJudges = GetPrelimsJudgesByDivision(division, Role.Follower, doc);
 
             List<PrelimScore> followerPrelimScores = new List<PrelimScore>();
             rawScore = 1;
             foreach (var follow in followerNodes)
             {
                 var node = follow.SelectNodes("td");
-
-                bool finaled = node[0].InnerText == "Y";
-                string name = node[3].InnerText;
+                bool finaled = follow.GetClasses().Contains("adv");
+                string name = node[1].InnerText;
                 int pos = name.IndexOf(' ');
-
-                string firstName, lastName = string.Empty;
-
-                if (name == "***")
-                {
-                    firstName = "REDACTED";
-                    lastName = (++redactedFollows).ToString();
-                }
-                else
-                {
-                    firstName = name.Substring(0, pos).Trim();
-                    lastName = name.Substring(pos + 1).Trim();
-                }
-
-                var competitor = new ICompetitor(firstName, lastName);
+                var competitor = new ICompetitor(name.Substring(0, pos).Trim(), name.Substring(pos + 1).Trim());
 
                 CallbackScore callbackScore;
-                int offset = 4;
+                int offset = 2;
                 for (int i = offset; i < followerJudges.Count + offset; i++)
                 {
                     try
                     {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText));
+                        callbackScore = Util.NumberToCallbackScore(double.Parse(node[i].InnerText));
                     }
                     catch
                     {
-                        callbackScore = Util.NumberToCallbackScore(Double.Parse(node[i].InnerText.Substring(0, 1)));
+                        callbackScore = Util.NumberToCallbackScore(double.Parse(node[i].InnerText.Substring(0, 1)));
                     }
 
                     var prelimScore = new PrelimScore(
@@ -195,9 +162,9 @@ namespace Impartial.Services.ScoresheetParser
                         judge: followerJudges[i - offset],
                         competitor: competitor,
                         finaled: finaled,
-                        callbackScore: callbackScore, 
+                        callbackScore: callbackScore,
                         rawScore: rawScore,
-                        round: 1);
+                        round: round);
 
                     followerPrelimScores.Add(prelimScore);
                 }
@@ -206,10 +173,11 @@ namespace Impartial.Services.ScoresheetParser
 
             return new Tuple<List<PrelimScore>, List<PrelimScore>>(leaderPrelimScores, followerPrelimScores);
         }
+
         private List<IFinalScore> GetFinalScores(Division division)
         {
             var sub = GetFinalsDocByDivision(division);
-            var judges = GetFinalsJudgesByDivision(division);
+            var finalsJudges = GetFinalsJudgesByDivision(division);
 
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(sub);
@@ -223,9 +191,11 @@ namespace Impartial.Services.ScoresheetParser
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i].SelectNodes("td");
-                int actualPlacement = Int32.Parse(node[3].InnerText);
 
-                string leaderName = node[1].InnerText;
+                string actualPlacementString = node.Where(n => n.GetClasses().Contains("r")).FirstOrDefault().InnerText;
+                int actualPlacement = int.Parse(actualPlacementString.Remove(actualPlacementString.Length - 2));
+
+                string leaderName = node.Where(n => n.GetClasses().Contains("nolines") && n.GetClasses().Contains("name")).FirstOrDefault().InnerText;
                 int leadPos = leaderName.IndexOf(' ');
                 string leaderFirstName = leaderName.Substring(0, leadPos).Trim();
                 string leaderLastName = leaderName.Substring(leadPos + 1).Trim();
@@ -237,7 +207,7 @@ namespace Impartial.Services.ScoresheetParser
                     leaders.Add(leader);
                 }
 
-                string followerName = node[2].InnerText;
+                string followerName = node.Where(n => n.GetClasses().Contains("nolines") && n.GetClasses().Contains("name") && n.GetClasses().Contains("heavyborder")).FirstOrDefault().InnerText;
                 int followPos = followerName.IndexOf(' ');
                 string followerFirstName = followerName.Substring(0, followPos).Trim();
                 string followerLastName = followerName.Substring(followPos + 1).Trim();
@@ -249,22 +219,21 @@ namespace Impartial.Services.ScoresheetParser
                     followers.Add(follower);
                 }
 
-                // scores start on the 5th node
-                int offset = 4;
-                for (int j = offset; j < judges.Count + offset; j++)
+                int offset = 3;
+                for (int j = offset; j < finalsJudges.Count + offset; j++)
                 {
                     int placement;
 
                     try
                     {
-                        placement = Int32.Parse(node[j].InnerText);
+                        placement = int.Parse(node[j].InnerText);
                     }
                     catch
                     {
-                        placement = Int32.Parse(node[j].InnerText.Substring(0, 1));
+                        placement = int.Parse(node[j].InnerText.Substring(0, 1));
                     }
 
-                    var score = new FinalScore(judges[j - offset], placement, actualPlacement)
+                    var score = new FinalScore(finalsJudges[j - offset], placement, actualPlacement)
                     {
                         Leader = leader,
                         Follower = follower,
@@ -272,16 +241,17 @@ namespace Impartial.Services.ScoresheetParser
 
                     scores.Add(score);
 
-                    if (judges[j - offset].Scores == null)
-                        judges[j - offset].Scores = new List<IFinalScore>();
+                    if (finalsJudges[j - offset].Scores == null)
+                        finalsJudges[j - offset].Scores = new List<IFinalScore>();
 
-                    judges[j - offset].Scores.Add(score);
+                    finalsJudges[j - offset].Scores.Add(score);
                 }
             }
+
             return scores;
         }
 
-        private List<IJudge> GetPrelimsJudgesByDivision(Division division, Role role)
+        private List<IJudge> GetPrelimsJudgesByDivision(Division division, Role role, string doc)
         {
             var judges = new List<IJudge>();
             string sub = string.Empty;
@@ -289,48 +259,46 @@ namespace Impartial.Services.ScoresheetParser
             if (role == Role.Leader)
             {
                 sub = Util.GetSubString(
-                    s: _prelimsSheetDoc,
-                    from: "</td>",
-                    to: "<td class=\"fw-bold td-grey bg-darken-md\">Scores Sum");
+                    s: doc,
+                    from: "<div><b>Judges: </b>",
+                    to: "</div>");
             }
             else if (role == Role.Follower)
             {
                 sub = Util.GetSubString(
-                    s: _prelimsSheetDoc.Substring(_prelimsSheetDoc.IndexOf("<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers")),
-                    from: "</td>",
-                    to: "<td class=\"fw-bold td-grey bg-darken-md\">Scores Sum");
+                    s: doc.Substring(doc.IndexOf("<h3 id=\"followers\">Followers")),
+                    from: "<div><b>Judges: </b>",
+                    to: "</div>");
             }
 
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(sub);
+            List<string> names = sub.Split(',').ToList();
 
-            var nodes = doc.DocumentNode.SelectNodes("td");
+            // step right solutions usuallys anonymizes judges, so we test for that
+            if (names.First().Contains("J1"))
+            {
+                foreach (var nameString in names)
+                {
+                    string name = nameString.Substring(0, nameString.IndexOf("<em>"));
+                    int pos = name.Trim().IndexOf(' ');
 
-            if (nodes == null) //division may not exist
+                    //no last name was recorded
+                    if (pos == -1)
+                    {
+                        judges.Add(new IJudge(name.Trim(), string.Empty));
+                    }
+                    else
+                    {
+                        judges.Add(new IJudge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
+                    }
+                }
+
                 return judges;
-
-            if (role == Role.Leader)
-            {
-                //delete unnecessary first 3 nodes
-                nodes.RemoveAt(0);
-                nodes.RemoveAt(0);
-                nodes.RemoveAt(0);
             }
 
-            foreach (var node in nodes)
+            // otherwise, we are going to return anonymous judges
+            for (int i = 1; i <= names.Count; i++)
             {
-                string name = node.InnerText.Trim();
-                int pos = name.Trim().IndexOf(' ');
-
-                //no last name was recorded
-                if (pos == -1)
-                {
-                    judges.Add(new IJudge(name.Trim(), string.Empty));
-                }
-                else
-                {
-                    judges.Add(new IJudge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
-                }
+                judges.Add(new IJudge("Anonymous", i.ToString()));
             }
 
             return judges;
@@ -341,58 +309,50 @@ namespace Impartial.Services.ScoresheetParser
 
             string sub = Util.GetSubString(
                 s: _finalsSheetDoc,
-                from: "</a></caption><thead><tr>",
-                to: "</tr>");
+                from: "<div><b>Judges: </b>",
+                to: "</div>");
 
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(sub);
+            List<string> names = sub.Split(',').ToList();
 
-            var nodes = doc.DocumentNode.SelectNodes("td");
-
-            if (nodes == null) //division may not exist
-                return judges;
-
-            // get rid of first 4 unnecessary nodes
-            nodes.RemoveAt(0);
-            nodes.RemoveAt(0);
-            nodes.RemoveAt(0);
-            nodes.RemoveAt(0);
-
-            foreach (var node in nodes)
+            // step right solutions usuallys anonymizes judges, so we test for that
+            if (names.First().Contains("J1"))
             {
-                string name = node.InnerText.Replace("&nbsp;", "");
-
-                // reached the end of the judges names
-                if (name == "1--1")
-                    break;
-
-                int pos = name.IndexOf(' ');
-
-                //no last name was recorded
-                if (pos == -1)
+                foreach (var nameString in names)
                 {
-                    judges.Add(new IJudge(name, string.Empty));
+                    string name = nameString.Substring(0, nameString.IndexOf("<em>"));
+                    int pos = name.Trim().IndexOf(' ');
+
+                    //no last name was recorded
+                    if (pos == -1)
+                    {
+                        judges.Add(new IJudge(name.Trim(), string.Empty));
+                    }
+                    else
+                    {
+                        judges.Add(new IJudge(name.Trim().Substring(0, pos), name.Trim().Substring(pos + 1)));
+                    }
                 }
-                else
-                {
-                    judges.Add(new IJudge(name.Substring(0, pos), name.Substring(pos + 1)));
-                }
+
+                return judges;
+            }
+
+            // otherwise, we are going to return anonymous judges
+            for (int i = 1; i <= names.Count; i++)
+            {
+                judges.Add(new IJudge("Anonymous", i.ToString()));
             }
 
             return judges;
         }
 
-        private string GetPrelimsDocByDivision(Division division, Role role)
+        private string GetPrelimsDocByDivision(Division division, Role role, string doc)
         {
             Division div;
-            var doc = Util.GetSubString(
-                s: _prelimsSheetDoc,
-                from: "<div class=\"pb-4\"><br>",
-                to: "</tbody></table></div>");
 
-            var divisionString = Util.GetSubString(doc, "<h3 class=\"text-center\">", "</h3>");
-
-            doc = doc.Substring(doc.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length);
+            var divisionString = Util.GetSubString(
+                s: doc,
+                from: "<h3>",
+                to: "</h3>");
 
             if (divisionString.Contains("Masters"))
                 return string.Empty;
@@ -424,16 +384,16 @@ namespace Impartial.Services.ScoresheetParser
             if (role == Role.Leader)
             {
                 prelims = Util.GetSubString(
-                    s: _prelimsSheetDoc,
-                    from: "<td class=\"fw-bold td-grey bg-darken-md text-start\">Leaders",
-                    to: "</tbody></table>");
+                    s: doc,
+                    from: "<h3 id=\"leaders\">Leaders",
+                    to: "</tbody></table><br>");
             }
             else if (role == Role.Follower)
             {
                 prelims = Util.GetSubString(
-                    s: _prelimsSheetDoc,
-                    from: "<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers",
-                    to: "</tbody></table></div></div>");
+                    s: doc,
+                    from: "<h3 id=\"followers\">Followers",
+                    to: "</tbody></table></div>                                <div class=\"text-center\">");
             }
 
             return prelims.Substring(prelims.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length - 1);
@@ -443,12 +403,12 @@ namespace Impartial.Services.ScoresheetParser
             Division div;
             var finals = Util.GetSubString(
                 s: _finalsSheetDoc,
-                from: "<div class=\"pb-4\"><br>",
+                from: "<div class=\"well clearfix\">",
                 to: "</tbody></table></div>");
 
-            var divisionString = Util.GetSubString(finals, "<h3 class=\"text-center\">", "</h3>");
+            var divisionString = Util.GetSubString(finals, "<h3>", "</h3>");
 
-            finals = finals.Substring(finals.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length);
+            finals = finals.Substring(finals.IndexOf("<tbody>") + new string("<tbody>").Length - 1);
 
             if (divisionString.Contains("Newcomer"))
                 div = Division.Newcomer;
@@ -483,15 +443,14 @@ namespace Impartial.Services.ScoresheetParser
             if (_finalsSheetDoc == null)
                 return string.Empty;
 
-            string name = Util.GetSubString(
-                s: _finalsSheetDoc,
-                from: "<title>",
-                to: "</title>").Trim();
+            var nameDoc = new HtmlDocument();
 
-            if (name.EndsWith(" - Scores"))
-            {
-                name = name.Substring(0, name.LastIndexOf(" - Scores"));
-            }
+            nameDoc.LoadHtml(
+                Util.GetSubString(
+                    s: _finalsSheetDoc,
+                    from: "<h2>",
+                    to: "</h2>"));
+            string name = nameDoc.DocumentNode.SelectNodes("a")?.FirstOrDefault().InnerText;
 
             return name;
         }

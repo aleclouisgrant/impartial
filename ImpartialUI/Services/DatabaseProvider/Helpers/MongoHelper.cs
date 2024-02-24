@@ -3,7 +3,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 
-namespace Impartial
+namespace ImpartialUI.Services.DatabaseProvider.Helpers
 {
     public class MongoHelper
     {
@@ -45,7 +45,7 @@ namespace Impartial
         {
             var collection = db.GetCollection<T>(table);
             var result = collection.ReplaceOne(
-                new BsonDocument("_id", id), 
+                new BsonDocument("_id", id),
                 record,
                 new ReplaceOptions { IsUpsert = true });
         }

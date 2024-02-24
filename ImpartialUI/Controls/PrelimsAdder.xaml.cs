@@ -1,6 +1,7 @@
 ﻿using Impartial;
 using Impartial.Enums;
 using ImpartialUI.Implementations.Models;
+using ImpartialUI.Models;
 using ScottPlot.Renderable;
 using System;
 using System.Collections.Generic;

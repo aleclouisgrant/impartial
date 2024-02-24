@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using HtmlAgilityPack;
+using Impartial;
 using Impartial.Enums;
-using iText.Kernel.Pdf.Canvas.Parser.ClipperLib;
 
-namespace Impartial
+namespace ImpartialUI.Services.ScoresheetParser
 {
     public class EEProParser : IScoresheetParser
     {
@@ -17,8 +16,8 @@ namespace Impartial
 
         public EEProParser(string prelimsPath = null, string finalsPath = null)
         {
-            bool prelimPathFound = !(prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath));
-            bool finalsPathFound = !(finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath));
+            bool prelimPathFound = !(prelimsPath == null || prelimsPath == string.Empty || !File.Exists(prelimsPath));
+            bool finalsPathFound = !(finalsPath == null || finalsPath == string.Empty || !File.Exists(finalsPath));
 
             if (!prelimPathFound && !finalsPathFound)
                 throw new FileNotFoundException();
@@ -47,7 +46,7 @@ namespace Impartial
                 try
                 {
                     divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
-                } 
+                }
                 catch
                 {
                     try
@@ -104,7 +103,7 @@ namespace Impartial
                 prelims.Item1.AddRange(semis.Item1);
                 prelims.Item2.AddRange(semis.Item2);
             }
-            
+
             return new Competition(division)
             {
                 Name = GetName(),
@@ -119,9 +118,9 @@ namespace Impartial
             if (_prelimsSheetDoc == null)
                 return false;
 
-            return (GetPrelimsDocByDivision(division, Role.Leader, 2) != string.Empty);
+            return GetPrelimsDocByDivision(division, Role.Leader, 2) != string.Empty;
         }
-        
+
         private Tuple<List<PrelimScore>, List<PrelimScore>> GetPrelimScores(Division division, int round)
         {
             string leadsPrelims = GetPrelimsDocByDivision(division, Role.Leader, round);
@@ -237,7 +236,7 @@ namespace Impartial
             for (int i = 1; i < nodes.Count; i++)
             {
                 var node = nodes[i].SelectNodes("td");
-                int actualPlacement = Int32.Parse(node[0].InnerText);
+                int actualPlacement = int.Parse(node[0].InnerText);
 
                 for (int j = 2; j < judges.Count + 2; j++)
                 {
@@ -245,11 +244,11 @@ namespace Impartial
 
                     try
                     {
-                        placement = Int32.Parse(node[j].InnerText);
+                        placement = int.Parse(node[j].InnerText);
                     }
                     catch
                     {
-                        placement = Int32.Parse(node[j].InnerText.Substring(0, 1));
+                        placement = int.Parse(node[j].InnerText.Substring(0, 1));
                     }
 
                     string leaderName = node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and "));
@@ -333,7 +332,7 @@ namespace Impartial
         private List<IJudge> GetFinalsJudgesByDivision(Division division)
         {
             var judges = new List<IJudge>();
-            
+
             string sheet = GetFinalsDocByDivision(division);
             string sub = Util.GetSubString(
                 s: sheet,
@@ -352,7 +351,7 @@ namespace Impartial
             {
                 string name = node.InnerText.Replace("&nbsp;", "");
                 int pos = name.IndexOf(' ');
-                
+
                 //no last name was recorded
                 if (pos == -1)
                 {
@@ -500,7 +499,7 @@ namespace Impartial
                 if (division == div)
                     return finals;
             }
-            
+
             return "";
         }
 
@@ -513,7 +512,7 @@ namespace Impartial
                 s: _finalsSheetDoc,
                 from: "<h2><center>",
                 to: "</center></h2>");
-            
+
             if (name.Contains("- "))
             {
                 name = name.Replace("- ", "");

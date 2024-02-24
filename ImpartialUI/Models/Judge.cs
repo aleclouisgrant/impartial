@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ImpartialUI
+namespace ImpartialUI.Models
 {
-    public class Judge : PersonModel, IJudge 
+    public class Judge : PersonModel, IJudge
     {
         public List<IFinalScore> Scores { get; set; }
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Impartial
+namespace ImpartialUI.Services.DatabaseProvider.Helpers
 {
     internal class PgHelper : IDisposable
     {

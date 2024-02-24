@@ -1,5 +1,6 @@
 ﻿using Impartial;
 using ImpartialUI.Commands;
+using ImpartialUI.Models;
 using iText.Layout.Properties;
 using Newtonsoft.Json.Linq;
 using System;

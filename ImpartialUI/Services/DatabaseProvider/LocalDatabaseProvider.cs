@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Impartial;
 
-namespace ImpartialUI.Implementations.Services.DatabaseProvider
+namespace ImpartialUI.Services.DatabaseProvider
 {
     public class LocalDatabaseProvider
     {

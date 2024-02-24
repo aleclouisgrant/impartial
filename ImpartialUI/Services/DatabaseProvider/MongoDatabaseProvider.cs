@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Impartial;
+using ImpartialUI.Services.DatabaseProvider.Helpers;
 
-namespace ImpartialUI.Implementations.Services.DatabaseProvider
+namespace ImpartialUI.Services.DatabaseProvider
 {
     public class MongoDatabaseProvider
     {
