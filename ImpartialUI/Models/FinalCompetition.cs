@@ -14,19 +14,66 @@ namespace ImpartialUI.Models
 
         public Division Division { get; set; }
 
-        public List<ICompetitor> Leaders { get; set; } = new();
-        public List<ICompetitor> Followers { get; set; } = new();
-        public List<IJudge> Judges { get; set; } = new List<IJudge>();
+        public List<ICompetitor> Leaders => GetLeaders();
+        public List<ICompetitor> Followers => GetFollowers();
+        public List<IJudge> Judges => GetJudges();
+
+        public List<ICouple> Couples => GetCouples();
 
         public FinalCompetition(Guid? id = null)
         {
-            if (id == null)
-                Id = Guid.NewGuid();
-            else
-                Id = (Guid)id;
+            Id = id ?? Guid.NewGuid();
         }
 
-        public List<ICouple> Couples => GetCouples();
+        public FinalCompetition(DateTime dateTime, Division division, List<IFinalScore> finalScores, Guid? id = null)
+        {
+            Id = id ?? Guid.NewGuid();
+        }
+
+        private List<ICompetitor> GetLeaders()
+        {
+            var competitors = new List<ICompetitor>();
+
+            foreach (var finalScore in FinalScores)
+            {
+                if (finalScore.Leader != null && !competitors.Contains(finalScore.Leader))
+                {
+                    competitors.Add(finalScore.Leader);
+                }
+            }
+
+            return competitors;
+        }
+
+        private List<ICompetitor> GetFollowers()
+        {
+            var competitors = new List<ICompetitor>();
+
+            foreach (var finalScore in FinalScores)
+            {
+                if (finalScore.Follower != null && !competitors.Contains(finalScore.Follower))
+                {
+                    competitors.Add(finalScore.Follower);
+                }
+            }
+
+            return competitors;
+        }
+
+        private List<IJudge> GetJudges()
+        {
+            var judges = new List<IJudge>();
+
+            foreach (var finalScore in FinalScores)
+            {
+                if (finalScore.Judge != null && !judges.Contains(finalScore.Judge))
+                {
+                    judges.Add(finalScore.Judge);
+                }
+            }
+
+            return judges;
+        }
 
         private List<ICouple> GetCouples()
         {
@@ -34,15 +81,15 @@ namespace ImpartialUI.Models
 
             foreach (IFinalScore score in FinalScores)
             {
-                if (!couples.Any(c => c.ActualPlacement == score.ActualPlacement))
+                if (!couples.Any(c => c.Placement == score.Placement))
                 {
-                    var couple = new Couple(score.Leader, score.Follower, score.ActualPlacement);
+                    var couple = new Couple(score.Leader, score.Follower, score.Placement);
                     couples.Add(couple);
                     couple.Scores.Add(score);
                 }
                 else
                 {
-                    var couple = couples.Find(c => c.ActualPlacement == score.ActualPlacement);
+                    var couple = couples.Find(c => c.Placement == score.Placement);
                     couple.Scores.Add(score);
                 }
             }
@@ -78,7 +125,7 @@ namespace ImpartialUI.Models
                 {
                     if (score.Leader == couple.Leader && score.Follower == couple.Follower)
                     {
-                        scores.Add(score.Placement);
+                        scores.Add(score.Score);
                     }
                 }
 

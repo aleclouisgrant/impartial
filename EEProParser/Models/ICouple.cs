@@ -6,7 +6,7 @@ namespace Impartial
     {
         public ICompetitor Leader { get; set; }
         public ICompetitor Follower { get; set; }
-        public int ActualPlacement { get; set; }
+        public int Placement { get; set; }
 
         public int CombinedRating => Leader.LeadStats.Rating + Follower.FollowStats.Rating;
 

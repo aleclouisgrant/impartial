@@ -212,8 +212,8 @@ namespace ImpartialUI.Controls
 
             if (couple != null)
             {
-                leaderSearchBox.Placement = couple.ActualPlacement; 
-                followerSearchBox.Placement = couple.ActualPlacement;
+                leaderSearchBox.Placement = couple.Placement; 
+                followerSearchBox.Placement = couple.Placement;
             }
             else
             {
@@ -270,7 +270,7 @@ namespace ImpartialUI.Controls
 
                 if (couple?.Scores != null)
                 {
-                    scoreTextBox.Text = couple.Scores[i - 1].Placement.ToString();
+                    scoreTextBox.Text = couple.Scores[i - 1].Score.ToString();
                 }
 
                 scoreBorder.Child = scoreTextBox;

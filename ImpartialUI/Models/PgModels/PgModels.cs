@@ -1,4 +1,5 @@
-﻿using Impartial.Enums;
+﻿using Impartial;
+using Impartial.Enums;
 using System;
 
 namespace ImpartialUI.Models.PgModels

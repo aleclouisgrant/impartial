@@ -12,9 +12,9 @@ namespace Impartial
 
         public Division Division { get; set; }
 
-        public List<ICompetitor> Leaders { get; set; }
-        public List<ICompetitor> Followers { get; set; }
-        public List<IJudge> Judges { get; set; }
+        public List<ICompetitor> Leaders { get; }
+        public List<ICompetitor> Followers { get; }
+        public List<IJudge> Judges { get; }
 
         public List<ICouple> Couples { get; }
 

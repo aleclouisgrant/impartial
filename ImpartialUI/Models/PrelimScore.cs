@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ImpartialUI.Models
 {
-    internal class PrelimScore : IPrelimScore
+    public class PrelimScore : IPrelimScore
     {
         private Guid _judgeId;
         private Guid _competitorId;
@@ -14,12 +14,9 @@ namespace ImpartialUI.Models
         public IPrelimCompetition PrelimCompetition { get; set; }
         public IJudge Judge { get; set; }
         public ICompetitor Competitor { get; set; }
-
-        public Role Role { get; set; }
-        public bool Finaled { get; set; }
         public CallbackScore CallbackScore { get; set; }
 
-        public PrelimScore(IPrelimCompetition prelimCompetition, Guid judgeId, Guid competitorId, Role role, bool finaled, CallbackScore callbackScore, Guid? id = null)
+        public PrelimScore(IPrelimCompetition prelimCompetition, Guid judgeId, Guid competitorId, CallbackScore callbackScore, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
 
@@ -27,8 +24,6 @@ namespace ImpartialUI.Models
             SetJudge(judgeId);
             SetCompetitor(competitorId);
 
-            Role = role;
-            Finaled = finaled;
             CallbackScore = callbackScore;
         }
 

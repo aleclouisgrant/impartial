@@ -14,8 +14,8 @@ namespace Impartial
         public Round Round { get; set; }
         public Role Role { get; set; }
 
-        public List<ICompetitor> Competitors { get; set; }
-        public List<IJudge> Judges { get; set; }
+        public List<ICompetitor> Competitors { get; }
+        public List<IJudge> Judges { get; }
 
         public List<ICompetitor> PromotedCompetitors { get; set; }
 

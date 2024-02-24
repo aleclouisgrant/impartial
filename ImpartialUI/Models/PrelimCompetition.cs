@@ -1,4 +1,5 @@
 ﻿using Impartial;
+using MongoDB.Driver.Core.Operations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,8 @@ namespace ImpartialUI.Models
         public Round Round { get; set; }
         public Role Role { get; set; }
 
-        public List<ICompetitor> Competitors { get; set; } = new();
-        public List<IJudge> Judges { get; set; } = new();
+        public List<ICompetitor> Competitors => GetCompetitors();
+        public List<IJudge> Judges => GetJudges();
 
         public List<ICompetitor> PromotedCompetitors { get; set; } = new();
 
@@ -32,8 +33,6 @@ namespace ImpartialUI.Models
             Round round,
             Role role,
             IEnumerable<IPrelimScore> prelimScores,
-            IEnumerable<ICompetitor> competitors,
-            IEnumerable<IJudge> judges,
             IEnumerable<ICompetitor> promotedCompetitors,
             Guid? id = null)
         {
@@ -116,6 +115,36 @@ namespace ImpartialUI.Models
                 }
             }
             return str;
+        }
+
+        private List<ICompetitor> GetCompetitors()
+        {
+            var competitors = new List<ICompetitor>();
+
+            foreach (var prelimScore in PrelimScores)
+            {
+                if (prelimScore.Competitor != null && !competitors.Contains(prelimScore.Competitor))
+                {
+                    competitors.Add(prelimScore.Competitor);
+                }
+            }
+
+            return competitors;
+        }
+
+        private List<IJudge> GetJudges()
+        {
+            var judges = new List<IJudge>();
+
+            foreach (var prelimScore in PrelimScores)
+            {
+                if (prelimScore.Judge != null && !judges.Contains(prelimScore.Judge))
+                {
+                    judges.Add(prelimScore.Judge);
+                }
+            }
+
+            return judges;
         }
     }
 }

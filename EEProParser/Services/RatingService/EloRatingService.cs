@@ -114,7 +114,7 @@ namespace Impartial
         public static List<ICouple> CalculateFinalsRating(List<ICouple> couples, bool straightToFinals = false)
         {
             //first put the couples in order of average ranking 
-            List<ICouple> couplesPlaced = couples.OrderBy(o => o.ActualPlacement).ToList();
+            List<ICouple> couplesPlaced = couples.OrderBy(o => o.Placement).ToList();
 
             //then compare the probability that their actual placement is their expected placement
             foreach (ICouple coupleA in couplesPlaced)
@@ -131,7 +131,7 @@ namespace Impartial
                 }
 
                 expectedScore = (expectedScore / couplesPlaced.Count());
-                double score = (((double)couplesPlaced.Count() - (double)coupleA.ActualPlacement + 1) / (double)couplesPlaced.Count());
+                double score = (((double)couplesPlaced.Count() - (double)coupleA.Placement + 1) / (double)couplesPlaced.Count());
                 if (!straightToFinals)
                     score = score + 0.2; // BONUS
 
@@ -147,7 +147,7 @@ namespace Impartial
                 coupleA.Follower.FollowStats.Rating = coupleA.Follower.FollowStats.Rating + ratingDifference;
 
                 Trace.WriteLine("{0}. {1} ({2} => {3}) ({4}) & {5} ({6} => {7}) ({8})",
-                    coupleA.ActualPlacement + ". " +
+                    coupleA.Placement + ". " +
                     coupleA.Leader.FullName + " (" + (coupleA.Leader.LeadStats.Rating - ratingDifference).ToString() + " => " + 
                     coupleA.Leader.LeadStats.Rating + ") (" + ratingChange + ") & " + 
                     coupleA.Follower.FullName + " (" + (coupleA.Follower.FollowStats.Rating - ratingDifference).ToString() + " => " + 

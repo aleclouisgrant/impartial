@@ -9,9 +9,6 @@ namespace Impartial
         public IPrelimCompetition PrelimCompetition { get; }
         public IJudge Judge { get; }
         public ICompetitor Competitor { get; }
-
-        public Role Role { get; set; }
-        public bool Finaled { get; set; }
         public CallbackScore CallbackScore { get; set; }
     }
 }
