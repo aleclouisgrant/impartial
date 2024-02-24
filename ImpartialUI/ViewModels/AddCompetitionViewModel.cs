@@ -2,6 +2,7 @@
 using Impartial.Services.ScoresheetParser;
 using ImpartialUI.Commands;
 using ImpartialUI.Enums;
+using ImpartialUI.Models;
 using Microsoft.Win32;
 using MongoDB.Driver;
 using System;
@@ -231,115 +232,6 @@ namespace ImpartialUI.ViewModels
         {
             Competitors = (await _databaseProvider.GetAllCompetitorsAsync()).ToList();
             Judges = (await _databaseProvider.GetAllJudgesAsync()).ToList();
-        }
-
-        private async void TestData()
-        {
-            var competition = new ICompetition()
-            {
-                Date = DateTime.Parse("1-1-2023"),
-                Name = "Countdown Swing Boston",
-                Division = Division.AllStar,
-                Scores = new List<IFinalScore>()
-            };
-
-            IJudge anne = await _databaseProvider.GetJudgeAsync("Anne", "Fleming");
-            IJudge arjay = await _databaseProvider.GetJudgeAsync("Arjay", "Centeno");
-            IJudge bryn = await _databaseProvider.GetJudgeAsync("Bryn", "Anderson");
-            IJudge john = await _databaseProvider.GetJudgeAsync("John", "Lindo");
-            IJudge lemery = await _databaseProvider.GetJudgeAsync("Lemery", "Rollinscott");
-
-            ICompetitor brandon = await _databaseProvider.GetCompetitorAsync("Brandon", "Rasmussen");
-            ICompetitor melodie = await _databaseProvider.GetCompetitorAsync("Melodie", "Paletta");
-            ICompetitor neil = await _databaseProvider.GetCompetitorAsync("Neil", "Joshi");
-            ICompetitor kristen = await _databaseProvider.GetCompetitorAsync("Kristen", "Wallace");
-            ICompetitor lucky = await _databaseProvider.GetCompetitorAsync("Lucky", "Sipin");
-            ICompetitor dimitri = await _databaseProvider.GetCompetitorAsync("Dimitri", "Hector");
-            ICompetitor maxwell = await _databaseProvider.GetCompetitorAsync("Maxwell", "Thew");
-            ICompetitor shanna = await _databaseProvider.GetCompetitorAsync("Shanna", "Porcari");
-            ICompetitor oscar = await _databaseProvider.GetCompetitorAsync("Oscar", "Hampton");
-            ICompetitor saya = await _databaseProvider.GetCompetitorAsync("Sayaka", "Suzaki");
-            ICompetitor joshu = await _databaseProvider.GetCompetitorAsync("Joshu", "Creel");
-            ICompetitor jen = await _databaseProvider.GetCompetitorAsync("Jen", "Ferreira");
-            ICompetitor edem = await _databaseProvider.GetCompetitorAsync("Edem", "Attikese");
-            ICompetitor jia = await _databaseProvider.GetCompetitorAsync("Jia", "Lu");
-            ICompetitor kyle = await _databaseProvider.GetCompetitorAsync("Kyle", "FitzGerald");
-            ICompetitor rachel = await _databaseProvider.GetCompetitorAsync("Rachel", "Shook");
-            ICompetitor sam = await _databaseProvider.GetCompetitorAsync("Sam", "Vaden");
-            ICompetitor elli = await _databaseProvider.GetCompetitorAsync("Elli", "Warner");
-            ICompetitor kaiano = await _databaseProvider.GetCompetitorAsync("Kaiano", "Levine");
-            ICompetitor liz = await _databaseProvider.GetCompetitorAsync("Liz", "Ravdin");
-            ICompetitor alec = await _databaseProvider.GetCompetitorAsync("Alec", "Grant");
-            ICompetitor olivia = await _databaseProvider.GetCompetitorAsync("Olivia", "Burnsed");
-            ICompetitor david = await _databaseProvider.GetCompetitorAsync("David", "Carrington");
-            ICompetitor jesann = await _databaseProvider.GetCompetitorAsync("Jes Ann", "Nail");
-
-            competition.Scores.Add(new FinalScore(competition, anne, brandon, melodie, 1, 1));
-            competition.Scores.Add(new FinalScore(competition, anne, neil, kristen, 4, 2));
-            competition.Scores.Add(new FinalScore(competition, anne, lucky, dimitri, 3, 3));
-            competition.Scores.Add(new FinalScore(competition, anne, maxwell, shanna, 6, 4));
-            competition.Scores.Add(new FinalScore(competition, anne, oscar, saya, 9, 5));
-            competition.Scores.Add(new FinalScore(competition, anne, joshu, jen, 8, 6));
-            competition.Scores.Add(new FinalScore(competition, anne, edem, jia, 5, 7));
-            competition.Scores.Add(new FinalScore(competition, anne, kyle, rachel, 2, 8));
-            competition.Scores.Add(new FinalScore(competition, anne, sam, elli, 12, 9));
-            competition.Scores.Add(new FinalScore(competition, anne, kaiano, liz, 7, 10));
-            competition.Scores.Add(new FinalScore(competition, anne, alec, olivia, 10, 11));
-            competition.Scores.Add(new FinalScore(competition, anne, david, jesann, 11, 12));
-
-            competition.Scores.Add(new FinalScore(competition, arjay, brandon, melodie, 2, 1));
-            competition.Scores.Add(new FinalScore(competition, arjay, neil, kristen, 4, 2));
-            competition.Scores.Add(new FinalScore(competition, arjay, lucky, dimitri, 3, 3));
-            competition.Scores.Add(new FinalScore(competition, arjay, maxwell, shanna, 1, 4));
-            competition.Scores.Add(new FinalScore(competition, arjay, oscar, saya, 5, 5));
-            competition.Scores.Add(new FinalScore(competition, arjay, joshu, jen, 8, 6));
-            competition.Scores.Add(new FinalScore(competition, arjay, edem, jia, 12, 7));
-            competition.Scores.Add(new FinalScore(competition, arjay, kyle, rachel, 6, 8));
-            competition.Scores.Add(new FinalScore(competition, arjay, sam, elli, 7, 9));
-            competition.Scores.Add(new FinalScore(competition, arjay, kaiano, liz, 9, 10));
-            competition.Scores.Add(new FinalScore(competition, arjay, alec, olivia, 10, 11));
-            competition.Scores.Add(new FinalScore(competition, arjay, david, jesann, 11, 12));
-
-            competition.Scores.Add(new FinalScore(competition, bryn, brandon, melodie, 11, 1));
-            competition.Scores.Add(new FinalScore(competition, bryn, neil, kristen, 1, 2));
-            competition.Scores.Add(new FinalScore(competition, bryn, lucky, dimitri, 3, 3));
-            competition.Scores.Add(new FinalScore(competition, bryn, maxwell, shanna, 4, 4));
-            competition.Scores.Add(new FinalScore(competition, bryn, oscar, saya, 2, 5));
-            competition.Scores.Add(new FinalScore(competition, bryn, joshu, jen, 6, 6));
-            competition.Scores.Add(new FinalScore(competition, bryn, edem, jia, 7, 7));
-            competition.Scores.Add(new FinalScore(competition, bryn, kyle, rachel, 10, 8));
-            competition.Scores.Add(new FinalScore(competition, bryn, sam, elli, 5, 9));
-            competition.Scores.Add(new FinalScore(competition, bryn, kaiano, liz, 9, 10));
-            competition.Scores.Add(new FinalScore(competition, bryn, alec, olivia, 8, 11));
-            competition.Scores.Add(new FinalScore(competition, bryn, david, jesann, 12, 12));
-
-            competition.Scores.Add(new FinalScore(competition, john, brandon, melodie, 1, 1));
-            competition.Scores.Add(new FinalScore(competition, john, neil, kristen, 2, 2));
-            competition.Scores.Add(new FinalScore(competition, john, lucky, dimitri, 5, 3));
-            competition.Scores.Add(new FinalScore(competition, john, maxwell, shanna, 3, 4));
-            competition.Scores.Add(new FinalScore(competition, john, oscar, saya, 9, 5));
-            competition.Scores.Add(new FinalScore(competition, john, joshu, jen, 4, 6));
-            competition.Scores.Add(new FinalScore(competition, john, edem, jia, 6, 7));
-            competition.Scores.Add(new FinalScore(competition, john, kyle, rachel, 7, 8));
-            competition.Scores.Add(new FinalScore(competition, john, sam, elli, 8, 9));
-            competition.Scores.Add(new FinalScore(competition, john, kaiano, liz, 10, 10));
-            competition.Scores.Add(new FinalScore(competition, john, alec, olivia, 11, 11));
-            competition.Scores.Add(new FinalScore(competition, john, david, jesann, 12, 12));
-
-            competition.Scores.Add(new FinalScore(competition, lemery, brandon, melodie, 4, 1));
-            competition.Scores.Add(new FinalScore(competition, lemery, neil, kristen, 2, 2));
-            competition.Scores.Add(new FinalScore(competition, lemery, lucky, dimitri, 1, 3));
-            competition.Scores.Add(new FinalScore(competition, lemery, maxwell, shanna, 10, 4));
-            competition.Scores.Add(new FinalScore(competition, lemery, oscar, saya, 3, 5));
-            competition.Scores.Add(new FinalScore(competition, lemery, joshu, jen, 5, 6));
-            competition.Scores.Add(new FinalScore(competition, lemery, edem, jia, 7, 7));
-            competition.Scores.Add(new FinalScore(competition, lemery, kyle, rachel, 12, 8));
-            competition.Scores.Add(new FinalScore(competition, lemery, sam, elli, 9, 9));
-            competition.Scores.Add(new FinalScore(competition, lemery, kaiano, liz, 6, 10));
-            competition.Scores.Add(new FinalScore(competition, lemery, alec, olivia, 8, 11));
-            competition.Scores.Add(new FinalScore(competition, lemery, david, jesann, 11, 12));
-
-            Competition = competition;
         }
 
         private void Clear()

@@ -17,7 +17,7 @@ namespace Impartial
         Task<IJudge?> GetJudgeAsync(Guid id);
         Task<IJudge?> GetJudgeAsync(string firstName, string lastName);
         Task<IEnumerable<IJudge>> GetAllJudgesAsync();
-        Task DeleteJudgeAsync(IJudge judge);
+        Task DeleteJudgeAsync(Guid id);
         Task DeleteAllJudgesAsync();
 
         Task UpsertDanceConventionAsync(IDanceConvention convention);

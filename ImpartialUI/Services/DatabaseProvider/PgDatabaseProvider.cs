@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
-using System.Numerics;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -429,7 +428,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             return results;
         }
-        public async Task DeleteJudgeAsync(IJudge judge)
+        public async Task DeleteJudgeAsync(Guid id)
         {
         }
         public async Task DeleteAllJudgesAsync()
