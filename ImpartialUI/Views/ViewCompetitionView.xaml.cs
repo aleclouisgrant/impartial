@@ -60,29 +60,6 @@ namespace ImpartialUI.Views
             SaveButton.Visibility = Visibility.Collapsed;
 
             CompetitionComboBox.IsEnabled = true;
-
-            //if (CompetitionComboBox.SelectedValue != null)
-            //{
-            //    CompetitionViewerGrid.Visibility = Visibility.Visible;
-
-            //    if (((ICompetition)CompetitionComboBox.SelectedValue).HasRound(1))
-            //    {
-            //        PrelimsViewerGrid.Visibility = Visibility.Visible;
-            //    }
-            //    else
-            //    {
-            //        PrelimsViewerGrid.Visibility = Visibility.Collapsed;
-            //    }
-
-            //    if (((ICompetition)CompetitionComboBox.SelectedValue).HasRound(2))
-            //    {
-            //        SemisViewerGrid.Visibility = Visibility.Visible;
-            //    }
-            //    else
-            //    {
-            //        SemisViewerGrid.Visibility = Visibility.Collapsed;
-            //    }
-            //}
         }
 
         private void CompetitionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

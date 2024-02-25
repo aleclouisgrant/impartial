@@ -10,6 +10,9 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Background="White"
              d:DataContext="{d:DesignInstance Type=vm:ViewCompetitionViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,19 +23,21 @@
             <ComboBox x:Name="CompetitionComboBox" Width="500" Margin="5"
                       SelectionChanged="CompetitionComboBox_SelectionChanged"
                       ItemsSource="{Binding Competitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                      SelectedItem="{Binding SelectedCompetition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button x:Name="RefreshButton" Content="Refresh" Command="{Binding RefreshCompetitionsCommand}" Width="70" Height="30"/>
             <Button x:Name="SaveButton" Content="Save" Command="{Binding SaveCompetitionCommand}" Click="SaveButton_Click" Width="70" Height="30" Visibility="Collapsed"/>
             <Button x:Name="EditButton" Content="Edit" Click="EditCompetitionButton_Click" Width="70" Height="30" Margin="5 0 0 0"/>
             <Button x:Name="DeleteButton" Content="Delete" Command="{Binding DeleteCompetitionCommand}" Width="70" Height="30" Margin="5 0 0 0"/>
         </StackPanel>
 
-        <Grid Grid.Row="1" x:Name="CompetitionViewerGrid" Visibility="Collapsed">
-            <ScrollViewer>
+        <Grid Grid.Row="1" x:Name="CompetitionViewerGrid">
+            <ScrollViewer >
                 <StackPanel Orientation="Vertical">
-                    <c:FinalCompetitionViewer FinalCompetition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid Visibility="{Binding ShowFinals, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <c:FinalCompetitionViewer FinalCompetition="{Binding FinalCompetition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
 
-                    <Grid x:Name="SemisViewerGrid" Margin="0 10 0 0" Visibility="Collapsed">
+                    <Grid x:Name="SemisViewerGrid" Margin="0 10 0 0" Visibility="{Binding ShowSemis, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition Width="20"/>
@@ -43,7 +48,7 @@
                         <c:PrelimCompetitionViewer Grid.Column="2" PrelimCompetition="{Binding FollowerSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
 
-                    <Grid x:Name="PrelimsViewerGrid" Margin="0 10 0 0" Visibility="Collapsed">
+                    <Grid x:Name="PrelimsViewerGrid" Margin="0 10 0 0" Visibility="{Binding ShowPrelims, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition Width="20"/>

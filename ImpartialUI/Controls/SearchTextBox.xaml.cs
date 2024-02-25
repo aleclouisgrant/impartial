@@ -16,12 +16,12 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty SelectedPersonProperty = DependencyProperty.Register(
             nameof(SelectedPerson),
-            typeof(PersonModel),
+            typeof(IPersonModel),
             typeof(SearchTextBox),
             new FrameworkPropertyMetadata());
-        public PersonModel SelectedPerson
+        public IPersonModel SelectedPerson
         {
-            get { return (PersonModel)GetValue(SelectedPersonProperty); }
+            get { return (IPersonModel)GetValue(SelectedPersonProperty); }
             set { SetValue(SelectedPersonProperty, value); }
         }
 
@@ -44,18 +44,18 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             nameof(ItemsSource),
-            typeof(IEnumerable<PersonModel>),
+            typeof(IEnumerable<IPersonModel>),
             typeof(SearchTextBox),
             new FrameworkPropertyMetadata(null, OnItemsSourcePropertyChanged));
-        public IEnumerable<PersonModel> ItemsSource
+        public IEnumerable<IPersonModel> ItemsSource
         {
-            get { return (IEnumerable<PersonModel>)GetValue(ItemsSourceProperty); }
+            get { return (IEnumerable<IPersonModel>)GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
         }
         private static void OnItemsSourcePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var control = (SearchTextBox)source;
-            control.ComboBoxItems.ItemsSource = (IEnumerable<PersonModel>)e.NewValue;
+            control.ComboBoxItems.ItemsSource = (IEnumerable<IPersonModel>)e.NewValue;
 
             control.GuessPerson();
         }
@@ -155,12 +155,12 @@ namespace ImpartialUI.Controls
             ComboBoxItems.SelectedItem = GetClosestPersonByFirstName(Text, ItemsSource.ToList());
         }
 
-        private PersonModel GetClosestPersonByFirstName(string input, List<PersonModel> list)
+        private IPersonModel GetClosestPersonByFirstName(string input, List<IPersonModel> list)
         {
             int leastDistance = 10000;
-            PersonModel match = null;
+            IPersonModel match = null;
 
-            foreach (PersonModel j in list)
+            foreach (IPersonModel j in list)
             {
                 int d = GetEditDistance(input, j.FirstName);
                 if (d == 0)

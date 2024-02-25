@@ -56,7 +56,7 @@ namespace ImpartialUI.Models
 
         public override string ToString()
         {
-            return Name + " " + Division + " Jack & Jill (" + Date.ToShortDateString() + ")";
+            return Name + " " + Util.DivisionToString(Division) + " Jack & Jill (" + Date.ToShortDateString() + ")";
         }
         public string ToLongString()
         {

@@ -112,7 +112,7 @@ namespace ImpartialUI.Controls
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
-                searchTextBox.ItemsSource = (IEnumerable<PersonModel>)Competitors;
+                searchTextBox.ItemsSource = Competitors;
 
                 if (selectedId != null)
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
@@ -124,7 +124,7 @@ namespace ImpartialUI.Controls
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
-                searchTextBox.ItemsSource = (IEnumerable<PersonModel>)Judges;
+                searchTextBox.ItemsSource = Judges;
 
                 if (selectedId != null)
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault(); ;
@@ -168,7 +168,7 @@ namespace ImpartialUI.Controls
             var leaderSearchBox = new SearchTextBox()
             {
                 Margin = new Thickness(1),
-                ItemsSource = (IEnumerable<PersonModel>)Competitors,
+                ItemsSource = Competitors,
                 SelectedPerson = null,
                 Placement = FinalCompetition.Couples.Count + 1
             };
@@ -207,7 +207,7 @@ namespace ImpartialUI.Controls
             var followerSearchBox = new SearchTextBox()
             {
                 Margin = new Thickness(1),
-                ItemsSource = (IEnumerable<PersonModel>)Competitors,
+                ItemsSource = Competitors,
                 SelectedPerson = null,
             };
 
@@ -303,7 +303,7 @@ namespace ImpartialUI.Controls
 
             SearchTextBox judgeSearchBox = new SearchTextBox()
             {
-                ItemsSource = (IEnumerable<PersonModel>)Judges,
+                ItemsSource = Judges,
                 SelectedPerson = null
             };
 

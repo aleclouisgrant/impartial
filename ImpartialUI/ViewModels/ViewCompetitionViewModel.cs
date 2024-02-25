@@ -25,14 +25,23 @@ namespace ImpartialUI.ViewModels
         { 
             get { return _selectedCompetition; }
             set 
-            { 
+            {
                 _selectedCompetition = value;
                 OnPropertyChanged();
+
                 OnPropertyChanged(nameof(LeaderPrelims));
                 OnPropertyChanged(nameof(FollowerPrelims));
                 OnPropertyChanged(nameof(LeaderSemis));
                 OnPropertyChanged(nameof(FollowerSemis));
                 OnPropertyChanged(nameof(FinalCompetition));
+
+                ShowFinals = SelectedCompetition?.FinalCompetition != null;
+                ShowPrelims = SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault() != null;
+                ShowSemis = SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault() != null;
+
+                OnPropertyChanged(nameof(ShowPrelims));
+                OnPropertyChanged(nameof(ShowSemis));
+                OnPropertyChanged(nameof(ShowFinals));
             }
         }
 
@@ -44,21 +53,16 @@ namespace ImpartialUI.ViewModels
 
         public IFinalCompetition FinalCompetition => SelectedCompetition?.FinalCompetition;
 
+        public bool ShowPrelims { get; set; }
+        public bool ShowSemis { get; set; }
+        public bool ShowFinals { get; set; }
+
         public ICommand RefreshCompetitionsCommand { get; set; }
         public ICommand SaveCompetitionCommand { get; set; }
         public ICommand DeleteCompetitionCommand { get; set; }
 
         public ViewCompetitionViewModel()
         {
-            RefreshCompetitionsCommand = new DelegateCommand(RefreshCompetitions);
-            SaveCompetitionCommand = new DelegateCommand(SaveCompetition);
-            DeleteCompetitionCommand = new DelegateCommand(DeleteCompetition);
-        }
-
-        public ViewCompetitionViewModel(List<ICompetition> competitions)
-        {
-            Competitions = competitions;
-
             RefreshCompetitionsCommand = new DelegateCommand(RefreshCompetitions);
             SaveCompetitionCommand = new DelegateCommand(SaveCompetition);
             DeleteCompetitionCommand = new DelegateCommand(DeleteCompetition);

@@ -147,10 +147,10 @@ namespace ImpartialUI.Controls
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
-                searchTextBox.ItemsSource = (IEnumerable<PersonModel>)Competitors;
+                searchTextBox.ItemsSource = Competitors;
 
                 if (selectedId != null)
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.Id == selectedId);
             }
         }
         public void UpdateJudges()
@@ -158,10 +158,10 @@ namespace ImpartialUI.Controls
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
-                searchTextBox.ItemsSource = (IEnumerable<PersonModel>)Judges;
+                searchTextBox.ItemsSource = Judges;
 
                 if (selectedId != null)
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault(); ;
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.Id == selectedId); ;
             }
         }
 

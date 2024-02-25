@@ -178,12 +178,12 @@ namespace ImpartialUI.Services.DatabaseProvider
         {
             var danceConvention = new DanceConvention(
                 name: "Countdown Swing Boston", 
-                date: DateTime.Parse("1-1-2023"));
+                date: DateTime.Parse("12-31-2022"));
 
             var competition = new Competition(
                 danceConventionId: danceConvention.Id, 
-                name: "Countdown Swing Boston", 
-                date: DateTime.Parse("1-1-2023"), 
+                name: danceConvention.Name, 
+                date: DateTime.Parse("12-31-2022"), 
                 division: Division.AllStar);
 
             IJudge anne = new Judge("Anne", "Fleming");
@@ -219,7 +219,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             competition.FinalCompetition = new FinalCompetition(
                 dateTime: competition.Date, 
-                division: Division.AllStar, 
+                division: competition.Division, 
                 finalScores: new());
 
             competition.FinalCompetition.FinalScores.Add(new FinalScore(anne, brandon, melodie, 1, 1));

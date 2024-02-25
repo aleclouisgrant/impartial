@@ -155,88 +155,9 @@ namespace Impartial
             }
         }
 
-        public static string CallbackScoreToString(CallbackScore score)
-        {
-            switch (score)
-            {
-                case CallbackScore.Alt1:
-                    return "A1";
-                case CallbackScore.Alt2:
-                    return "A2";
-                case CallbackScore.Alt3:
-                    return "A3";
-                case CallbackScore.Yes:
-                    return "Y";
-                case CallbackScore.No:
-                    return "N";
-                default:
-                case CallbackScore.NoScore:
-                    return "";
-            }
-        }
 
-        public static CallbackScore StringToCallbackScore(string score)
-        {
-            switch (score)
-            {
-                case "A1":
-                case "Alt1":
-                case "Alternate1":
-                case "45":
-                    return CallbackScore.Alt1;
-                case "A2":
-                case "Alt2":
-                case "Alternate2":
-                case "43":
-                    return CallbackScore.Alt2;
-                case "A3":
-                case "Alt3":
-                case "Alternate3":
-                case "42":
-                    return CallbackScore.Alt3;
-                case "Y":
-                case "Yes":
-                case "100":
-                    return CallbackScore.Yes;
-                case "N":
-                case "No":
-                case "0":
-                    return CallbackScore.No;
-                default:
-                    return CallbackScore.NoScore;
-            }
-        }
 
-        public static Role StringToRole(string role)
-        {
-            switch (role)
-            {
-                case "Follower":
-                    return Role.Follower;
-                default:
-                case "Leader":
-                    return Role.Leader;
-            }
-        }
 
-        public static CallbackScore NumberToCallbackScore(double value)
-        {
-            switch (value)
-            {
-                case 10:
-                    return CallbackScore.Yes;
-                case 4.5:
-                    return CallbackScore.Alt1;
-                case 4.3:
-                    return CallbackScore.Alt2;
-                case 4.2:
-                    return CallbackScore.Alt3;
-                case 0:
-                    return CallbackScore.No;
-                default:
-                    return CallbackScore.NoScore;
-            }
-        }
 
         public static double GetAccuracy(int placement, int actualPlacement)
         {
@@ -380,6 +301,66 @@ namespace Impartial
             return -1;
         }
 
+        public static Role StringToRole(string role)
+        {
+            switch (role)
+            {
+                case "Follower":
+                    return Role.Follower;
+                default:
+                case "Leader":
+                    return Role.Leader;
+            }
+        }
+        public static CallbackScore StringToCallbackScore(string score)
+        {
+            switch (score)
+            {
+                case "A1":
+                case "Alt1":
+                case "Alternate1":
+                case "45":
+                    return CallbackScore.Alt1;
+                case "A2":
+                case "Alt2":
+                case "Alternate2":
+                case "43":
+                    return CallbackScore.Alt2;
+                case "A3":
+                case "Alt3":
+                case "Alternate3":
+                case "42":
+                    return CallbackScore.Alt3;
+                case "Y":
+                case "Yes":
+                case "100":
+                    return CallbackScore.Yes;
+                case "N":
+                case "No":
+                case "0":
+                    return CallbackScore.No;
+                default:
+                    return CallbackScore.NoScore;
+            }
+        }
+        public static CallbackScore NumberToCallbackScore(double value)
+        {
+            switch (value)
+            {
+                case 10:
+                    return CallbackScore.Yes;
+                case 4.5:
+                    return CallbackScore.Alt1;
+                case 4.3:
+                    return CallbackScore.Alt2;
+                case 4.2:
+                    return CallbackScore.Alt3;
+                case 0:
+                    return CallbackScore.No;
+                default:
+                    return CallbackScore.NoScore;
+            }
+        }
         public static Division GetDivisionFromString(string s)
         {
             switch (s)
@@ -430,6 +411,47 @@ namespace Impartial
                 default:
                 case "Finals":
                     return Round.Finals;
+            }
+        }
+
+        public static string CallbackScoreToString(CallbackScore score)
+        {
+            switch (score)
+            {
+                case CallbackScore.Alt1:
+                    return "A1";
+                case CallbackScore.Alt2:
+                    return "A2";
+                case CallbackScore.Alt3:
+                    return "A3";
+                case CallbackScore.Yes:
+                    return "Y";
+                case CallbackScore.No:
+                    return "N";
+                default:
+                case CallbackScore.NoScore:
+                    return "";
+            }
+        }
+        public static string DivisionToString(Division division)
+        {
+            switch(division)
+            {
+                case Division.Newcomer:
+                    return "Newcomer";
+                case Division.Novice:
+                    return "Novice";
+                case Division.Intermediate:
+                    return "Intermediate";
+                case Division.Advanced:
+                    return "Advanced";
+                case Division.AllStar:
+                    return "All Star";
+                case Division.Champion:
+                    return "Champion";
+                default:
+                case Division.Open:
+                    return "Open";
             }
         }
 

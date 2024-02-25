@@ -71,8 +71,11 @@ namespace ImpartialUI.Controls
             Grid.SetColumn(competitorBorder, 1);
 
             var finalCompetition = (IFinalCompetition)e.NewValue;
+            viewer.TitleTextBlock.Text = "";
             if (finalCompetition == null)
                 return;
+
+            viewer.TitleTextBlock.Text = "Jack & Jill " + Util.DivisionToString(finalCompetition.Division) + " Finals";
 
             var judges = finalCompetition.Judges?.OrderBy(j => j.FullName);
             var couples = finalCompetition.Couples;
