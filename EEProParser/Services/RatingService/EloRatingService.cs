@@ -31,82 +31,83 @@ namespace Impartial
 
         public static List<ICompetitor> PrelimRatings(IPrelimCompetition prelimCompetition)
         {
-            List<Tuple<ICompetitor, List<IPrelimScore>>> finalists = new(); 
-            List<Tuple<ICompetitor, List<IPrelimScore>>> nonFinalists = new();  
+            List<ICompetitor> competitors = new();
 
-            foreach (var prelimScore in prelimCompetition.PrelimScores)
-            {
-                if (prelimCompetition.PromotedCompetitors.Contains(prelimScore.Competitor))
-                {
-                    var competitor = finalists.Where(f => f.Item1.Id == prelimScore.Competitor.Id).FirstOrDefault();
+            //TODO:
+            //List<Tuple<ICompetitor, List<IPrelimScore>>> finalists = new(); 
+            //List<Tuple<ICompetitor, List<IPrelimScore>>> nonFinalists = new();  
 
-                    if (competitor != null)
-                    {
-                        finalists.
-                    }
-                }
-                else
-                {
+            //foreach (var prelimScore in prelimCompetition.PrelimScores)
+            //{
+            //    if (prelimCompetition.PromotedCompetitors.Contains(prelimScore.Competitor))
+            //    {
+            //        var competitor = finalists.Where(f => f.Item1.Id == prelimScore.Competitor.Id).FirstOrDefault();
 
-                }
+            //        if (competitor != null)
+            //        {
 
+            //        }
+            //    }
+            //    else
+            //    {
 
-            }
+            //    }
+            //}
 
-            int totalNumber = prelimCompetition.Competitors.Count();
-            int finalistSpots = finalists.Count();
-            int ratingSum = 0;
-            double maxScore = 1;
+            //int totalNumber = prelimCompetition.Competitors.Count();
+            //int finalistSpots = finalists.Count();
+            //int ratingSum = 0;
+            //double maxScore = 1;
 
-            if (prelimCompetition.Role == Role.Leader)
-            {
-                ratingSum = finalists.Sum(c => c.Item1.LeadStats.Rating);
-                maxScore = prelimCompetition.Judges.Count() * 10;
-            }
-            else if (prelimCompetition.Role == Role.Follower)
-            {
-                ratingSum = finalists.Sum(c => c.Item1.FollowStats.Rating);
-                maxScore = prelimCompetition.Judges.Count() * 10;
-            }
+            //if (prelimCompetition.Role == Role.Leader)
+            //{
+            //    ratingSum = finalists.Sum(c => c.Item1.LeadStats.Rating);
+            //    maxScore = prelimCompetition.Judges.Count() * 10;
+            //}
+            //else if (prelimCompetition.Role == Role.Follower)
+            //{
+            //    ratingSum = finalists.Sum(c => c.Item1.FollowStats.Rating);
+            //    maxScore = prelimCompetition.Judges.Count() * 10;
+            //}
 
-            int averageRating = ratingSum / finalistSpots;
+            //int averageRating = ratingSum / finalistSpots;
 
-            foreach (var competitor in prelimCompetition.Competitors)
-            {
-                int ratingDifference = 0;
+            //foreach (var competitor in prelimCompetition.Competitors)
+            //{
+            //    int ratingDifference = 0;
 
-                double score = prelimScores.Where(s => s.Competitor.Id == competitor.Id).Sum(s => (int)s.CallbackScore) / 10;
-                double normalizedScore = (score / maxScore);
-                double bonus = ((double)(round - 1) * 0.3);
-                bonus = 0; //taking out bonus for now
+            //    double score = prelimCompetition.PrelimScores.Where(s => s.Competitor.Id == competitor.Id).Sum(s => (int)s.CallbackScore) / 10;
+            //    double normalizedScore = (score / maxScore);
+            //    double bonus = ((double)(round - 1) * 0.3);
+            //    bonus = 0; //taking out bonus for now
 
-                if (prelimCompetition.Role == Role.Leader)
-                {
-                    double expectedScore = ExpectedScore(competitor.LeadStats.Rating, averageRating);
-                    ratingDifference = UpdateRating(competitor.LeadStats.Rating, normalizedScore + bonus, expectedScore) - competitor.LeadStats.Rating;
-                    competitor.LeadStats.Rating = competitor.LeadStats.Rating + ratingDifference;
-                }
-                else if (prelimCompetition.Role == Role.Follower)
-                {
-                    double expectedScore = ExpectedScore(competitor.FollowStats.Rating, averageRating);
-                    ratingDifference = UpdateRating(competitor.FollowStats.Rating, normalizedScore + bonus, expectedScore) - competitor.FollowStats.Rating;
-                    competitor.FollowStats.Rating = competitor.FollowStats.Rating + ratingDifference;
-                }
+            //    if (prelimCompetition.Role == Role.Leader)
+            //    {
+            //        double expectedScore = ExpectedScore(competitor.LeadStats.Rating, averageRating);
+            //        ratingDifference = UpdateRating(competitor.LeadStats.Rating, normalizedScore + bonus, expectedScore) - competitor.LeadStats.Rating;
+            //        competitor.LeadStats.Rating = competitor.LeadStats.Rating + ratingDifference;
+            //    }
+            //    else if (prelimCompetition.Role == Role.Follower)
+            //    {
+            //        double expectedScore = ExpectedScore(competitor.FollowStats.Rating, averageRating);
+            //        ratingDifference = UpdateRating(competitor.FollowStats.Rating, normalizedScore + bonus, expectedScore) - competitor.FollowStats.Rating;
+            //        competitor.FollowStats.Rating = competitor.FollowStats.Rating + ratingDifference;
+            //    }
 
-                string ratingChange;
-                if (ratingDifference > 0)
-                    ratingChange = "+" + ratingDifference;
-                else
-                    ratingChange = ratingDifference.ToString();
+            //    string ratingChange;
+            //    if (ratingDifference > 0)
+            //        ratingChange = "+" + ratingDifference;
+            //    else
+            //        ratingChange = ratingDifference.ToString();
 
-                if (finalists.Any(c => c.Item1.Id == competitor.Id))
-                    Trace.Write("*");
+            //    if (finalists.Any(c => c.Item1.Id == competitor.Id))
+            //        Trace.Write("*");
 
-                if (prelimCompetition.Role == Role.Leader)
-                    Trace.WriteLine(competitor.FullName + " (" + (competitor.LeadStats.Rating - ratingDifference).ToString() + " => " + competitor.LeadStats.Rating + ") (" + ratingChange + ")");
-                else if (prelimCompetition.Role == Role.Follower)
-                    Trace.WriteLine(competitor.FullName + " (" + (competitor.FollowStats.Rating - ratingDifference).ToString() + " => " + competitor.FollowStats.Rating + ") (" + ratingChange + ")");
-            }
+            //    if (prelimCompetition.Role == Role.Leader)
+            //        Trace.WriteLine(competitor.FullName + " (" + (competitor.LeadStats.Rating - ratingDifference).ToString() + " => " + competitor.LeadStats.Rating + ") (" + ratingChange + ")");
+            //    else if (prelimCompetition.Role == Role.Follower)
+            //        Trace.WriteLine(competitor.FullName + " (" + (competitor.FollowStats.Rating - ratingDifference).ToString() + " => " + competitor.FollowStats.Rating + ") (" + ratingChange + ")");
+            //}
 
             return competitors;
         }

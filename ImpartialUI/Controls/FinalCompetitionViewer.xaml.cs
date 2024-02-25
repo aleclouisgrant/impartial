@@ -174,18 +174,18 @@ namespace ImpartialUI.Controls
                         Margin = new Thickness(1)
                     };
 
-                    if (score.Placement == score.Placement){
-                        textBlock.Text = score.Placement.ToString();
+                    if (score.Score == score.Score){
+                        textBlock.Text = score.Score.ToString();
                     }
                     else
                     {
                         textBlock.Inlines.Add(new Run()
                         {
-                            Text = score.Placement.ToString()
+                            Text = score.Score.ToString()
                         });
                         textBlock.Inlines.Add(new Run()
                         {
-                            Text = " (" + (-1 * Math.Abs(score.Placement - score.Placement)).ToString() + ")",
+                            Text = " (" + (-1 * Math.Abs(score.Score - score.Score)).ToString() + ")",
                             Foreground = Brushes.Red
                         });
                     }

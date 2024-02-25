@@ -144,5 +144,10 @@ namespace ImpartialUI.Models
 
             return judges;
         }
+
+        public void Clear()
+        {
+            PrelimScores.Clear();
+        }
     }
 }

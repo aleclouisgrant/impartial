@@ -9,7 +9,7 @@
              xmlns:local="clr-namespace:ImpartialUI.Views"
              xmlns:converters="clr-namespace:ImpartialUI.Converters"
              xmlns:uiEnums="clr-namespace:ImpartialUI.Enums"
-             xmlns:enums="clr-namespace:Impartial.Enums"
+             xmlns:imp="clr-namespace:Impartial"
              mc:Ignorable="d"
              x:Name="View"
              d:DesignHeight="800" d:DesignWidth="1600"
@@ -201,7 +201,7 @@
                         <c:PrelimCompetitionAdder 
                             x:Name="LeaderPrelimsAdder" 
                             Grid.Column="2" 
-                            Round="{x:Static enums:Round.Prelims}" 
+                            Round="{x:Static imp:Round.Prelims}" 
                             Role="Leader" 
                             PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -224,7 +224,7 @@
                         <c:PrelimCompetitionAdder 
                             x:Name="FollowersPrelimsAdder" 
                             Grid.Column="2" 
-                            Round="{x:Static enums:Round.Prelims}" 
+                            Round="{x:Static imp:Round.Prelims}" 
                             Role="Follower" 
                             PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -249,7 +249,7 @@
                             x:Name="LeaderSemisAdder" 
                             Grid.Column="2" 
                             Role="Leader" 
-                            Round="{x:Static enums:Round.Semifinals}" 
+                            Round="{x:Static imp:Round.Semifinals}" 
                             PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -272,7 +272,7 @@
                             x:Name="FollowerSemisAdder" 
                             Grid.Column="2" 
                             Role="Follower" 
-                            Round="{x:Static enums:Round.Semifinals}" 
+                            Round="{x:Static imp:Round.Semifinals}" 
                             PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>

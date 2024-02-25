@@ -98,7 +98,7 @@ namespace ImpartialUI.Controls
 
             var placementTextBlock = new TextBlock()
             {
-                Text = scores.First().ActualPlacement.ToString(),
+                Text = scores.First().Placement.ToString(),
                 Margin = new Thickness(1)
             };
 
@@ -176,19 +176,19 @@ namespace ImpartialUI.Controls
                     Margin = new Thickness(1)
                 };
 
-                if (score.Placement == score.ActualPlacement)
+                if (score.Score == score.Placement)
                 {
-                    textBlock.Text = score.Placement.ToString();
+                    textBlock.Text = score.Score.ToString();
                 }
                 else
                 {
                     textBlock.Inlines.Add(new Run()
                     {
-                        Text = score.Placement.ToString()
+                        Text = score.Score.ToString()
                     });
                     textBlock.Inlines.Add(new Run()
                     {
-                        Text = " (" + (-1 * Math.Abs(score.Placement - score.ActualPlacement)).ToString() + ")",
+                        Text = " (" + (-1 * Math.Abs(score.Score - score.Placement)).ToString() + ")",
                         Foreground = Brushes.Red
                     });
                 }
