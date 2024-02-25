@@ -36,13 +36,13 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        public IPrelimCompetition LeaderPrelims => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().LeaderPrelimCompetition;
-        public IPrelimCompetition FollowerPrelims => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().FollowerPrelimCompetition;
+        public IPrelimCompetition LeaderPrelims => SelectedCompetition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerPrelims => SelectedCompetition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.FollowerPrelimCompetition;
 
-        public IPrelimCompetition LeaderSemis => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().LeaderPrelimCompetition;
-        public IPrelimCompetition FollowerSemis => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().FollowerPrelimCompetition;
+        public IPrelimCompetition LeaderSemis => SelectedCompetition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault()?.LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerSemis => SelectedCompetition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault()?.FollowerPrelimCompetition;
 
-        public IFinalCompetition FinalCompetition => SelectedCompetition.FinalCompetition;
+        public IFinalCompetition FinalCompetition => SelectedCompetition?.FinalCompetition;
 
         public ICommand RefreshCompetitionsCommand { get; set; }
         public ICommand SaveCompetitionCommand { get; set; }

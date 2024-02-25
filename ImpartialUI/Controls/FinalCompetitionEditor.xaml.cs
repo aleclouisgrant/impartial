@@ -63,7 +63,7 @@ namespace ImpartialUI.Controls
             nameof(Competitors),
             typeof(List<ICompetitor>),
             typeof(FinalCompetitionEditor),
-            new FrameworkPropertyMetadata(1, OnCompetitorsPropertyChanged));
+            new FrameworkPropertyMetadata(new List<ICompetitor>(), OnCompetitorsPropertyChanged));
         public List<ICompetitor> Competitors
         {
             get { return (List<ICompetitor>)GetValue(CompetitorsProperty); }
@@ -77,7 +77,7 @@ namespace ImpartialUI.Controls
             nameof(Judges),
             typeof(List<IJudge>),
             typeof(FinalCompetitionEditor),
-            new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
+            new FrameworkPropertyMetadata(new List<IJudge>(), OnJudgesPropertyChanged));
         public List<IJudge> Judges
         {
             get { return (List<IJudge>)GetValue(JudgesProperty); }

@@ -1,6 +1,7 @@
 ﻿using Impartial;
 using ImpartialUI.Services.DatabaseProvider;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ImpartialUI
@@ -13,5 +14,17 @@ namespace ImpartialUI
 
         public static List<IJudge> JudgesDb { get; set; } = new List<IJudge>();
         public static List<ICompetitor> CompetitorsDb { get; set;} = new List<ICompetitor>();
+
+        public App()
+        {
+            InitializeComponent();
+            RefreshCaches();
+        }
+
+        public async Task RefreshCaches()
+        {
+            JudgesDb = (List<IJudge>)await DatabaseProvider.GetAllJudgesAsync();
+            CompetitorsDb = (List<ICompetitor>)await DatabaseProvider.GetAllCompetitorsAsync();
+        }
     }
 }

@@ -167,13 +167,13 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        public IPrelimCompetition LeaderPrelims => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().LeaderPrelimCompetition;
-        public IPrelimCompetition FollowerPrelims => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().FollowerPrelimCompetition;
+        public IPrelimCompetition LeaderPrelims => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerPrelims => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.FollowerPrelimCompetition;
 
-        public IPrelimCompetition LeaderSemis => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().LeaderPrelimCompetition;
-        public IPrelimCompetition FollowerSemis => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().FollowerPrelimCompetition;
+        public IPrelimCompetition LeaderSemis => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault()?.LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerSemis => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault()?.FollowerPrelimCompetition;
 
-        public IFinalCompetition FinalCompetition => Competition.FinalCompetition;
+        public IFinalCompetition FinalCompetition => Competition?.FinalCompetition;
 
 
         private double _parseProgressPercentage;
@@ -246,8 +246,6 @@ namespace ImpartialUI.ViewModels
             Competitors = competitors;
             Judges = judges;
 
-            RefreshCache();
-
             //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
             //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-04-01 city of angels\prelims.html";
             //SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\semis.html";
@@ -257,8 +255,8 @@ namespace ImpartialUI.ViewModels
 
         private async void RefreshCache()
         {
-            Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
-            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
+            //Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
+            //Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
         }
 
         private void Clear()

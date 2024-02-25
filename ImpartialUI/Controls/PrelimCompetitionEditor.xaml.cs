@@ -87,7 +87,7 @@ namespace ImpartialUI.Controls
             nameof(Round),
             typeof(Round),
             typeof(PrelimCompetitionEditor),
-            new FrameworkPropertyMetadata(1, OnRoundPropertyChanged));
+            new FrameworkPropertyMetadata(Round.Prelims, OnRoundPropertyChanged));
         public Round Round
         {
             get { return (Round)GetValue(RoundProperty); }
@@ -102,7 +102,7 @@ namespace ImpartialUI.Controls
             nameof(Competitors),
             typeof(List<ICompetitor>),
             typeof(PrelimCompetitionEditor),
-            new FrameworkPropertyMetadata(1, OnCompetitorsPropertyChanged));
+            new FrameworkPropertyMetadata(new List<ICompetitor>(), OnCompetitorsPropertyChanged));
         public List<ICompetitor> Competitors
         {
             get { return (List<ICompetitor>)GetValue(CompetitorsProperty); }
@@ -116,7 +116,7 @@ namespace ImpartialUI.Controls
             nameof(Judges),
             typeof(List<IJudge>),
             typeof(PrelimCompetitionEditor),
-            new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
+            new FrameworkPropertyMetadata(new List<IJudge>(), OnJudgesPropertyChanged));
         public List<IJudge> Judges
         {
             get { return (List<IJudge>)GetValue(JudgesProperty); }

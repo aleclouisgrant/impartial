@@ -202,8 +202,7 @@
                             x:Name="LeaderPrelimsAdder" 
                             Grid.Column="2" 
                             Round="{x:Static imp:Round.Prelims}" 
-                            Role="Leader" 
-                            PrelimCompetition="{Binding LeaderPrelims, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            PrelimCompetition="{Binding LeaderPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -225,8 +224,7 @@
                             x:Name="FollowersPrelimsAdder" 
                             Grid.Column="2" 
                             Round="{x:Static imp:Round.Prelims}" 
-                            Role="Follower" 
-                            PrelimCompetition="{Binding FollowerPrelims, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PrelimCompetition="{Binding FollowerPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -248,9 +246,8 @@
                         <c:PrelimCompetitionEditor
                             x:Name="LeaderSemisAdder" 
                             Grid.Column="2" 
-                            Role="Leader" 
                             Round="{x:Static imp:Round.Semifinals}" 
-                            PrelimCompetition="{Binding LeaderSemis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PrelimCompetition="{Binding LeaderSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -271,9 +268,8 @@
                         <c:PrelimCompetitionEditor
                             x:Name="FollowerSemisAdder" 
                             Grid.Column="2" 
-                            Role="Follower" 
                             Round="{x:Static imp:Round.Semifinals}" 
-                            PrelimCompetition="{Binding FollowerSemis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PrelimCompetition="{Binding FollowerSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -294,7 +290,7 @@
                         <c:FinalCompetitionEditor 
                             x:Name="FinalsCompetitionAdder" 
                             Grid.Row="1" 
-                            FinalCompetition="{Binding FinalCompetition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            FinalCompetition="{Binding FinalCompetition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Margin="10"/>

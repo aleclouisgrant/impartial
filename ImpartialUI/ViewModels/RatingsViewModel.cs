@@ -174,27 +174,13 @@ namespace ImpartialUI.ViewModels
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             RefreshCompetitorsCommand = new DelegateCommand(RefreshCompetitors);
             ResetRatingsCommand = new DelegateCommand(ResetRatings);
-            CrunchRatingsCommand = new DelegateCommand(CrunchRatings);
-
-            Initialize();
-        }
-
-        public RatingsViewModel(List<ICompetitor> competitors, List<ICompetition> competitions)
-        {
-            _databaseProvider = App.DatabaseProvider;
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
-
-            AddCompetitorCommand = new DelegateCommand(AddCompetitor);
-            RefreshCompetitorsCommand = new DelegateCommand(RefreshCompetitors);
-            ResetRatingsCommand = new DelegateCommand(ResetRatings);
-            CrunchRatingsCommand = new DelegateCommand(new Action(async () => 
+            CrunchRatingsCommand = new DelegateCommand(new Action(async () =>
             {
                 await Task.Run(CrunchRatings);
             }));
 
-            Competitors = new ObservableCollection<ICompetitor>(competitors);
-            _competitions = competitions;
+            Competitors = new ObservableCollection<ICompetitor>(App.CompetitorsDb);
+            //_competitions = competitions;
 
             _crunchProgress = new Progress<double>(ReportProgress);
             CrunchEnabled = true;
