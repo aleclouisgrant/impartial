@@ -18,7 +18,7 @@ namespace ImpartialUI.Models
                 if (Scores == null)
                     return 0;
 
-                var scores = Scores.FindAll(s => s.Placement <= 5);
+                var scores = Scores.FindAll(s => s.ActualPlacement <= 5);
                 return Math.Round(scores.Sum(s => s.Accuracy) / scores.Count, 2);
             }
         }

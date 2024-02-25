@@ -9,6 +9,13 @@ namespace ImpartialUI.Models
         public Round Round { get; set; }
         public IPrelimCompetition LeaderPrelimCompetition { get; set; }
         public IPrelimCompetition FollowerPrelimCompetition { get; set; }
+
+        public PairedPrelimCompetition(Round round, IPrelimCompetition leaderPrelimCompetition, IPrelimCompetition followerPrelimCompetition)
+        {
+            Round = round;
+            LeaderPrelimCompetition = leaderPrelimCompetition;
+            FollowerPrelimCompetition = followerPrelimCompetition;
+        }
     }
 
     public class Competition : ICompetition

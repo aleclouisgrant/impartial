@@ -8,7 +8,8 @@
              xmlns:c="clr-namespace:ImpartialUI.Controls"
              xmlns:local="clr-namespace:ImpartialUI.Views"
              xmlns:converters="clr-namespace:ImpartialUI.Converters"
-             xmlns:enums="clr-namespace:ImpartialUI.Enums"
+             xmlns:uiEnums="clr-namespace:ImpartialUI.Enums"
+             xmlns:enums="clr-namespace:Impartial.Enums"
              mc:Ignorable="d"
              x:Name="View"
              d:DesignHeight="800" d:DesignWidth="1600"
@@ -80,10 +81,10 @@
                     <StackPanel.Resources>
                         <converters:BoolToEnumConverter x:Key="BoolToEnumConverter"/>
                     </StackPanel.Resources>
-                    <RadioButton Content="Auto" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.Auto}}"/>
-                    <RadioButton Content="EEPro" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.EEPro}}"/>
-                    <RadioButton Content="Step Right Solutions" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.StepRightSolutions}}"/>
-                    <RadioButton Content="World Dance Registry" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static enums:ScoresheetSelector.WorldDanceRegistry}}"/>
+                    <RadioButton Content="Auto" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static uiEnums:ScoresheetSelector.Auto}}"/>
+                    <RadioButton Content="EEPro" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static uiEnums:ScoresheetSelector.EEPro}}"/>
+                    <RadioButton Content="Step Right Solutions" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static uiEnums:ScoresheetSelector.StepRightSolutions}}"/>
+                    <RadioButton Content="World Dance Registry" Margin="10" IsChecked="{Binding ScoresheetSelector, Converter={StaticResource BoolToEnumConverter}, ConverterParameter={x:Static uiEnums:ScoresheetSelector.WorldDanceRegistry}}"/>
                 </StackPanel>
             </StackPanel>
             
@@ -194,17 +195,15 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer 
+                        <c:PrelimCompetitionViewer 
                             Grid.Column="0" 
-                            Role="Leader" 
-                            Round="1" 
-                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder 
+                            PrelimCompetition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionAdder 
                             x:Name="LeaderPrelimsAdder" 
                             Grid.Column="2" 
-                            Round="1" 
+                            Round="{x:Static enums:Round.Prelims}" 
                             Role="Leader" 
-                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -219,17 +218,15 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer 
-                            Grid.Column="0" 
-                            Role="Follower" 
-                            Round="1" 
-                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder 
+                        <c:PrelimCompetitionViewer 
+                            Grid.Column="0"
+                            PrelimCompetition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionAdder 
                             x:Name="FollowersPrelimsAdder" 
                             Grid.Column="2" 
-                            Round="1" 
+                            Round="{x:Static enums:Round.Prelims}" 
                             Role="Follower" 
-                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -245,17 +242,15 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer 
+                        <c:PrelimCompetitionViewer 
                             Grid.Column="0" 
-                            Role="Leader" 
-                            Round="2" 
-                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder 
+                            PrelimCompetition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionAdder 
                             x:Name="LeaderSemisAdder" 
                             Grid.Column="2" 
                             Role="Leader" 
-                            Round="2" 
-                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Round="{x:Static enums:Round.Semifinals}" 
+                            PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -270,17 +265,15 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer 
+                        <c:PrelimCompetitionViewer 
                             Grid.Column="0" 
-                            Role="Follower" 
-                            Round="2" 
-                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder 
+                            PrelimCompetition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionAdder 
                             x:Name="FollowerSemisAdder" 
                             Grid.Column="2" 
                             Role="Follower" 
-                            Round="2" 
-                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Round="{x:Static enums:Round.Semifinals}" 
+                            PrelimCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
@@ -294,14 +287,14 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <c:CompetitionViewer 
+                        <c:FinalCompetitionViewer 
                             Grid.Row="0" 
-                            Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                            FinalCompetition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                             Margin="10"/>
-                        <c:CompetitionAdder 
+                        <c:FinalCompetitionAdder 
                             x:Name="FinalsCompetitionAdder" 
                             Grid.Row="1" 
-                            Competition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            FinalCompetition="{Binding Competition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                             Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Margin="10"/>

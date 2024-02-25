@@ -44,8 +44,6 @@ namespace ImpartialUI.Models
             Role = role;
 
             PrelimScores = prelimScores.ToList();
-            Competitors = competitors.ToList();
-            Judges = judges.ToList();
 
             PromotedCompetitors = promotedCompetitors.ToList();
         }

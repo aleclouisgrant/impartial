@@ -188,8 +188,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                 JudgeId = score.Judge.Id,
                 LeaderId = score.Leader.Id,
                 FollowerId = score.Follower.Id,
-                JudgePlacement = score.Score,
-                score.Placement,
+                JudgePlacement = score.Placement,
+                score.ActualPlacement,
             };
 
             await _helper.SaveDataAsync(storedProcedure: "dbo.Scores_Upsert", s);

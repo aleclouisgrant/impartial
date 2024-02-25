@@ -11,19 +11,26 @@ namespace ImpartialUI.Models
         private Guid _competitorId;
 
         public Guid Id { get; }
-        public IPrelimCompetition PrelimCompetition { get; set; }
         public IJudge Judge { get; set; }
         public ICompetitor Competitor { get; set; }
         public CallbackScore CallbackScore { get; set; }
 
-        public PrelimScore(IPrelimCompetition prelimCompetition, Guid judgeId, Guid competitorId, CallbackScore callbackScore, Guid? id = null)
+        public PrelimScore(Guid judgeId, Guid competitorId, CallbackScore callbackScore, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
 
-            PrelimCompetition = prelimCompetition;
             SetJudge(judgeId);
             SetCompetitor(competitorId);
 
+            CallbackScore = callbackScore;
+        }
+
+        public PrelimScore(IJudge judge, ICompetitor competitor, CallbackScore callbackScore, Guid? id = null)
+        {
+            Id = id ?? Guid.NewGuid();
+
+            Judge = judge;
+            Competitor = competitor;
             CallbackScore = callbackScore;
         }
 

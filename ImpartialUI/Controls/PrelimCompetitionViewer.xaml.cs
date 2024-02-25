@@ -1,5 +1,4 @@
 ﻿using Impartial;
-using ImpartialUI.Implementations.Models;
 using ImpartialUI.Models;
 using MongoDB.Driver.Linq;
 using System;
@@ -13,23 +12,23 @@ using System.Windows.Media;
 
 namespace ImpartialUI.Controls
 {
-    public partial class PrelimsViewer : UserControl
+    public partial class PrelimCompetitionViewer : UserControl
     {
         #region DependencyProperties
 
-        public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
-            nameof(Competition),
-            typeof(ICompetition),
-            typeof(PrelimsViewer),
-            new FrameworkPropertyMetadata(new ICompetition(), OnCompetitionPropertyChanged));
-        public ICompetition Competition
+        public static readonly DependencyProperty PrelimCompetitionProperty = DependencyProperty.Register(
+            nameof(PrelimCompetition),
+            typeof(IPrelimCompetition),
+            typeof(PrelimCompetitionViewer),
+            new FrameworkPropertyMetadata(new PrelimCompetition(), OnPrelimCompetitionPropertyChanged));
+        public IPrelimCompetition PrelimCompetition
         {
-            get { return (ICompetition)GetValue(CompetitionProperty); }
-            set { SetValue(CompetitionProperty, value); }
+            get { return (IPrelimCompetition)GetValue(PrelimCompetitionProperty); }
+            set { SetValue(PrelimCompetitionProperty, value); }
         }
-        private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        private static void OnPrelimCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            var control = (PrelimsViewer)source;
+            var control = (PrelimCompetitionViewer)source;
             control.ScoreGrid.Children.Clear();
             control.ScoreGrid.RowDefinitions.Clear();
             control.ScoreGrid.ColumnDefinitions.Clear();
@@ -80,17 +79,12 @@ namespace ImpartialUI.Controls
             Grid.SetRow(competitorBorder, 0);
             Grid.SetColumn(competitorBorder, 1);
 
-            var competition = (ICompetition)e.NewValue;
+            var competition = (IPrelimCompetition)e.NewValue;
             if (competition == null)
                 return;
 
-            List<IJudge> judges = new List<IJudge>();
-
-            if (control.Role == Role.Leader)
-                judges = competition.PrelimLeaderJudges(control.Round)?.OrderBy(j => j.FullName).ToList();
-            else if (control.Role == Role.Follower)
-                judges = competition.PrelimFollowerJudges(control.Round)?.OrderBy(j => j.FullName).ToList();
-
+            List<IJudge> judges = competition?.Judges.OrderBy(j => j.FullName).ToList() ?? new();
+            
             // judge names
             foreach (var judge in judges)
             {
@@ -141,39 +135,28 @@ namespace ImpartialUI.Controls
             Grid.SetColumn(scoreBorder, control.ScoreGrid.Children.Count - 1);
             Grid.SetRow(scoreBorder, 0);
 
-            List<Competitor> c = new List<Competitor>();
+            List<ICompetitor> c = competition.Competitors ?? new();
 
-            if (control.Role == Role.Leader)
-                c = competition.PrelimLeaders(control.Round);
-            else if (control.Role == Role.Follower)
-                c = competition.PrelimFollowers(control.Round);
+            var competitors = new LinkedList<Tuple<ICompetitor, List<IPrelimScore>>>();
 
-            var competitors = new LinkedList<Tuple<Competitor, List<PrelimScore>>>();
-
-            if (control.Role == Role.Leader)
+            foreach (var competitor in c)
             {
-                foreach (var competitor in c)
-                {
-                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.LeaderPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == control.Round).ToList()));
-                }
-            }
-            else if (control.Role == Role.Follower)
-            {
-                foreach (var competitor in c)
-                {
-                    competitors.AddLast(new Tuple<Competitor, List<PrelimScore>>(competitor, competition.FollowerPrelimScores.Where(s => s.Competitor.FullName == competitor.FullName && s.Round == control.Round).ToList()));
-                }
+                var prelimScores = competition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
+
+                competitors.AddLast(new Tuple<ICompetitor, List<IPrelimScore>>(
+                    item1: competitor, 
+                    item2: prelimScores));
             }
 
-            competitors = new LinkedList<Tuple<Competitor, List<PrelimScore>>>(competitors.OrderBy(s => s.Item2.FirstOrDefault().RawScore));
+            competitors = new LinkedList<Tuple<ICompetitor, List<IPrelimScore>>>(competitors.OrderBy(s => s.Item2.FirstOrDefault()));
 
             int i = 1;
             int count = 1;
             int sameCount = 0;
-            for (LinkedListNode<Tuple<Competitor, List<PrelimScore>>> competitor = competitors.First; competitor != null; competitor = competitor.Next)
+            for (var competitor = competitors.First; competitor != null; competitor = competitor.Next)
             {
                 control.ScoreGrid.RowDefinitions.Add(new RowDefinition());
-                bool finaled = competitor.Value.Item2.FirstOrDefault().Finaled;
+                bool finaled = control.PrelimCompetition.PromotedCompetitors.Contains(competitor.Value.Item1);
 
                 // placement
                 var competitorCountBorder = new Border()
@@ -293,75 +276,12 @@ namespace ImpartialUI.Controls
             control.OnPropertyChanged(nameof(control.Count));
             control.OnPropertyChanged(nameof(control.RoundString));
         }
-
-        public static readonly DependencyProperty RoleProperty = DependencyProperty.Register(
-            nameof(Role),
-            typeof(Role),
-            typeof(PrelimsViewer),
-            new FrameworkPropertyMetadata(Role.Leader, OnRolePropertyChanged));
-        public Role Role
-        {
-            get { return (Role)GetValue(RoleProperty); }
-            set { SetValue(RoleProperty, value); }
-        }
-        private static void OnRolePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
-        {
-            OnCompetitionPropertyChanged(source, 
-                new DependencyPropertyChangedEventArgs(
-                    CompetitionProperty, 
-                    ((PrelimsViewer)source).Competition, 
-                    ((PrelimsViewer)source).Competition));
-        }
-
-        public static readonly DependencyProperty RoundProperty = DependencyProperty.Register(
-            nameof(Round),
-            typeof(int),
-            typeof(PrelimsViewer),
-            new FrameworkPropertyMetadata(1, OnRoundPropertyChanged));
-        public int Round
-        {
-            get { return (int)GetValue(RoundProperty); }
-            set { SetValue(RoundProperty, value); }
-        }
-        private static void OnRoundPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
-        {
-            OnCompetitionPropertyChanged(source,
-                new DependencyPropertyChangedEventArgs(
-                    CompetitionProperty,
-                    ((PrelimsViewer)source).Competition,
-                    ((PrelimsViewer)source).Competition));
-        }
-
         #endregion
 
-        public string Count
-        {
-            get
-            {
-                if (Role == Role.Leader)
-                    return Competition.TotalLeaders.ToString();
-                else if (Role == Role.Follower)
-                    return Competition.TotalFollowers.ToString();
-                else
-                    return string.Empty;
-            }
-        }
-        public string RoundString
-        {
-            get 
-            { 
-                switch (Round)
-                {
-                    case 2:
-                        return "Semis";
-                    default:
-                    case 1:
-                        return "Prelims";
-                } 
-            }
-        }
+        public string Count => PrelimCompetition.Competitors.Count().ToString();
+        public string RoundString => PrelimCompetition.Round.ToString();
 
-        public PrelimsViewer()
+        public PrelimCompetitionViewer()
         {
             InitializeComponent();
         }

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace Impartial
+﻿namespace Impartial
 {
     public interface IScoresheetParser
     {
-        public List<Division> GetDivisions();
+        public IPrelimCompetition GetPrelimCompetition(Division division, Round round, Role role);
+        public IPairedPrelimCompetition GetPairedPrelimCompetition(Division division, Round round);
+        public IFinalCompetition GetFinalCompetition(Division division);
         public ICompetition GetCompetition(Division division);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Impartial;
-using ImpartialUI.Enums;
+using ImpartialUI.Models;
 using System;
 using System.Linq;
 using System.Windows;
@@ -9,34 +9,23 @@ using System.Windows.Media;
 
 namespace ImpartialUI.Controls
 {
-    public partial class CompetitionViewer : UserControl
+    public partial class FinalCompetitionViewer : UserControl
     {
         #region DependencyProperties
 
-        public static readonly DependencyProperty CompetitionTypeProperty = DependencyProperty.Register(
-            nameof(CompetitionType),
-            typeof(CompetitionType),
-            typeof(CompetitionViewer),
-            new FrameworkPropertyMetadata(CompetitionType.JackAndJill));
-        public CompetitionType CompetitionType
+        public static readonly DependencyProperty FinalCompetitionProperty = DependencyProperty.Register(
+            nameof(FinalCompetition),
+            typeof(IFinalCompetition),
+            typeof(FinalCompetitionViewer),
+            new FrameworkPropertyMetadata(new FinalCompetition(), OnFinalCompetitionPropertyChanged));
+        public IFinalCompetition FinalCompetition
         {
-            get { return (CompetitionType)GetValue(CompetitionTypeProperty); }
-            set { SetValue(CompetitionTypeProperty, value); }
+            get { return (IFinalCompetition)GetValue(FinalCompetitionProperty); }
+            set { SetValue(FinalCompetitionProperty, value); }
         }
-
-        public static readonly DependencyProperty CompetitionProperty = DependencyProperty.Register(
-            nameof(Competition),
-            typeof(ICompetition),
-            typeof(CompetitionViewer),
-            new FrameworkPropertyMetadata(new ICompetition(), OnCompetitionPropertyChanged));
-        public ICompetition Competition
+        private static void OnFinalCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            get { return (ICompetition)GetValue(CompetitionProperty); }
-            set { SetValue(CompetitionProperty, value); }
-        }
-        private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
-        {
-            var viewer = (CompetitionViewer)source;
+            var viewer = (FinalCompetitionViewer)source;
             viewer.ScoreGrid.Children.Clear();
 
             var placeBorder = new Border()
@@ -81,19 +70,19 @@ namespace ImpartialUI.Controls
             Grid.SetRow(competitorBorder, 0);
             Grid.SetColumn(competitorBorder, 1);
 
-            var competition = (ICompetition)e.NewValue;
-            if (competition == null)
+            var finalCompetition = (IFinalCompetition)e.NewValue;
+            if (finalCompetition == null)
                 return;
 
-            var judges = competition.Judges?.OrderBy(j => j.FullName);
-            var couples = competition.Couples;
+            var judges = finalCompetition.Judges?.OrderBy(j => j.FullName);
+            var couples = finalCompetition.Couples;
 
             //competition.Scores = competition.Scores.OrderBy(s => s.ActualPlacement).ThenBy(s => s.Judge.FullName).ToList();
 
             // judge names
             foreach (var judge in judges)
             {
-                judge.Scores = competition.Scores.Where(s => s.Judge.Id == judge.Id).ToList();
+                judge.Scores = finalCompetition.FinalScores.Where(s => s.Judge.Id == judge.Id).ToList();
 
                 viewer.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
@@ -136,7 +125,7 @@ namespace ImpartialUI.Controls
 
                 var placementTextBlock = new TextBlock()
                 {
-                    Text = couple.ActualPlacement.ToString(),
+                    Text = couple.Placement.ToString(),
                     Margin = new Thickness(1)
                 };
 
@@ -144,7 +133,7 @@ namespace ImpartialUI.Controls
 
                 viewer.ScoreGrid.Children.Add(placementBorder);
                 Grid.SetColumn(placementBorder, 0);
-                Grid.SetRow(placementBorder, couple.ActualPlacement);
+                Grid.SetRow(placementBorder, couple.Placement);
 
                 // names
                 var nameBorder = new Border()
@@ -165,7 +154,7 @@ namespace ImpartialUI.Controls
 
                 viewer.ScoreGrid.Children.Add(nameBorder);
                 Grid.SetColumn(nameBorder, 1);
-                Grid.SetRow(nameBorder, couple.ActualPlacement);
+                Grid.SetRow(nameBorder, couple.Placement);
 
                 // scores
                 for (int i = 0; i < couple.Scores.Count; i++)
@@ -185,7 +174,7 @@ namespace ImpartialUI.Controls
                         Margin = new Thickness(1)
                     };
 
-                    if (score.Placement == score.ActualPlacement){
+                    if (score.Placement == score.Placement){
                         textBlock.Text = score.Placement.ToString();
                     }
                     else
@@ -196,7 +185,7 @@ namespace ImpartialUI.Controls
                         });
                         textBlock.Inlines.Add(new Run()
                         {
-                            Text = " (" + (-1 * Math.Abs(score.Placement - score.ActualPlacement)).ToString() + ")",
+                            Text = " (" + (-1 * Math.Abs(score.Placement - score.Placement)).ToString() + ")",
                             Foreground = Brushes.Red
                         });
                     }
@@ -205,13 +194,13 @@ namespace ImpartialUI.Controls
 
                     viewer.ScoreGrid.Children.Add(border);
                     Grid.SetColumn(border, i + 2);
-                    Grid.SetRow(border, couple.ActualPlacement);
+                    Grid.SetRow(border, couple.Placement);
                 }
             }
         }
         #endregion
 
-        public CompetitionViewer()
+        public FinalCompetitionViewer()
         {
             InitializeComponent();
         }

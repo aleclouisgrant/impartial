@@ -19,5 +19,6 @@ namespace Impartial
         public List<ICouple> Couples { get; }
 
         public string ToLongString();
+        public void Clear();
     }
 }

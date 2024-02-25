@@ -29,49 +29,49 @@ namespace Impartial
             return (int)Math.Round(rating + k3 * (score - expectedScore));
         }
 
-        public static List<ICompetitor> PrelimRatings(List<PrelimScore> prelimScores, Role role, List<IJudge> prelimJudges)
+        public static List<ICompetitor> PrelimRatings(IPrelimCompetition prelimCompetition)
         {
-            var competitors = new List<ICompetitor>();
-            var finalists = new List<Tuple<ICompetitor, List<PrelimScore>>>();
-            var notFinalists = new List<Tuple<ICompetitor, List<PrelimScore>>>();
-            int round = prelimScores.FirstOrDefault().Round;
+            List<Tuple<ICompetitor, List<IPrelimScore>>> finalists = new(); 
+            List<Tuple<ICompetitor, List<IPrelimScore>>> nonFinalists = new();  
 
-            foreach (var score in prelimScores)
+            foreach (var prelimScore in prelimCompetition.PrelimScores)
             {
-                if (!competitors.Any(c => c.Id == score.Competitor.Id))
-                    competitors.Add(score.Competitor);
-            }
-            foreach (var competitor in competitors)
-            {
-                if (!finalists.Any(c => c.Item1.Id == competitor.Id) || !notFinalists.Any(c => c.Item1.Id == competitor.Id))
+                if (prelimCompetition.PromotedCompetitors.Contains(prelimScore.Competitor))
                 {
-                    var tuple = new Tuple<ICompetitor, List<PrelimScore>>(competitor, prelimScores.Where(s => s.Competitor.Id == competitor.Id).ToList());
-                    if (tuple.Item2.First().Finaled)
-                        finalists.Add(tuple);
-                    else    
-                        notFinalists.Add(tuple);
+                    var competitor = finalists.Where(f => f.Item1.Id == prelimScore.Competitor.Id).FirstOrDefault();
+
+                    if (competitor != null)
+                    {
+                        finalists.
+                    }
                 }
+                else
+                {
+
+                }
+
+
             }
 
-            int totalNumber = competitors.Count();
+            int totalNumber = prelimCompetition.Competitors.Count();
             int finalistSpots = finalists.Count();
             int ratingSum = 0;
             double maxScore = 1;
 
-            if (role == Role.Leader)
+            if (prelimCompetition.Role == Role.Leader)
             {
                 ratingSum = finalists.Sum(c => c.Item1.LeadStats.Rating);
-                maxScore = prelimJudges.Count() * 10;
+                maxScore = prelimCompetition.Judges.Count() * 10;
             }
-            else if (role == Role.Follower)
+            else if (prelimCompetition.Role == Role.Follower)
             {
                 ratingSum = finalists.Sum(c => c.Item1.FollowStats.Rating);
-                maxScore = prelimJudges.Count() * 10;
+                maxScore = prelimCompetition.Judges.Count() * 10;
             }
 
             int averageRating = ratingSum / finalistSpots;
 
-            foreach (var competitor in competitors)
+            foreach (var competitor in prelimCompetition.Competitors)
             {
                 int ratingDifference = 0;
 
@@ -80,13 +80,13 @@ namespace Impartial
                 double bonus = ((double)(round - 1) * 0.3);
                 bonus = 0; //taking out bonus for now
 
-                if (role == Role.Leader)
+                if (prelimCompetition.Role == Role.Leader)
                 {
                     double expectedScore = ExpectedScore(competitor.LeadStats.Rating, averageRating);
                     ratingDifference = UpdateRating(competitor.LeadStats.Rating, normalizedScore + bonus, expectedScore) - competitor.LeadStats.Rating;
                     competitor.LeadStats.Rating = competitor.LeadStats.Rating + ratingDifference;
                 }
-                else if (role == Role.Follower)
+                else if (prelimCompetition.Role == Role.Follower)
                 {
                     double expectedScore = ExpectedScore(competitor.FollowStats.Rating, averageRating);
                     ratingDifference = UpdateRating(competitor.FollowStats.Rating, normalizedScore + bonus, expectedScore) - competitor.FollowStats.Rating;
@@ -102,9 +102,9 @@ namespace Impartial
                 if (finalists.Any(c => c.Item1.Id == competitor.Id))
                     Trace.Write("*");
 
-                if (role == Role.Leader)
+                if (prelimCompetition.Role == Role.Leader)
                     Trace.WriteLine(competitor.FullName + " (" + (competitor.LeadStats.Rating - ratingDifference).ToString() + " => " + competitor.LeadStats.Rating + ") (" + ratingChange + ")");
-                else if (role == Role.Follower)
+                else if (prelimCompetition.Role == Role.Follower)
                     Trace.WriteLine(competitor.FullName + " (" + (competitor.FollowStats.Rating - ratingDifference).ToString() + " => " + competitor.FollowStats.Rating + ") (" + ratingChange + ")");
             }
 
@@ -114,7 +114,7 @@ namespace Impartial
         public static List<ICouple> CalculateFinalsRating(List<ICouple> couples, bool straightToFinals = false)
         {
             //first put the couples in order of average ranking 
-            List<ICouple> couplesPlaced = couples.OrderBy(o => o.Placement).ToList();
+            List<ICouple> couplesPlaced = couples.OrderBy(o => o.ActualPlacement).ToList();
 
             //then compare the probability that their actual placement is their expected placement
             foreach (ICouple coupleA in couplesPlaced)
@@ -131,7 +131,7 @@ namespace Impartial
                 }
 
                 expectedScore = (expectedScore / couplesPlaced.Count());
-                double score = (((double)couplesPlaced.Count() - (double)coupleA.Placement + 1) / (double)couplesPlaced.Count());
+                double score = (((double)couplesPlaced.Count() - (double)coupleA.ActualPlacement + 1) / (double)couplesPlaced.Count());
                 if (!straightToFinals)
                     score = score + 0.2; // BONUS
 
@@ -147,7 +147,7 @@ namespace Impartial
                 coupleA.Follower.FollowStats.Rating = coupleA.Follower.FollowStats.Rating + ratingDifference;
 
                 Trace.WriteLine("{0}. {1} ({2} => {3}) ({4}) & {5} ({6} => {7}) ({8})",
-                    coupleA.Placement + ". " +
+                    coupleA.ActualPlacement + ". " +
                     coupleA.Leader.FullName + " (" + (coupleA.Leader.LeadStats.Rating - ratingDifference).ToString() + " => " + 
                     coupleA.Leader.LeadStats.Rating + ") (" + ratingChange + ") & " + 
                     coupleA.Follower.FullName + " (" + (coupleA.Follower.FollowStats.Rating - ratingDifference).ToString() + " => " + 

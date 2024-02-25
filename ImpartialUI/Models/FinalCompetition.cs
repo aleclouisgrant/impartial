@@ -81,15 +81,15 @@ namespace ImpartialUI.Models
 
             foreach (IFinalScore score in FinalScores)
             {
-                if (!couples.Any(c => c.Placement == score.Placement))
+                if (!couples.Any(c => c.ActualPlacement == score.ActualPlacement))
                 {
-                    var couple = new Couple(score.Leader, score.Follower, score.Placement);
+                    var couple = new Couple(score.Leader, score.Follower, score.ActualPlacement);
                     couples.Add(couple);
                     couple.Scores.Add(score);
                 }
                 else
                 {
-                    var couple = couples.Find(c => c.Placement == score.Placement);
+                    var couple = couples.Find(c => c.ActualPlacement == score.ActualPlacement);
                     couple.Scores.Add(score);
                 }
             }
@@ -125,7 +125,7 @@ namespace ImpartialUI.Models
                 {
                     if (score.Leader == couple.Leader && score.Follower == couple.Follower)
                     {
-                        scores.Add(score.Score);
+                        scores.Add(score.Placement);
                     }
                 }
 

@@ -1,20 +1,15 @@
 ﻿using Impartial;
 using ImpartialUI.Commands;
 using ImpartialUI.Models;
-using iText.Layout.Properties;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Xml;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace ImpartialUI.ViewModels
 {
