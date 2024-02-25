@@ -5,9 +5,8 @@ using Impartial;
 using System.Linq;
 using System.Collections.Generic;
 using System.Windows;
-using System;
-using Impartial.Services.ScoresheetParser;
-using System.Threading.Tasks;
+using ImpartialUI.Models;
+using ImpartialUI.Services.ScoresheetParser;
 
 namespace ImpartialUI.ViewModels
 {
@@ -135,7 +134,7 @@ namespace ImpartialUI.ViewModels
 
         private async void AddJudge()
         {
-            await _databaseProvider.UpsertJudgeAsync(new IJudge(FirstName, LastName));
+            await _databaseProvider.UpsertJudgeAsync(new Judge(FirstName, LastName));
             RefreshJudgesDatabase();
 
             // clear the name fields
@@ -143,7 +142,7 @@ namespace ImpartialUI.ViewModels
         }
         private void DeleteJudge(object obj)
         {
-            _databaseProvider.DeleteJudgeAsync((IJudge)obj);
+            _databaseProvider.DeleteJudgeAsync(((IJudge)obj).Id);
             RefreshJudgesDatabase();
         }
         private void ClearJudgesDatabase()
@@ -224,60 +223,60 @@ namespace ImpartialUI.ViewModels
 
         private void ParseScoreSheets()
         {
-            _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
+            //_scoresheetParser = new EEProParser(prelimsPath, finalsPath);
 
-            Competitions = new List<ICompetition>();
-            Judges = new List<IJudge>();
+            //Competitions = new List<ICompetition>();
+            //Judges = new List<IJudge>();
 
-            var divisions = _scoresheetParser.GetDivisions();
+            //var divisions = _scoresheetParser.GetDivisions();
 
-            foreach (var division in divisions)
-            {
-                var comp = _scoresheetParser.GetCompetition(division);
-                Competitions.Add(comp);
+            //foreach (var division in divisions)
+            //{
+            //    var comp = _scoresheetParser.GetCompetition(division);
+            //    Competitions.Add(comp);
 
-                foreach (var judge in comp.Judges)
-                {
-                    if (!Judges.Any(j => j.FullName == judge.FullName)) //these should actually be compared with IDs
-                    {
-                        Judges.Add(new Judge(judge.FirstName, judge.LastName)
-                        {
-                            Scores = judge.Scores
-                        });
-                    }
-                    else
-                    {
-                        Judges.FirstOrDefault(j => j.FullName == judge.FullName).Scores.AddRange(judge.Scores);
-                    }
-                }
-            }
+            //    foreach (var judge in comp.Judges)
+            //    {
+            //        if (!Judges.Any(j => j.FullName == judge.FullName)) //these should actually be compared with IDs
+            //        {
+            //            Judges.Add(new Judge(judge.FirstName, judge.LastName)
+            //            {
+            //                Scores = judge.Scores
+            //            });
+            //        }
+            //        else
+            //        {
+            //            Judges.FirstOrDefault(j => j.FullName == judge.FullName).Scores.AddRange(judge.Scores);
+            //        }
+            //    }
+            //}
 
-            // sort from lowest to highest division
-            Competitions = Competitions.OrderBy(c => (int)c.Division).ToList();
+            //// sort from lowest to highest division
+            //Competitions = Competitions.OrderBy(c => (int)c.Division).ToList();
 
-            OnPropertyChanged(nameof(Competitions));
-            OnPropertyChanged(nameof(Judges));
+            //OnPropertyChanged(nameof(Competitions));
+            //OnPropertyChanged(nameof(Judges));
         }
 
         private void SendToDatabase()
         {
-            foreach (var competition in Competitions)
-            {
-                foreach (var score in competition.Scores)
-                {
-                    if (score.Judge.Scores == null)
-                        score.Judge.Scores = new List<IFinalScore>();
+            //foreach (var competition in Competitions)
+            //{
+            //    foreach (var score in competition.Scores)
+            //    {
+            //        if (score.Judge.Scores == null)
+            //            score.Judge.Scores = new List<IFinalScore>();
 
-                    //_databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
-                }
-            }
+            //        //_databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
+            //    }
+            //}
 
-            MessageLog = "completed";
-            RefreshJudgesDatabase();
+            //MessageLog = "completed";
+            //RefreshJudgesDatabase();
 
-            Judges = null; SelectJudges = null;
-            OnPropertyChanged(nameof(Judges));
-            OnPropertyChanged(nameof(SelectJudges));
+            //Judges = null; SelectJudges = null;
+            //OnPropertyChanged(nameof(Judges));
+            //OnPropertyChanged(nameof(SelectJudges));
         }
 
         private void Cancel()

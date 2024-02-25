@@ -1,5 +1,6 @@
 ﻿using Impartial;
 using ImpartialUI.Enums;
+using ImpartialUI.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -71,7 +72,6 @@ namespace ImpartialUI.Controls
         }
         private static void OnDatabaseProviderPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            var control = (SearchTextBox)source;
         }
 
         public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(
@@ -245,15 +245,15 @@ namespace ImpartialUI.Controls
             //else if (typeof(ComboBoxItems.SelectedItem) is Competitor)
             //    DatabaseProvider.InsertCompetitor(new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text));
 
-            var competitor = new ICompetitor(FirstNameTextBox.Text, LastNameTextBox.Text, Int32.Parse(WsdcIdTextBox.Text));
+            var competitor = new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text, Int32.Parse(WsdcIdTextBox.Text));
             await App.DatabaseProvider.UpsertCompetitorAsync(competitor);
-            ItemsSource = await App.DatabaseProvider.GetAllCompetitorsAsync();
+            ItemsSource = (IEnumerable<PersonModel>)await App.DatabaseProvider.GetAllCompetitorsAsync();
 
             SearchMode();
             ComboBoxItems.SelectedValue = ItemsSource.Where(c => c.Id == competitor.Id).FirstOrDefault();
 
             List<ICompetitor> removedItems = new List<ICompetitor>(){
-                new ICompetitor(_cancelledPersonFirstName, _cancelledPersonLastName)
+                new Competitor(_cancelledPersonFirstName, _cancelledPersonLastName)
             };
             List<ICompetitor> addedItems = new List<ICompetitor>(){
                 (ICompetitor)ComboBoxItems.SelectedValue
@@ -283,7 +283,7 @@ namespace ImpartialUI.Controls
             if (_wasCancelled)
             {
                 var removedItems = new List<PersonModel> {
-                    new ICompetitor(_cancelledPersonFirstName, _cancelledPersonLastName) };
+                    new Competitor(_cancelledPersonFirstName, _cancelledPersonLastName) };
 
                 eventArgs = new SearchTextBoxSelectionChangedEventArgs(SelectionChangedEvent, removedItems, e.AddedItems, Placement);
             }

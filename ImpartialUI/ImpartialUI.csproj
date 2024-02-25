@@ -17,10 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Controls\FinalCompetitionAdder.xaml.cs">
+    <Compile Update="Controls\FinalCompetitionEditor.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Controls\PrelimCompetitionAdder.xaml.cs">
+    <Compile Update="Controls\PrelimCompetitionEditor.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\RatingsView.xaml.cs">
@@ -50,11 +50,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Controls\FinalCompetitionAdder.xaml">
+    <Page Update="Controls\FinalCompetitionEditor.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Controls\PrelimCompetitionAdder.xaml">
+    <Page Update="Controls\PrelimCompetitionEditor.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\RatingsView.xaml">

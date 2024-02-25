@@ -9,17 +9,6 @@ namespace ImpartialUI.ViewModels
 {
     public class ViewCompetitionViewModel : BaseViewModel
     {
-        private ICompetition _competition;
-        public ICompetition Competition 
-        { 
-            get { return _competition; }
-            set 
-            { 
-                _competition = value;
-                OnPropertyChanged();
-            }
-        }
-
         private List<ICompetition> _competitions;
         public List<ICompetition> Competitions
         {
@@ -30,6 +19,30 @@ namespace ImpartialUI.ViewModels
                 OnPropertyChanged();
             }
         }
+
+        private ICompetition _selectedCompetition;
+        public ICompetition SelectedCompetition 
+        { 
+            get { return _selectedCompetition; }
+            set 
+            { 
+                _selectedCompetition = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LeaderPrelims));
+                OnPropertyChanged(nameof(FollowerPrelims));
+                OnPropertyChanged(nameof(LeaderSemis));
+                OnPropertyChanged(nameof(FollowerSemis));
+                OnPropertyChanged(nameof(FinalCompetition));
+            }
+        }
+
+        public IPrelimCompetition LeaderPrelims => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerPrelims => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().FollowerPrelimCompetition;
+
+        public IPrelimCompetition LeaderSemis => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerSemis => SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().FollowerPrelimCompetition;
+
+        public IFinalCompetition FinalCompetition => SelectedCompetition.FinalCompetition;
 
         public ICommand RefreshCompetitionsCommand { get; set; }
         public ICommand SaveCompetitionCommand { get; set; }
@@ -49,8 +62,6 @@ namespace ImpartialUI.ViewModels
             RefreshCompetitionsCommand = new DelegateCommand(RefreshCompetitions);
             SaveCompetitionCommand = new DelegateCommand(SaveCompetition);
             DeleteCompetitionCommand = new DelegateCommand(DeleteCompetition);
-
-            RefreshCompetitions();
         }
 
         private async void RefreshCompetitions()
@@ -59,22 +70,23 @@ namespace ImpartialUI.ViewModels
         }
         private async void DeleteCompetition()
         {
-            await App.DatabaseProvider.DeleteCompetitionAsync(Competition);
+            await App.DatabaseProvider.DeleteCompetitionAsync(SelectedCompetition.Id);
 
             // should be able to do just this instead of refreshing but it's not working for some reason
             //Competitions.Remove(Competition);
             //OnPropertyChanged(nameof(Competitions));
 
             RefreshCompetitions();
-            Competition = null;
+            SelectedCompetition = null;
         }
         private async void SaveCompetition()
         {
-            Guid id = Competition.Id;
-            await App.DatabaseProvider.UpsertCompetitionAsync(Competition);
+            Guid id = SelectedCompetition.Id;
+            //TODO:
+            //await App.DatabaseProvider.UpsertCompetitionAsync(Competition);
 
             RefreshCompetitions();
-            Competition = Competitions.Where(c => c.Id == id).FirstOrDefault();
+            SelectedCompetition = Competitions.Where(c => c.Id == id).FirstOrDefault();
         }
     }
 }

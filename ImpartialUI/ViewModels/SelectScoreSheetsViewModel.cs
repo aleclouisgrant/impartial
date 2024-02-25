@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System;
+using ImpartialUI.Services.ScoresheetParser;
 
 namespace ImpartialUI.ViewModels
 {
@@ -236,13 +237,14 @@ namespace ImpartialUI.ViewModels
 
             var competition = scoresheetParser.GetCompetition(Division);
 
-            foreach (var score in competition.Scores)
-            {
-                if (score.Judge.Scores == null)
-                    score.Judge.Scores = new List<IFinalScore>();
+            //TODO: 
+            //foreach (var score in competition.Scores)
+            //{
+            //    if (score.Judge.Scores == null)
+            //        score.Judge.Scores = new List<IFinalScore>();
 
-                //await _databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
-            }
+            //    //await _databaseProvider.UpdateJudgeAsync(score.Judge.Id, score.Judge);
+            //}
 
             MessageLog = "completed";
             RefreshJudgesDatabase();

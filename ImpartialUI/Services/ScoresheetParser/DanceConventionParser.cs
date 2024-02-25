@@ -32,17 +32,22 @@ namespace ImpartialUI.Services.ScoresheetParser
         {
         }
 
+        public IPrelimCompetition GetPrelimCompetition(Division division, Round round, Role role)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IPairedPrelimCompetition GetPairedPrelimCompetition(Division division, Round round)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IFinalCompetition GetFinalCompetition(Division division)
+        {
+            throw new NotImplementedException();
+        }
+
         public ICompetition GetCompetition(Division division)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Division> GetDivisions()
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<IJudge> GetFinalsJudgesByDivision(Division division)
         {
             throw new NotImplementedException();
         }

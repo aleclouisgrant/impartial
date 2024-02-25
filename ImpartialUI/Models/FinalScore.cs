@@ -20,12 +20,12 @@ namespace ImpartialUI.Models
 
         public double Accuracy => Util.GetAccuracy(Score, Placement);
 
-        public FinalScore(IJudge judge, ICompetitor leader, ICompetitor follower, int placement, int actualPlacement, Guid? id = null)
+        public FinalScore(IJudge judge, ICompetitor leader, ICompetitor follower, int score, int placement, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
 
             Judge = judge; Leader = leader; Follower = follower;
-            Score = placement; Placement = actualPlacement;
+            Score = score; Placement = placement;
         }
 
         public FinalScore(Guid judgeId, Guid leaderId, Guid followerId, int score, int placement, Guid? id = null)

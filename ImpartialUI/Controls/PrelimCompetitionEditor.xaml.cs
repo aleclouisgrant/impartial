@@ -12,13 +12,13 @@ using System.Windows.Media;
 
 namespace ImpartialUI.Controls
 {
-    public partial class PrelimCompetitionAdder : UserControl
+    public partial class PrelimCompetitionEditor : UserControl
     {
         #region DependencyProperties
         public static readonly DependencyProperty PrelimCompetitionProperty = DependencyProperty.Register(
             nameof(PrelimCompetition),
             typeof(IPrelimCompetition),
-            typeof(PrelimCompetitionAdder),
+            typeof(PrelimCompetitionEditor),
             new FrameworkPropertyMetadata(new PrelimCompetition(), OnCompetitionPropertyChanged));
         public IPrelimCompetition PrelimCompetition
         {
@@ -27,7 +27,7 @@ namespace ImpartialUI.Controls
         }
         private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            var control = (PrelimCompetitionAdder)source;
+            var control = (PrelimCompetitionEditor)source;
             var competition = (IPrelimCompetition)e.NewValue;
 
             if (competition == null)
@@ -71,7 +71,7 @@ namespace ImpartialUI.Controls
         public static readonly DependencyProperty RoleProperty = DependencyProperty.Register(
             nameof(Role),
             typeof(Role),
-            typeof(PrelimCompetitionAdder),
+            typeof(PrelimCompetitionEditor),
             new FrameworkPropertyMetadata(Role.Leader, OnRolePropertyChanged));
         public Role Role
         {
@@ -80,13 +80,13 @@ namespace ImpartialUI.Controls
         }
         private static void OnRolePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            ((PrelimCompetitionAdder)source).PrelimCompetition.Role = (Role)e.NewValue;
+            ((PrelimCompetitionEditor)source).PrelimCompetition.Role = (Role)e.NewValue;
         }
 
         public static readonly DependencyProperty RoundProperty = DependencyProperty.Register(
             nameof(Round),
             typeof(Round),
-            typeof(PrelimCompetitionAdder),
+            typeof(PrelimCompetitionEditor),
             new FrameworkPropertyMetadata(1, OnRoundPropertyChanged));
         public Round Round
         {
@@ -95,13 +95,13 @@ namespace ImpartialUI.Controls
         }
         private static void OnRoundPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            ((PrelimCompetitionAdder)source).PrelimCompetition.Round = (Round)e.NewValue;
+            ((PrelimCompetitionEditor)source).PrelimCompetition.Round = (Round)e.NewValue;
         }
 
         public static readonly DependencyProperty CompetitorsProperty = DependencyProperty.Register(
             nameof(Competitors),
             typeof(List<ICompetitor>),
-            typeof(PrelimCompetitionAdder),
+            typeof(PrelimCompetitionEditor),
             new FrameworkPropertyMetadata(1, OnCompetitorsPropertyChanged));
         public List<ICompetitor> Competitors
         {
@@ -115,7 +115,7 @@ namespace ImpartialUI.Controls
         public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
             nameof(Judges),
             typeof(List<IJudge>),
-            typeof(PrelimCompetitionAdder),
+            typeof(PrelimCompetitionEditor),
             new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
         public List<IJudge> Judges
         {
@@ -137,7 +137,7 @@ namespace ImpartialUI.Controls
 
         private IPrelimScore[,] _scores;
 
-        public PrelimCompetitionAdder()
+        public PrelimCompetitionEditor()
         {
             InitializeComponent();
         }

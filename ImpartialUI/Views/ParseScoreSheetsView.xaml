@@ -106,7 +106,7 @@
                     <ItemsControl ItemsSource="{Binding Competitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <c:CompetitionViewer Competition="{Binding }" Margin="20"/>
+                                <c:FinalCompetitionViewer FinalCompetition="{Binding }" Margin="20"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                         <ItemsControl.ItemsPanel>

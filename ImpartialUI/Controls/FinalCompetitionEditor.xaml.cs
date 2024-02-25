@@ -11,13 +11,13 @@ using System.Windows.Media;
 
 namespace ImpartialUI.Controls
 {
-    public partial class FinalCompetitionAdder : UserControl
+    public partial class FinalCompetitionEditor : UserControl
     {
         #region DependencyProperties
         public static readonly DependencyProperty FinalCompetitionProperty = DependencyProperty.Register(
             nameof(FinalCompetition),
             typeof(IFinalCompetition),
-            typeof(FinalCompetitionAdder),
+            typeof(FinalCompetitionEditor),
             new FrameworkPropertyMetadata(new FinalCompetition(), OnCompetitionPropertyChanged));
         public IFinalCompetition FinalCompetition
         {
@@ -26,11 +26,11 @@ namespace ImpartialUI.Controls
         }
         private static void OnCompetitionPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            var viewer = (FinalCompetitionAdder)source;
+            var viewer = (FinalCompetitionEditor)source;
             var competition = (IFinalCompetition)e.NewValue;
 
             var judges = competition?.Judges.OrderBy(j => j.FullName);
-            var couples = competition?.Couples.OrderBy(c => c.ActualPlacement);
+            var couples = competition?.Couples.OrderBy(c => c.Placement);
 
             DateTime date = DateTime.Now;
             if (competition != null)
@@ -62,7 +62,7 @@ namespace ImpartialUI.Controls
         public static readonly DependencyProperty CompetitorsProperty = DependencyProperty.Register(
             nameof(Competitors),
             typeof(List<ICompetitor>),
-            typeof(FinalCompetitionAdder),
+            typeof(FinalCompetitionEditor),
             new FrameworkPropertyMetadata(1, OnCompetitorsPropertyChanged));
         public List<ICompetitor> Competitors
         {
@@ -76,7 +76,7 @@ namespace ImpartialUI.Controls
         public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
             nameof(Judges),
             typeof(List<IJudge>),
-            typeof(FinalCompetitionAdder),
+            typeof(FinalCompetitionEditor),
             new FrameworkPropertyMetadata(1, OnJudgesPropertyChanged));
         public List<IJudge> Judges
         {
@@ -96,7 +96,7 @@ namespace ImpartialUI.Controls
 
         private int _coupleCount = 0;
 
-        public FinalCompetitionAdder()
+        public FinalCompetitionEditor()
         {
             InitializeComponent();
 
@@ -213,8 +213,8 @@ namespace ImpartialUI.Controls
 
             if (couple != null)
             {
-                leaderSearchBox.Placement = couple.ActualPlacement; 
-                followerSearchBox.Placement = couple.ActualPlacement;
+                leaderSearchBox.Placement = couple.Placement; 
+                followerSearchBox.Placement = couple.Placement;
             }
             else
             {

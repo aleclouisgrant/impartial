@@ -19,6 +19,7 @@ namespace Impartial
         public List<IPairedPrelimCompetition> PairedPrelimCompetitions { get; set; }
         public IFinalCompetition FinalCompetition { get; set; }
 
+        public string ToString();
         public string ToLongString();
 
         public void Clear();

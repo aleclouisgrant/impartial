@@ -148,6 +148,11 @@ namespace ImpartialUI.ViewModels
             {
                 _competition = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(LeaderPrelims));
+                OnPropertyChanged(nameof(FollowerPrelims));
+                OnPropertyChanged(nameof(LeaderSemis));
+                OnPropertyChanged(nameof(FollowerSemis));
+                OnPropertyChanged(nameof(FinalCompetition));
             }
         }
 
@@ -161,6 +166,15 @@ namespace ImpartialUI.ViewModels
                 OnPropertyChanged();
             }
         }
+
+        public IPrelimCompetition LeaderPrelims => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerPrelims => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault().FollowerPrelimCompetition;
+
+        public IPrelimCompetition LeaderSemis => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerSemis => Competition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault().FollowerPrelimCompetition;
+
+        public IFinalCompetition FinalCompetition => Competition.FinalCompetition;
+
 
         private double _parseProgressPercentage;
         public double ParseProgressPercentage
@@ -337,9 +351,10 @@ namespace ImpartialUI.ViewModels
                 case ScoresheetSelector.DanceConvention:
                     _scoresheetParser = new DanceConventionParser(prelimsPath, finalsPath);
                     break;
-                case ScoresheetSelector.StepRightSolutions:
-                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, semisPath, finalsPath);
-                    break;
+                //TODO: readd this
+                //case ScoresheetSelector.StepRightSolutions:
+                //    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, semisPath, finalsPath);
+                //    break;
                 case ScoresheetSelector.WorldDanceRegistry:
                     _scoresheetParser = new WorldDanceRegistryParser(prelimsPath, finalsPath);
                     break;

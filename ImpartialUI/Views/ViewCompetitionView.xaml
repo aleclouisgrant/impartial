@@ -30,7 +30,7 @@
         <Grid Grid.Row="1" x:Name="CompetitionViewerGrid" Visibility="Collapsed">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical">
-                    <c:CompetitionViewer Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <c:FinalCompetitionViewer FinalCompetition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Grid x:Name="SemisViewerGrid" Margin="0 10 0 0" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
@@ -39,8 +39,8 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsViewer Grid.Column="2" Role="Follower" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionViewer Grid.Column="0" PrelimCompetition="{Binding LeaderSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionViewer Grid.Column="2" PrelimCompetition="{Binding FollowerSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
 
                     <Grid x:Name="PrelimsViewerGrid" Margin="0 10 0 0" Visibility="Collapsed">
@@ -50,8 +50,8 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsViewer Grid.Column="0" Role="Leader" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsViewer Grid.Column="2" Role="Follower" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionViewer Grid.Column="0" PrelimCompetition="{Binding LeaderPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionViewer Grid.Column="2" PrelimCompetition="{Binding FollowerPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>
@@ -60,7 +60,7 @@
         <Grid Grid.Row="1" x:Name="CompetitionEditorGrid" Visibility="Collapsed">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical">
-                    <c:CompetitionAdder Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <c:FinalCompetitionEditor FinalCompetition="{Binding FinalCompetition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Grid x:Name="SemisEditorGrid" Margin="0 10 0 0" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
@@ -69,8 +69,8 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsAdder Grid.Column="0" Role="Leader" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder Grid.Column="2" Role="Follower" Round="2" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionEditor Grid.Column="0" PrelimCompetition="{Binding LeaderSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionEditor Grid.Column="2" PrelimCompetition="{Binding FollowerSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
 
                     <Grid x:Name="PrelimsEditorGrid" Margin="0 10 0 0" Visibility="Collapsed">
@@ -80,8 +80,8 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimsAdder Grid.Column="0" Role="Leader" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimsAdder Grid.Column="2" Role="Follower" Round="1" Competition="{Binding Competition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionEditor Grid.Column="0" PrelimCompetition="{Binding LeaderPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <c:PrelimCompetitionEditor Grid.Column="2" PrelimCompetition="{Binding FollowerPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>
