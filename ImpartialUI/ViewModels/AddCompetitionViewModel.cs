@@ -194,17 +194,21 @@ namespace ImpartialUI.ViewModels
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(LeaderPrelims));
                 OnPropertyChanged(nameof(FollowerPrelims));
+                OnPropertyChanged(nameof(LeaderQuarters));
+                OnPropertyChanged(nameof(FollowerQuarters));
                 OnPropertyChanged(nameof(LeaderSemis));
                 OnPropertyChanged(nameof(FollowerSemis));
                 OnPropertyChanged(nameof(FinalCompetition));
 
                 ShowFinals = Competition?.FinalCompetition != null;
                 ShowPrelims = Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault() != null;
+                ShowQuarters = Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Quarterfinals).FirstOrDefault() != null;
                 ShowSemis = Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault() != null;
 
-                ShowCompetition = ShowFinals || ShowPrelims || ShowSemis;
+                ShowCompetition = ShowFinals || ShowPrelims || ShowQuarters || ShowSemis;
 
                 OnPropertyChanged(nameof(ShowPrelims));
+                OnPropertyChanged(nameof(ShowQuarters));
                 OnPropertyChanged(nameof(ShowSemis));
                 OnPropertyChanged(nameof(ShowFinals));
                 OnPropertyChanged(nameof(ShowCompetition));
@@ -213,6 +217,9 @@ namespace ImpartialUI.ViewModels
 
         public IPrelimCompetition LeaderPrelims => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.LeaderPrelimCompetition;
         public IPrelimCompetition FollowerPrelims => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.FollowerPrelimCompetition;
+
+        public IPrelimCompetition LeaderQuarters => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Quarterfinals).FirstOrDefault()?.LeaderPrelimCompetition;
+        public IPrelimCompetition FollowerQuarters => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Quarterfinals).FirstOrDefault()?.FollowerPrelimCompetition;
 
         public IPrelimCompetition LeaderSemis => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault()?.LeaderPrelimCompetition;
         public IPrelimCompetition FollowerSemis => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault()?.FollowerPrelimCompetition;
@@ -233,6 +240,7 @@ namespace ImpartialUI.ViewModels
         private IProgress<double> _parseProgress;
 
         public bool ShowPrelims { get; set; }
+        public bool ShowQuarters { get; set; }
         public bool ShowSemis { get; set; }
         public bool ShowFinals { get; set; }
         public bool ShowCompetition { get; set; }
@@ -279,12 +287,14 @@ namespace ImpartialUI.ViewModels
 
         private void TestData()
         {
-            var newDanceConvention = new DanceConvention("Swing Fling", DateTime.Parse("8-14-2022"));
+            var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
             DanceConventions.Add(newDanceConvention);
             SelectedDanceConvention = newDanceConvention;
             ScoresheetSelector = ScoresheetSelector.EEPro;
-            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\prelims.html";
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\finals.html";
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\finals.html";
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
         }
 
         private async void RefreshCache()
@@ -385,7 +395,6 @@ namespace ImpartialUI.ViewModels
         private async void ParseScoreSheets()
         {
             ClearException();
-            _parseProgress.Report(0);
 
             if (ScoresheetSelector == ScoresheetSelector.Auto)
             {
@@ -422,196 +431,7 @@ namespace ImpartialUI.ViewModels
                 return;
             }
 
-            // prelims rounds
-            foreach (var pairedPrelimCompetition in Competition.PairedPrelimCompetitions)
-            {
-                foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
-                {
-                    var serverCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, Competitors);
-                    if (serverCompetitor == null)
-                    {
-                        serverCompetitor = await App.DatabaseProvider.GetCompetitorAsync(competitor.FirstName, competitor.LastName);
-                    }
-
-                    if (serverCompetitor != null)
-                    {
-                        serverCompetitor = new Competitor(
-                            id: serverCompetitor.Id, 
-                            wsdcId: serverCompetitor.WsdcId,
-                            firstName: serverCompetitor.FirstName, 
-                            lastName: serverCompetitor.LastName,
-                            leaderRating: serverCompetitor.LeadStats.Rating, 
-                            leaderVariance: serverCompetitor.LeadStats.Variance,
-                            followerRating: serverCompetitor.FollowStats.Rating, 
-                            followerVariance: serverCompetitor.FollowStats.Variance);
-
-                        var scores = pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
-                        foreach (var score in scores)
-                        {
-                            score.SetCompetitor(serverCompetitor.Id);
-                        }
-                    }
-                    else
-                    {
-                        int wsdcId = await GuessWsdcId(competitor.FirstName, competitor.LastName);
-
-                        var scores = pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
-                        foreach (var score in scores)
-                        {
-                            score.Competitor.WsdcId = wsdcId;
-                        }
-                    }
-                }
-
-                foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
-                {
-                    var serverCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, Competitors);
-                    if (serverCompetitor == null)
-                    {
-                        serverCompetitor = await App.DatabaseProvider.GetCompetitorAsync(competitor.FirstName, competitor.LastName);
-                    }
-
-                    if (serverCompetitor != null)
-                    {
-                        serverCompetitor = new Competitor(
-                            id: serverCompetitor.Id,
-                            wsdcId: serverCompetitor.WsdcId,
-                            firstName: serverCompetitor.FirstName,
-                            lastName: serverCompetitor.LastName,
-                            leaderRating: serverCompetitor.LeadStats.Rating,
-                            leaderVariance: serverCompetitor.LeadStats.Variance,
-                            followerRating: serverCompetitor.FollowStats.Rating,
-                            followerVariance: serverCompetitor.FollowStats.Variance);
-
-                        var scores = pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
-                        foreach (var score in scores)
-                        {
-                            score.SetCompetitor(serverCompetitor.Id);
-                        }
-                    }
-                    else
-                    {
-                        int wsdcId = await GuessWsdcId(competitor.FirstName, competitor.LastName);
-
-                        var scores = pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
-                        foreach (var score in scores)
-                        {
-                            score.Competitor.WsdcId = wsdcId;
-                        }
-                    }
-                }
-
-                //foreach (var judge in comp.PrelimLeaderJudges(round))
-                //{
-                //    var serverJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, Judges);
-                //    if (serverJudge != null)
-                //    {
-                //        serverJudge = new Judge(serverJudge.Id, serverJudge.FirstName, serverJudge.LastName, serverJudge.Accuracy, serverJudge.Top5Accuracy);
-
-                //        var scores = comp.LeaderPrelimScores.Where(s => s.Judge.FullName == judge.FullName && s.Round == round).ToList();
-                //        foreach (var score in scores)
-                //        {
-                //            score.Judge = serverJudge;
-                //        }
-                //    }
-                //}
-
-                //foreach (var judge in comp.PrelimFollowerJudges(round))
-                //{
-                //    var serverJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, Judges);
-                //    if (serverJudge != null)
-                //    {
-                //        serverJudge = new Judge(serverJudge.Id, serverJudge.FirstName, serverJudge.LastName, serverJudge.Accuracy, serverJudge.Top5Accuracy);
-
-                //        var scores = comp.FollowerPrelimScores.Where(s => s.Judge.FullName == judge.FullName && s.Round == round).ToList();
-                //        foreach (var score in scores)
-                //        {
-                //            score.Judge = serverJudge;
-                //        }
-                //    }
-                //}
-            }
-
-            // finals
-            foreach (var judge in comp.FinalCompetition.Judges)
-            {
-                var serverJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, Judges);
-                if (serverJudge == null)
-                {
-                    serverJudge = await App.DatabaseProvider.GetJudgeAsync(judge.FirstName, judge.LastName);
-                }
-
-                if (serverJudge != null)
-                {
-                    serverJudge = new Judge(serverJudge.FirstName, serverJudge.LastName, serverJudge.Id)
-                    {
-                        Scores = judge.Scores
-                    };
-
-                    var scores = comp.FinalCompetition.FinalScores.Where(s => s.Judge.FullName == judge.FullName).ToList();
-                    foreach (var score in scores)
-                    {
-                        score.Judge = serverJudge;
-                    }
-                }
-            }
-
-            foreach (var couple in comp.FinalCompetition.Couples)
-            {
-                var serverLeader = Util.FindCompetitorInCache(couple.Leader.FirstName, couple.Leader.LastName, Competitors);
-                if (serverLeader == null)
-                {
-                    serverLeader = await App.DatabaseProvider.GetCompetitorAsync(couple.Leader.FirstName, couple.Leader.LastName);
-                }
-
-                if (serverLeader != null)
-                {
-                    var scores = comp.FinalCompetition.FinalScores.Where(s => s.Leader.FullName == couple.Leader.FullName).ToList();
-                    foreach (var score in scores)
-                    {
-                        score.Leader = serverLeader;
-                    }
-                }
-                else
-                {
-                    int wsdcId = await GuessWsdcId(couple.Leader.FirstName, couple.Leader.LastName);
-
-                    var scores = comp.FinalCompetition.FinalScores.Where(s => s.Leader.FullName == couple.Leader.FullName).ToList();
-                    foreach (var score in scores)
-                    {
-                        score.Leader.WsdcId = wsdcId;
-                    }
-                }
-
-                var serverFollower = Util.FindCompetitorInCache(couple.Follower.FirstName, couple.Follower.LastName, Competitors);
-                if (serverFollower == null)
-                {
-                    serverFollower = await App.DatabaseProvider.GetCompetitorAsync(couple.Follower.FirstName, couple.Follower.LastName);
-                }
-
-                if (serverFollower != null)
-                {
-                    var scores = comp.FinalCompetition.FinalScores.Where(s => s.Follower.FullName == couple.Follower.FullName).ToList();
-                    foreach (var score in scores)
-                    {
-                        score.Follower = serverFollower;
-                    }
-                }
-                else
-                {
-                    int wsdcId = await GuessWsdcId(couple.Follower.FirstName, couple.Follower.LastName);
-
-                    var scores = comp.FinalCompetition.FinalScores.Where(s => s.Follower.FullName == couple.Follower.FullName).ToList();
-                    foreach (var score in scores)
-                    {
-                        score.Follower.WsdcId = wsdcId;
-                    }
-                }
-            }
-
             Competition = comp;
-
-            _parseProgress.Report(0);
         }
         private void AddCompetition()
         {

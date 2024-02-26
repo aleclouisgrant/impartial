@@ -42,20 +42,23 @@ namespace ImpartialUI.Services.ScoresheetParser
             };
 
             var prelims = GetPairedPrelimCompetition(division, Round.Prelims);
-            //TODO: var quarters = GetPairedPrelimCompetition(division, Round.Quarterfinals);
-            //var semis = GetPairedPrelimCompetition(division, Round.Semifinals);
+            var quarters = GetPairedPrelimCompetition(division, Round.Quarterfinals);
+            var semis = GetPairedPrelimCompetition(division, Round.Semifinals);
 
             if (prelims.LeaderPrelimCompetition != null)
                 competition.PairedPrelimCompetitions.Add(prelims);
 
-            //if (semis.LeaderPrelimCompetition != null)
-            //    competition.PairedPrelimCompetitions.Add(semis);
+            if (quarters.LeaderPrelimCompetition != null)
+                competition.PairedPrelimCompetitions.Add(quarters);
+
+            if (semis.LeaderPrelimCompetition != null)
+                competition.PairedPrelimCompetitions.Add(semis);
 
             return competition;
         }
 
-        public abstract IPrelimCompetition GetPrelimCompetition(Division division, Round round, Role role);
-        public abstract IFinalCompetition GetFinalCompetition(Division division);
+        public abstract IPrelimCompetition? GetPrelimCompetition(Division division, Round round, Role role);
+        public abstract IFinalCompetition? GetFinalCompetition(Division division);
         public abstract List<Division> GetDivisions();
         public abstract string GetName();
     }

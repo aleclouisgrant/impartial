@@ -180,8 +180,8 @@ namespace ImpartialUI.Controls
 
             if (couple?.Leader != null)
             {
-                leaderSearchBox.SelectedPerson = leaderSearchBox.ItemsSource.Where(c => c.Id == couple.Leader.Id).FirstOrDefault();
-                
+                leaderSearchBox.SelectedPerson = Util.FindCompetitorInCache(couple.Leader.FirstName, couple.Leader.LastName, (IEnumerable<ICompetitor>)leaderSearchBox.ItemsSource);
+
                 if (leaderSearchBox.SelectedPerson == null)
                 {
                     leaderSearchBox.AddMode(couple.Leader.FirstName, couple.Leader.LastName, couple.Leader.WsdcId);
@@ -229,7 +229,7 @@ namespace ImpartialUI.Controls
 
             if (couple?.Follower != null)
             {
-                followerSearchBox.SelectedPerson = followerSearchBox.ItemsSource.Where(c => c.Id == couple.Follower.Id).FirstOrDefault();
+                followerSearchBox.SelectedPerson = Util.FindCompetitorInCache(couple.Follower.FirstName, couple.Follower.LastName, (IEnumerable<ICompetitor>)followerSearchBox.ItemsSource);
 
                 if (followerSearchBox.SelectedPerson == null)
                 {
@@ -319,7 +319,7 @@ namespace ImpartialUI.Controls
 
             if (judge != null)
             {
-                judgeSearchBox.SelectedPerson = judgeSearchBox.ItemsSource.Where(j => j.Id == judge.Id).FirstOrDefault();
+                judgeSearchBox.SelectedPerson = Util.FindJudgeInCache(judge.FirstName, judge.LastName, (IEnumerable<IJudge>)judgeSearchBox.ItemsSource);
             }
 
             judgeBorder.Child = judgeSearchBox;

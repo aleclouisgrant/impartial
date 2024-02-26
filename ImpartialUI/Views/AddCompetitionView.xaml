@@ -219,8 +219,11 @@
                           HorizontalAlignment="Left"/>
             </StackPanel>
 
+            <!-- Competition Tabs -->
             <TabControl Grid.Row="1"
                         Visibility="{Binding ShowCompetition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                
+                <!-- Prelims -->
                 <TabItem Header="Prelims (Leaders)"
                      Visibility="{Binding ShowPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer Margin="10 5">
@@ -257,7 +260,6 @@
                             Grid.Column="0"
                             PrelimCompetition="{Binding FollowerPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <c:PrelimCompetitionEditor
-                            x:Name="FollowersPrelimsAdder" 
                             Grid.Column="2" 
                             Round="{x:Static imp:Round.Prelims}" 
                             PrelimCompetition="{Binding FollowerPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -266,7 +268,54 @@
                     </Grid>
                 </ScrollViewer>
             </TabItem>
+                
+                <!-- Quarters -->
+                <TabItem Header="Quarters (Leaders)"
+                     Visibility="{Binding ShowQuarters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ScrollViewer Margin="10 5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
 
+                            <c:PrelimCompetitionViewer 
+                                Grid.Column="0" 
+                                PrelimCompetition="{Binding LeaderQuarters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <c:PrelimCompetitionEditor
+                                Grid.Column="2" 
+                                Round="{x:Static imp:Round.Quarterfinals}" 
+                                PrelimCompetition="{Binding LeaderQuarters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Quarters (Followers)"
+                     Visibility="{Binding ShowQuarters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ScrollViewer Margin="10 5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <c:PrelimCompetitionViewer 
+                                Grid.Column="0"
+                                PrelimCompetition="{Binding FollowerQuarters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <c:PrelimCompetitionEditor
+                                Grid.Column="2" 
+                                Round="{x:Static imp:Round.Quarterfinals}" 
+                                PrelimCompetition="{Binding FollowerQuarters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Competitors="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Judges="{Binding Judges, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+
+            <!-- Semis -->
             <TabItem Header="Semis (Leaders)" 
                      Visibility="{Binding ShowSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer Margin="10 5">

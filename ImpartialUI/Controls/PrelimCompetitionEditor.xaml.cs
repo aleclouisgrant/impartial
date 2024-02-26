@@ -267,7 +267,7 @@ namespace ImpartialUI.Controls
 
             if (competitor != null)
             {
-                competitorSearchBox.SelectedPerson = competitorSearchBox.ItemsSource.Where(c => c.FullName == competitor.FullName).FirstOrDefault();
+                competitorSearchBox.SelectedPerson = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, (IEnumerable<ICompetitor>)competitorSearchBox.ItemsSource);
 
                 if (competitorSearchBox.SelectedPerson == null)
                 {
@@ -347,7 +347,7 @@ namespace ImpartialUI.Controls
 
             if (judge != null)
             {
-                judgeSearchBox.SelectedPerson = judgeSearchBox.ItemsSource.Where(j => j.FullName == judge.FullName).FirstOrDefault();
+                judgeSearchBox.SelectedPerson = Util.FindJudgeInCache(judge.FirstName, judge.LastName, (IEnumerable<IJudge>)judgeSearchBox.ItemsSource);
 
                 if (judgeSearchBox.SelectedPerson != null)
                 {

@@ -79,7 +79,7 @@ namespace ImpartialUI.Services.ScoresheetParser
             return divisions;
         }
 
-        public override IPrelimCompetition GetPrelimCompetition(Division division, Round round, Role role)
+        public override IPrelimCompetition? GetPrelimCompetition(Division division, Round round, Role role)
         {
             var prelimCompetition = new PrelimCompetition(
                 dateTime: DateTime.MinValue,
@@ -90,6 +90,11 @@ namespace ImpartialUI.Services.ScoresheetParser
                 promotedCompetitors: new List<ICompetitor>());
 
             string prelims = GetPrelimsDocByDivision(division, role, round);
+            if (prelims == string.Empty)
+            {
+                return null;
+            }
+
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(prelims);
             var nodes = doc.DocumentNode.SelectNodes("tr");
@@ -144,9 +149,12 @@ namespace ImpartialUI.Services.ScoresheetParser
             return prelimCompetition;
         }
 
-        public override IFinalCompetition GetFinalCompetition(Division division) 
+        public override IFinalCompetition? GetFinalCompetition(Division division) 
         {
             var sub = GetFinalsDocByDivision(division);
+            if (sub == string.Empty)
+                return null;
+
             var judges = GetFinalsJudgesByDivision(division);
 
             HtmlDocument doc = new HtmlDocument();
@@ -326,12 +334,17 @@ namespace ImpartialUI.Services.ScoresheetParser
 
                 if (round == Round.Prelims)
                 {
-                    if (divisionString.Contains("Semis"))
+                    if (divisionString.Contains("Semis") || divisionString.Contains("Quarters"))
                         continue;
                 }
                 else if (round == Round.Semifinals)
                 {
-                    if (divisionString.Contains("Prelims"))
+                    if (divisionString.Contains("Prelims") || divisionString.Contains("Quarters"))
+                        continue;
+                }
+                else if (round == Round.Quarterfinals)
+                {
+                    if (divisionString.Contains("Prelims") || divisionString.Contains("Semis"))
                         continue;
                 }
 
