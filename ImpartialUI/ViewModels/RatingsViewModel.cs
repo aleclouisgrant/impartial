@@ -193,8 +193,8 @@ namespace ImpartialUI.ViewModels
 
         private async void Initialize()
         {
-            _competitions = (await _databaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date).ToList();
-            Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
+            //_competitions = (await _databaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date).ToList();
+            //Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
         }
 
         private void ReportProgress(double progress)

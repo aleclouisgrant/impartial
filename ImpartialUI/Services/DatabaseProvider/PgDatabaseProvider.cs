@@ -7,9 +7,6 @@ using System.Threading.Tasks;
 using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
-using System.Numerics;
-using ImpartialUI.Controls;
-using System.Net;
 using Impartial.Enums;
 
 namespace ImpartialUI.Services.DatabaseProvider
@@ -68,23 +65,26 @@ namespace ImpartialUI.Services.DatabaseProvider
             string columnNames = string.Empty;
             string parameterPositions = string.Empty;
 
-            int startingPos = 1;
-            while (startingPos <= properties.Length)
+            int startingPos = 0;
+            while (startingPos < properties.Length)
             {
-                if (properties[startingPos - 1].GetValue(parameters) != null)
+                if (properties[startingPos].GetValue(parameters) != null)
                 {
-                    columnNames += properties[startingPos - 1].Name;
+                    columnNames += properties[startingPos].Name;
                     parameterPositions += "$1";
+                    int count = 2;
 
-                    for (int parameterIndex = startingPos; parameterIndex < properties.Length; parameterIndex++)
+                    for (int parameterIndex = startingPos + 1; parameterIndex < properties.Length; parameterIndex++)
                     {
                         if (properties[parameterIndex].GetValue(parameters) != null)
                         {
                             columnNames += ", " + properties[parameterIndex].Name;
-                            parameterPositions += ", $" + (startingPos + 1).ToString();
+                            parameterPositions += ", $" + count;
+                            count++;
                         }
-                        startingPos++;
                     }
+
+                    break;
                 }
 
                 startingPos++;
@@ -103,39 +103,41 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             if (properties.Length == 0)
                 return command + ";";
-            
+
             command += " ";
 
             string columnNames = string.Empty;
             string parameterPositions = string.Empty;
             string excluded = string.Empty;
 
-            int startingPos = 1;
-            while (startingPos <= properties.Length)
+            int startingPos = 0;
+            while (startingPos < properties.Length)
             {
-                if (properties[startingPos - 1].GetValue(parameters) != null)
+                if (properties[startingPos].GetValue(parameters) != null)
                 {
-                    columnNames += properties[startingPos - 1].Name;
-                    parameterPositions += "$1";
+                    columnNames += properties[startingPos].Name;
+                    parameterPositions += "$1"; 
                     excluded += properties[startingPos].Name + " = EXCLUDED." + properties[startingPos].Name;
 
-                    for (int parameterIndex = startingPos; parameterIndex < properties.Length; parameterIndex++)
+                    int count = 2;
+
+                    for (int parameterIndex = startingPos + 1; parameterIndex < properties.Length; parameterIndex++)
                     {
                         if (properties[parameterIndex].GetValue(parameters) != null)
                         {
                             columnNames += ", " + properties[parameterIndex].Name;
-                            parameterPositions += ", $" + (startingPos + 1).ToString();
+                            parameterPositions += ", $" + count;
                             excluded += ", " + properties[parameterIndex].Name + " = EXCLUDED." + properties[parameterIndex].Name;
+
+                            count++;
                         }
-                        startingPos++;
                     }
+
+                    break;
                 }
 
                 startingPos++;
             }
-
-            command += "(" + columnNames + ")";
-            command += " VALUES (" + parameterPositions + ")";
 
             command += "(" + columnNames + ")";
             command += " VALUES (" + parameterPositions + ")";
@@ -268,7 +270,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<ICompetitor?> GetCompetitorAsync(Guid id)
         {
             string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
-                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
+                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
                 + " WHERE competitor_profiles.id = " + id;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -293,7 +295,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<ICompetitor?> GetCompetitorAsync(string firstName, string lastName)
         {
             string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
-               + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
+               + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
                + " WHERE users.first_name = " + firstName + " AND users.last_name = " + lastName;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -375,7 +377,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<IJudge?> GetJudgeAsync(Guid id)
         {
             string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
-                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
+                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
                 + " WHERE judge_profiles.id = " + id;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -397,7 +399,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<IJudge?> GetJudgeAsync(string firstName, string lastName)
         {
             string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
-                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
+                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
                + " WHERE users.first_name = " + firstName + " AND users.last_name = " + lastName;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -521,7 +523,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 follower_tier = competition.FollowerTier
             };
 
-            SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel).Wait();
+            await SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel);
 
             var competitorRegistrations = new List<PgCompetitorRegistrationModel>();
             var competitorRecords = new List<PgCompetitorRecordModel>();
@@ -534,8 +536,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     date_time = pairedPrelimCompetition.LeaderPrelimCompetition.DateTime,
                     role = Role.Leader,
                     round = pairedPrelimCompetition.LeaderPrelimCompetition.Round,
-                    alternate_1_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate1.CompetitorId,
-                    alternate_2_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate2.CompetitorId,
+                    alternate1_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate1.CompetitorId,
+                    alternate2_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate2.CompetitorId,
                 };
 
                 foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
@@ -579,8 +581,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     date_time = pairedPrelimCompetition.FollowerPrelimCompetition.DateTime,
                     role = Role.Follower,
                     round = pairedPrelimCompetition.FollowerPrelimCompetition.Round,
-                    alternate_1_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate1.CompetitorId,
-                    alternate_2_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate2.CompetitorId,
+                    alternate1_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate1.CompetitorId,
+                    alternate2_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate2.CompetitorId,
                 };
 
                 foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
@@ -629,7 +631,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                         prelim_competition_id = pairedPrelimCompetition.LeaderPrelimCompetition.Id,
                         competitor_id = prelimScore.Competitor.CompetitorId,
                         judge_id = prelimScore.Judge.JudgeId,
-                        callbackscore = prelimScore.CallbackScore,
+                        callback_score = prelimScore.CallbackScore,
                     };
 
                     await SaveDataAsync(PG_PRELIM_SCORES_TABLE_NAME, prelimScore);
@@ -643,7 +645,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                         prelim_competition_id = pairedPrelimCompetition.FollowerPrelimCompetition.Id,
                         competitor_id = prelimScore.Competitor.CompetitorId,
                         judge_id = prelimScore.Judge.JudgeId,
-                        callbackscore = prelimScore.CallbackScore,
+                        callback_score = prelimScore.CallbackScore,
                     };
 
                     await SaveDataAsync(PG_PRELIM_SCORES_TABLE_NAME, prelimScore);
@@ -760,7 +762,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             string query =
                 "SELECT dance_conventions.id, dance_conventions.name, dance_conventions.date, competitions.division"
                 + " FROM " + PG_COMPETITIONS_TABLE_NAME
-                + " LEFT JOIN " + PG_DANCE_CONVENTIONS_TABLE_NAME + " ON dance_conventions.id = competitions.dance_convention_id"
+                + " INNER JOIN " + PG_DANCE_CONVENTIONS_TABLE_NAME + " ON dance_conventions.id = competitions.dance_convention_id"
                 + " WHERE competitions.id = " + id;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -985,7 +987,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 while (await reader.ReadAsync())
                 {
-                    Guid competitionId = reader.GetGuid(1);
+                    Guid competitionId = reader.GetGuid(0);
                     competitionIds.Add(competitionId);
                 }
             }

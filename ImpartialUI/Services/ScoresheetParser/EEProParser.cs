@@ -374,7 +374,7 @@ namespace ImpartialUI.Services.ScoresheetParser
                 else if (divisionString.Contains("Follower") || divisionString.Contains("FOLLOWER"))
                     r = Role.Follower;
                 else
-                    r = Role.None;
+                    r = Role.Leader;
 
                 if (division == div && r == role)
                     return prelims;

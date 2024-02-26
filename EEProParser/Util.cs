@@ -388,14 +388,13 @@ namespace Impartial
         {
             switch (s)
             {
-                case "Leader":
-                case "leader":
-                    return Role.Leader;
                 case "Follower":
                 case "follower":
                     return Role.Follower;
+                case "Leader":
+                case "leader":
                 default:
-                    return Role.None;
+                    return Role.Leader;
             }
         }
         public static Round GetRoundFromString(string s)
