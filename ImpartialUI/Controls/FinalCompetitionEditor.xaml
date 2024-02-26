@@ -14,23 +14,11 @@
         </Grid.RowDefinitions>
 
         <Border VerticalAlignment="Top" Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBox Margin="2" MinWidth="10" Grid.Column="0" x:Name="NameTextBox" TextChanged="NameTextBox_TextChanged" Background="Transparent" Text="{Binding FinalCompetition.Name, Mode=TwoWay}"/>
-
-                <TextBlock Margin="2" Grid.Column="1" VerticalAlignment="Center">
-                    <Run Text="Jack &amp; Jill"/>
-                    <Run Text="{Binding FinalCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Run Text="Finals"/>
-                </TextBlock>
-
-                <DatePicker x:Name="CompDatePicker" Grid.Column="2" HorizontalAlignment="Right" SelectedDateChanged="CompDatePicker_SelectedDateChanged" DisplayDate="{Binding FinalCompetition.DateTime, Mode=TwoWay}"/>
-            </Grid>
+            <TextBlock Margin="2" VerticalAlignment="Center">
+                <Run Text="Jack &amp; Jill"/>
+                <Run Text="{Binding FinalCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="Finals"/>
+            </TextBlock>
         </Border>
 
         <Grid VerticalAlignment="Top" Grid.Row="1" x:Name="ScoreGrid">

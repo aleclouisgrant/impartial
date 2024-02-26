@@ -32,10 +32,6 @@ namespace ImpartialUI.Controls
             var judges = competition?.Judges.OrderBy(j => j.FullName);
             var couples = competition?.Couples.OrderBy(c => c.Placement);
 
-            DateTime date = DateTime.Now;
-            if (competition != null)
-                date = competition.DateTime;
-
             viewer.Clear();
 
             if (judges != null)
@@ -55,7 +51,6 @@ namespace ImpartialUI.Controls
                 }
             }
 
-            viewer.CompDatePicker.DisplayDate = date;
             viewer.UpdateCompetition();
         }
 
@@ -99,8 +94,6 @@ namespace ImpartialUI.Controls
         public FinalCompetitionEditor()
         {
             InitializeComponent();
-
-            CompDatePicker.DisplayDate = DateTime.Now;
 
             UpdateCompetitors();
             UpdateJudges();
@@ -363,8 +356,6 @@ namespace ImpartialUI.Controls
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
-            //CompDatePicker.SelectedDate = DateTime.Now;
-
             var placeBorder = new Border()
             {
                 BorderBrush = Brushes.Gray,
@@ -471,7 +462,6 @@ namespace ImpartialUI.Controls
                 return;
 
             FinalCompetition.Clear();
-            FinalCompetition.DateTime = CompDatePicker.DisplayDate;
 
             for (int placement = 1; placement <= ScoreGrid.RowDefinitions.Count - 2; placement++)
             {
@@ -539,14 +529,6 @@ namespace ImpartialUI.Controls
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshItemSources();
-        }
-        private void NameTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            OnPropertyChanged(nameof(FinalCompetition));
-        }
-        private void CompDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            OnPropertyChanged(nameof(FinalCompetition));
         }
 
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };

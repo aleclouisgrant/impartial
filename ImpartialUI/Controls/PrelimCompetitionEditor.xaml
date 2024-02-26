@@ -15,7 +15,7 @@
         <Border Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
             <TextBlock Margin="2">
                 <Run Text="Jack &amp; Jill"/>
-                <Run Text="{Binding PrelimCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding PrelimCompetition.Division, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DivisionToStringConverter}}"/>
                 <Run Text="Prelims ("/>
                 <Run Text="{Binding Role, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Run Text="("/>

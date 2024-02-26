@@ -22,7 +22,7 @@ namespace ImpartialUI.ViewModels
         private IScoresheetParser _scoresheetParser;
         private HttpClient _client;
 
-        private List<ICompetitor> _competitors = new List<ICompetitor>();
+        private List<ICompetitor> _competitors = new();
         public List<ICompetitor> Competitors
         {
             get { return _competitors; }
@@ -32,13 +32,24 @@ namespace ImpartialUI.ViewModels
             }
         }
         
-        private List<IJudge> _judges = new List<IJudge>();
+        private List<IJudge> _judges = new();
         public List<IJudge> Judges
         {
             get { return _judges; }
             set
             {
                 _judges = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private List<IDanceConvention> _danceConventions = new();
+        public List<IDanceConvention> DanceConventions
+        {
+            get { return _danceConventions; }
+            set
+            {
+                _danceConventions = value;
                 OnPropertyChanged();
             }
         }
@@ -129,6 +140,28 @@ namespace ImpartialUI.ViewModels
             }
         }
 
+        private string _newDanceConventionName;
+        public string NewDanceConventionName
+        {
+            get { return _newDanceConventionName; }
+            set
+            {
+                _newDanceConventionName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _newDanceConventionDate;
+        public DateTime NewDanceConventionDate
+        {
+            get { return _newDanceConventionDate; }
+            set
+            {
+                _newDanceConventionDate = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ScoresheetSelector _scoresheetSelector;
         public ScoresheetSelector ScoresheetSelector
         {
@@ -136,6 +169,17 @@ namespace ImpartialUI.ViewModels
             set
             {
                 _scoresheetSelector = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IDanceConvention _selectedDanceConvention;
+        public IDanceConvention SelectedDanceConvention
+        {
+            get { return _selectedDanceConvention; }
+            set
+            {
+                _selectedDanceConvention = value;
                 OnPropertyChanged();
             }
         }
@@ -156,17 +200,6 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private IDanceConvention _danceConvention;
-        public IDanceConvention DanceConvention
-        {
-            get { return _danceConvention; }
-            set
-            {
-                _danceConvention = value;
-                OnPropertyChanged();
-            }
-        }
-
         public IPrelimCompetition LeaderPrelims => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.LeaderPrelimCompetition;
         public IPrelimCompetition FollowerPrelims => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault()?.FollowerPrelimCompetition;
 
@@ -174,7 +207,6 @@ namespace ImpartialUI.ViewModels
         public IPrelimCompetition FollowerSemis => Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault()?.FollowerPrelimCompetition;
 
         public IFinalCompetition FinalCompetition => Competition?.FinalCompetition;
-
 
         private double _parseProgressPercentage;
         public double ParseProgressPercentage
@@ -191,6 +223,7 @@ namespace ImpartialUI.ViewModels
 
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand AddJudgeCommand { get; set; }
+        public ICommand AddDanceConventionCommand { get; set; }
         public ICommand AddCompetitionCommand { get; set; }
         public ICommand ParseScoreSheetsCommand { get; set; }
         public ICommand CancelCommand { get; set; }
@@ -204,10 +237,12 @@ namespace ImpartialUI.ViewModels
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             AddJudgeCommand = new DelegateCommand(AddJudge);
             AddCompetitionCommand = new DelegateCommand(AddCompetition);
+            AddDanceConventionCommand = new DelegateCommand(AddDanceConvention);
             SelectPrelimsPathCommand = new DelegateCommand(SelectPrelimsPath);
             SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
             ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
             CancelCommand = new DelegateCommand(Clear);
+            RefreshCacheCommand = new DelegateCommand(RefreshCache);
 
             _client = new HttpClient();
             _client.BaseAddress = new Uri("https://points.worldsdc.com/");
@@ -218,34 +253,12 @@ namespace ImpartialUI.ViewModels
             };
             ScoresheetSelector = ScoresheetSelector.Auto;
 
-            _parseProgress = new Progress<double>(ReportProgress);
-        }
-        public AddCompetitionViewModel(List<ICompetitor> competitors, List<IJudge> judges)
-        {
-            AddCompetitorCommand = new DelegateCommand(AddCompetitor);
-            AddJudgeCommand = new DelegateCommand(AddJudge);
-            AddCompetitionCommand = new DelegateCommand(AddCompetition);
-            SelectPrelimsPathCommand = new DelegateCommand(SelectPrelimsPath);
-            SelectSemisPathCommand = new DelegateCommand(SelectSemisPath);
-            SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
-            ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
-            RefreshCacheCommand = new DelegateCommand(RefreshCache);
-            CancelCommand = new DelegateCommand(Clear);
-
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
-
-            Competition = new Competition()
-            {
-                Division = Division.AllStar
-            };
-            ScoresheetSelector = ScoresheetSelector.Auto;
+            NewDanceConventionDate = DateTime.Now;
 
             _parseProgress = new Progress<double>(ReportProgress);
 
-            Competitors = competitors;
-            Judges = judges;
-
+            RefreshCache();
+            
             //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
             //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-04-01 city of angels\prelims.html";
             //SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\semis.html";
@@ -255,8 +268,9 @@ namespace ImpartialUI.ViewModels
 
         private async void RefreshCache()
         {
-            //Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).ToList();
-            //Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList();
+            DanceConventions = (await App.DatabaseProvider.GetAllDanceConventionsAsync()).OrderBy(c => c.Date).ToList();
+            Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).OrderBy(c => c.FullName).ToList();
+            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList().OrderBy(c => c.FullName).ToList();
         }
 
         private void Clear()
@@ -292,6 +306,16 @@ namespace ImpartialUI.ViewModels
 
             JudgeFirstName = string.Empty;
             JudgeLastName = string.Empty;
+        }
+        private async void AddDanceConvention()
+        {
+            var newDanceConvention = new DanceConvention(NewDanceConventionName, NewDanceConventionDate);
+
+            await App.DatabaseProvider.UpsertDanceConventionAsync(newDanceConvention);
+            DanceConventions.Add(newDanceConvention);
+
+            NewDanceConventionName = string.Empty;
+            NewDanceConventionDate = DateTime.Now;
         }
 
         private void SelectPrelimsPath()
@@ -585,7 +609,7 @@ namespace ImpartialUI.ViewModels
         private void AddCompetition()
         {
             Trace.WriteLine(Competition.ToLongString());
-            App.DatabaseProvider.UpsertCompetitionAsync(Competition, DanceConvention.Id);
+            App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
             Clear();
         }
 

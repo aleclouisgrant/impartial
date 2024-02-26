@@ -26,7 +26,7 @@
                       SelectedItem="{Binding SelectedCompetition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button x:Name="RefreshButton" Content="Refresh" Command="{Binding RefreshCompetitionsCommand}" Width="70" Height="30"/>
             <Button x:Name="SaveButton" Content="Save" Command="{Binding SaveCompetitionCommand}" Click="SaveButton_Click" Width="70" Height="30" Visibility="Collapsed"/>
-            <Button x:Name="EditButton" Content="Edit" Click="EditCompetitionButton_Click" Width="70" Height="30" Margin="5 0 0 0"/>
+            <Button x:Name="EditButton" Content="Edit" IsEnabled="False" Click="EditCompetitionButton_Click" Width="70" Height="30" Margin="5 0 0 0"/>
             <Button x:Name="DeleteButton" Content="Delete" Command="{Binding DeleteCompetitionCommand}" Width="70" Height="30" Margin="5 0 0 0"/>
         </StackPanel>
 

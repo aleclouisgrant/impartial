@@ -23,5 +23,10 @@ namespace ImpartialUI.Models
 
             Competitions = new List<ICompetition>();
         }
+
+        public override string ToString()
+        {
+            return Name + " " + Date.ToShortDateString();
+        }
     }
 }
