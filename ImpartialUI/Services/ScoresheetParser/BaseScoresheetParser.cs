@@ -26,14 +26,14 @@ namespace ImpartialUI.Services.ScoresheetParser
             FinalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
         }
 
-        public IPairedPrelimCompetition GetPairedPrelimCompetition(Division division, Round round)
+        public virtual IPairedPrelimCompetition GetPairedPrelimCompetition(Division division, Round round)
         {
             return PrelimsSheetDoc != null ?
                 new PairedPrelimCompetition(round, GetPrelimCompetition(division, round, Role.Leader), GetPrelimCompetition(division, round, Role.Follower))
                 : new PairedPrelimCompetition(round, null, null);
         }
 
-        public ICompetition GetCompetition(Division division)
+        public virtual ICompetition GetCompetition(Division division)
         {
             var competition = new Competition(danceConventionId: Guid.Empty, name: GetName(), date: DateTime.MinValue, division: division)
             {

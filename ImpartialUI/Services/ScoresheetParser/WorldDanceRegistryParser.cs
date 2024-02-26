@@ -12,27 +12,15 @@ namespace ImpartialUI.Services.ScoresheetParser
 {
     public class WorldDanceRegistryParser : ScoresheetParserBase
     {
-        private string _prelimsSheetDoc { get; set; }
-        private string _finalsSheetDoc { get; set; }
-
-        public WorldDanceRegistryParser(string prelimsPath = null, string finalsPath = null)
-        {
-            bool prelimPathFound = !(prelimsPath == null || prelimsPath == String.Empty || !File.Exists(prelimsPath));
-            bool finalsPathFound = !(finalsPath == null || finalsPath == String.Empty || !File.Exists(finalsPath));
-
-            if (!prelimPathFound && !finalsPathFound)
-                throw new FileNotFoundException();
-
-            _prelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
-            _finalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
-        }
+        //TODO: add semis and quarters sheets
+        public WorldDanceRegistryParser(string prelimsPath = null, string finalsPath = null) : base(prelimsPath, finalsPath) { }
 
         public override List<Division> GetDivisions()
         {
             var divisions = new List<Division>();
 
             var finals = Util.GetSubString(
-                s: _finalsSheetDoc,
+                s: FinalsSheetDoc,
                 from: "<div class=\"pb-4\"><br>",
                 to: "</tbody></table></div>");
 
@@ -63,8 +51,28 @@ namespace ImpartialUI.Services.ScoresheetParser
             return divisions;
         }
 
+        public override ICompetition GetCompetition(Division division)
+        {
+            var competition = new Competition(danceConventionId: Guid.Empty, name: GetName(), date: DateTime.MinValue, division: division)
+            {
+                FinalCompetition = GetFinalCompetition(division),
+                PairedPrelimCompetitions = new List<IPairedPrelimCompetition>()
+            };
+
+            var prelims = GetPairedPrelimCompetition(division, Round.Prelims);
+
+            if (prelims.LeaderPrelimCompetition != null)
+                competition.PairedPrelimCompetitions.Add(prelims);
+
+            return competition;
+        }
+
         public override IPrelimCompetition GetPrelimCompetition(Division division, Round round, Role role)
         {
+            var prelims = GetPrelimsDocByDivision(division, role, round);
+            if (prelims == string.Empty)
+                return null;
+
             var prelimCompetition = new PrelimCompetition(
                 dateTime: DateTime.MinValue,
                 division: division,
@@ -73,7 +81,6 @@ namespace ImpartialUI.Services.ScoresheetParser
                 prelimScores: new List<IPrelimScore>(),
                 promotedCompetitors: new List<ICompetitor>());
 
-            var prelims = GetPrelimsDocByDivision(division, role, round);
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(prelims);
             var nodes = doc.DocumentNode.SelectNodes("tr");
@@ -131,9 +138,12 @@ namespace ImpartialUI.Services.ScoresheetParser
 
             return prelimCompetition;
         }
-        public override IFinalCompetition GetFinalCompetition(Division division)
+        public override IFinalCompetition? GetFinalCompetition(Division division)
         {
             var sub = GetFinalsDocByDivision(division);
+            if (sub == string.Empty)
+                return null;
+            
             var judges = GetFinalsJudgesByDivision(division);
 
             HtmlDocument doc = new HtmlDocument();
@@ -215,14 +225,14 @@ namespace ImpartialUI.Services.ScoresheetParser
             if (role == Role.Leader)
             {
                 sub = Util.GetSubString(
-                    s: _prelimsSheetDoc,
+                    s: PrelimsSheetDoc,
                     from: "</td>",
                     to: "<td class=\"fw-bold td-grey bg-darken-md\">Scores Sum");
             }
             else if (role == Role.Follower)
             {
                 sub = Util.GetSubString(
-                    s: _prelimsSheetDoc.Substring(_prelimsSheetDoc.IndexOf("<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers")),
+                    s: PrelimsSheetDoc.Substring(PrelimsSheetDoc.IndexOf("<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers")),
                     from: "</td>",
                     to: "<td class=\"fw-bold td-grey bg-darken-md\">Scores Sum");
             }
@@ -266,7 +276,7 @@ namespace ImpartialUI.Services.ScoresheetParser
             var judges = new List<IJudge>();
 
             string sub = Util.GetSubString(
-                s: _finalsSheetDoc,
+                s: FinalsSheetDoc,
                 from: "</a></caption><thead><tr>",
                 to: "</tr>");
 
@@ -312,7 +322,7 @@ namespace ImpartialUI.Services.ScoresheetParser
         {
             Division div;
             var doc = Util.GetSubString(
-                s: _prelimsSheetDoc,
+                s: PrelimsSheetDoc,
                 from: "<div class=\"pb-4\"><br>",
                 to: "</tbody></table></div>");
 
@@ -350,14 +360,14 @@ namespace ImpartialUI.Services.ScoresheetParser
             if (role == Role.Leader)
             {
                 prelims = Util.GetSubString(
-                    s: _prelimsSheetDoc,
+                    s: PrelimsSheetDoc,
                     from: "<td class=\"fw-bold td-grey bg-darken-md text-start\">Leaders",
                     to: "</tbody></table>");
             }
             else if (role == Role.Follower)
             {
                 prelims = Util.GetSubString(
-                    s: _prelimsSheetDoc,
+                    s: PrelimsSheetDoc,
                     from: "<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers",
                     to: "</tbody></table></div></div>");
             }
@@ -368,7 +378,7 @@ namespace ImpartialUI.Services.ScoresheetParser
         {
             Division div;
             var finals = Util.GetSubString(
-                s: _finalsSheetDoc,
+                s: FinalsSheetDoc,
                 from: "<div class=\"pb-4\"><br>",
                 to: "</tbody></table></div>");
 
@@ -406,11 +416,11 @@ namespace ImpartialUI.Services.ScoresheetParser
 
         public override string GetName()
         {
-            if (_finalsSheetDoc == null)
+            if (FinalsSheetDoc == null)
                 return string.Empty;
 
             string name = Util.GetSubString(
-                s: _finalsSheetDoc,
+                s: FinalsSheetDoc,
                 from: "<title>",
                 to: "</title>").Trim();
 
