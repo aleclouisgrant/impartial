@@ -16,12 +16,12 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty SelectedPersonProperty = DependencyProperty.Register(
             nameof(SelectedPerson),
-            typeof(IPersonModel),
+            typeof(IUser),
             typeof(SearchTextBox),
             new FrameworkPropertyMetadata());
-        public IPersonModel SelectedPerson
+        public IUser SelectedPerson
         {
-            get { return (IPersonModel)GetValue(SelectedPersonProperty); }
+            get { return (IUser)GetValue(SelectedPersonProperty); }
             set { SetValue(SelectedPersonProperty, value); }
         }
 
@@ -44,18 +44,18 @@ namespace ImpartialUI.Controls
 
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             nameof(ItemsSource),
-            typeof(IEnumerable<IPersonModel>),
+            typeof(IEnumerable<IUser>),
             typeof(SearchTextBox),
             new FrameworkPropertyMetadata(null, OnItemsSourcePropertyChanged));
-        public IEnumerable<IPersonModel> ItemsSource
+        public IEnumerable<IUser> ItemsSource
         {
-            get { return (IEnumerable<IPersonModel>)GetValue(ItemsSourceProperty); }
+            get { return (IEnumerable<IUser>)GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
         }
         private static void OnItemsSourcePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             var control = (SearchTextBox)source;
-            control.ComboBoxItems.ItemsSource = (IEnumerable<IPersonModel>)e.NewValue;
+            control.ComboBoxItems.ItemsSource = (IEnumerable<IUser>)e.NewValue;
 
             control.GuessPerson();
         }
@@ -155,12 +155,12 @@ namespace ImpartialUI.Controls
             ComboBoxItems.SelectedItem = GetClosestPersonByFirstName(Text, ItemsSource.ToList());
         }
 
-        private IPersonModel GetClosestPersonByFirstName(string input, List<IPersonModel> list)
+        private IUser GetClosestPersonByFirstName(string input, List<IUser> list)
         {
             int leastDistance = 10000;
-            IPersonModel match = null;
+            IUser match = null;
 
-            foreach (IPersonModel j in list)
+            foreach (IUser j in list)
             {
                 int d = GetEditDistance(input, j.FirstName);
                 if (d == 0)
@@ -247,10 +247,10 @@ namespace ImpartialUI.Controls
 
             var competitor = new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text, Int32.Parse(WsdcIdTextBox.Text));
             await App.DatabaseProvider.UpsertCompetitorAsync(competitor);
-            ItemsSource = (IEnumerable<PersonModel>)await App.DatabaseProvider.GetAllCompetitorsAsync();
+            ItemsSource = await App.DatabaseProvider.GetAllCompetitorsAsync();
 
             SearchMode();
-            ComboBoxItems.SelectedValue = ItemsSource.Where(c => c.Id == competitor.Id).FirstOrDefault();
+            ComboBoxItems.SelectedValue = ItemsSource.Where(u => u.UserId == competitor.UserId).FirstOrDefault();
 
             List<ICompetitor> removedItems = new List<ICompetitor>(){
                 new Competitor(_cancelledPersonFirstName, _cancelledPersonLastName)
@@ -282,7 +282,7 @@ namespace ImpartialUI.Controls
 
             if (_wasCancelled)
             {
-                var removedItems = new List<PersonModel> {
+                var removedItems = new List<IUser> {
                     new Competitor(_cancelledPersonFirstName, _cancelledPersonLastName) };
 
                 eventArgs = new SearchTextBoxSelectionChangedEventArgs(SelectionChangedEvent, removedItems, e.AddedItems, Placement);

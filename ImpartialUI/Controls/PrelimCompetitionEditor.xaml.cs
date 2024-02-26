@@ -45,7 +45,7 @@ namespace ImpartialUI.Controls
 
             foreach (var competitor in competition.Competitors)
             {
-                var prelimScores = competition.PrelimScores.Where(s => s.Competitor.Id == competitor.Id).OrderBy(c => c.Judge.FullName).ToList();
+                var prelimScores = competition.PrelimScores.Where(s => s.Competitor.CompetitorId == competitor.CompetitorId).OrderBy(c => c.Judge.FullName).ToList();
 
                 competitorScoresList.Add(new PrelimCompetitorScores 
                     {
@@ -165,12 +165,12 @@ namespace ImpartialUI.Controls
         {
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
-                var selectedId = searchTextBox.SelectedPerson?.Id;
+                var selectedId = searchTextBox.SelectedPerson?.UserId;
                 searchTextBox.ItemsSource = Competitors;
 
                 if (selectedId != null)
                 {
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.Id == selectedId);
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.UserId == selectedId);
                 }
                 else
                 {
@@ -182,12 +182,12 @@ namespace ImpartialUI.Controls
         {
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
-                var selectedId = searchTextBox.SelectedPerson?.Id;
+                var selectedId = searchTextBox.SelectedPerson?.UserId;
                 searchTextBox.ItemsSource = Judges;
 
                 if (selectedId != null)
                 {
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.Id == selectedId); ;
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.UserId == selectedId); ;
                 }
                 else
                 {
@@ -277,7 +277,7 @@ namespace ImpartialUI.Controls
                 {
                     foreach (var prelimScore in competitorPrelimScores)
                     {
-                        prelimScore.SetCompetitor(competitorSearchBox.SelectedPerson.Id);
+                        prelimScore.SetCompetitor(competitorSearchBox.SelectedPerson.UserId);
                     }
                 }
             }
@@ -384,7 +384,7 @@ namespace ImpartialUI.Controls
         {
             for (int j = 0; j < _judgeBoxes.Count(); j++)
             {
-                _scores[placement - 1, j].SetCompetitor(newCompetitor.Id);
+                _scores[placement - 1, j].SetCompetitor(newCompetitor.CompetitorId);
             }
 
             OnPropertyChanged(nameof(PrelimCompetition));
@@ -393,7 +393,7 @@ namespace ImpartialUI.Controls
         {
             for (int i = 0; i < _competitorBoxes.Count(); i++)
             {
-                _scores[i, judgeIndex].SetJudge(newJudge.Id);
+                _scores[i, judgeIndex].SetJudge(newJudge.JudgeId);
             }
 
             OnPropertyChanged(nameof(PrelimCompetition));
@@ -424,7 +424,7 @@ namespace ImpartialUI.Controls
             for (int judgeIndex = 0; judgeIndex < _scores.GetLength(1); judgeIndex++)
             {
                 var newPrelimScore = new PrelimScore(
-                    judgeId: _judgeBoxes.ElementAt(judgeIndex).SelectedPerson.Id,
+                    judgeId: ((IJudge)_judgeBoxes.ElementAt(judgeIndex).SelectedPerson).JudgeId,
                     competitorId: Guid.Empty,
                     callbackScore: CallbackScore.NoScore);
 
@@ -457,7 +457,7 @@ namespace ImpartialUI.Controls
             {
                 var newPrelimScore = new PrelimScore(
                     judgeId: Guid.Empty,
-                    competitorId: _competitorBoxes.ElementAt(competitorIndex).SelectedPerson.Id,
+                    competitorId: ((ICompetitor)_competitorBoxes.ElementAt(competitorIndex).SelectedPerson).CompetitorId,
                     callbackScore: CallbackScore.NoScore);
 
                 scores[competitorIndex, scores.GetLength(1) - 1] = newPrelimScore;

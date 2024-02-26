@@ -232,12 +232,12 @@ namespace Impartial
 
             return match;
         }
-        public static IPersonModel GetClosestPersonByFirstName(string input, IEnumerable<IPersonModel> list)
+        public static IUser GetClosestPersonByFirstName(string input, IEnumerable<IUser> list)
         {
             int leastDistance = 10000;
-            IPersonModel match = null;
+            IUser match = null;
 
-            foreach (IPersonModel p in list)
+            foreach (IUser p in list)
             {
                 int d = GetEditDistance(input, p.FirstName);
                 if (d == 0)

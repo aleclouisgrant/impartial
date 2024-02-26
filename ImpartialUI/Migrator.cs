@@ -31,13 +31,13 @@ namespace ImpartialUI
                 {
                     cmd.Parameters.AddWithValue("FirstName", competitor.FirstName);
                     cmd.Parameters.AddWithValue("LastName", competitor.LastName);
-                    cmd.Parameters.AddWithValue("Id", competitor.Id);
+                    cmd.Parameters.AddWithValue("Id", competitor.CompetitorId);
                     await cmd.ExecuteNonQueryAsync();
                 }
 
                 await using (var cmd = new NpgsqlCommand(pgCompetitorInsertCommand, pgConnection))
                 {
-                    cmd.Parameters.AddWithValue("UserId", competitor.Id);
+                    cmd.Parameters.AddWithValue("UserId", competitor.CompetitorId);
                     cmd.Parameters.AddWithValue("WsdcId", competitor.WsdcId);
                     await cmd.ExecuteNonQueryAsync();
                 }

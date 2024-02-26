@@ -38,11 +38,11 @@ namespace Impartial
         }
     }
 
-    public interface ICompetitor : IPersonModel
+    public interface ICompetitor : IUser
     {
-        // personal info
         public new string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
 
+        public Guid CompetitorId { get; set; }
         public int WsdcId { get; set; }
 
         public RoleStats LeadStats { get; set; }

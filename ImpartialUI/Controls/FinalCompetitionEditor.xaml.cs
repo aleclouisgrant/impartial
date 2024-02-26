@@ -105,12 +105,12 @@ namespace ImpartialUI.Controls
         {
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
-                var selectedId = searchTextBox.SelectedPerson?.Id;
+                var selectedId = searchTextBox.SelectedPerson?.UserId;
                 searchTextBox.ItemsSource = Competitors;
 
                 if (selectedId != null)
                 {
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.UserId == selectedId).FirstOrDefault();
                 }
                 else
                 {
@@ -122,12 +122,12 @@ namespace ImpartialUI.Controls
         {
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
-                var selectedId = searchTextBox.SelectedPerson?.Id;
+                var selectedId = searchTextBox.SelectedPerson?.UserId;
                 searchTextBox.ItemsSource = Judges;
 
                 if (selectedId != null)
                 {
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.UserId == selectedId).FirstOrDefault();
                 }
                 else
                 {

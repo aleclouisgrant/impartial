@@ -12,7 +12,7 @@ namespace ImpartialUI.Models
 
         public CompetitorDataModel(ICompetitor competitor)
         {
-            CompetitorId = competitor.Id;
+            CompetitorId = competitor.CompetitorId;
             Competitor = competitor;
         }
 

@@ -87,7 +87,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public void DeleteCompetitor(ICompetitor competitor)
         {
-            _helper.DeleteById<ICompetitor>(COMPETITORS_TABLE_STRING, competitor.Id);
+            _helper.DeleteById<ICompetitor>(COMPETITORS_TABLE_STRING, competitor.CompetitorId);
         }
         public void DeleteAllCompetitors()
         {
@@ -116,7 +116,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public void DeleteJudge(IJudge judge)
         {
-            _helper.DeleteById<IJudge>(JUDGES_TABLE_STRING, judge.Id);
+            _helper.DeleteById<IJudge>(JUDGES_TABLE_STRING, judge.JudgeId);
         }
         public void DeleteAllJudges()
         {

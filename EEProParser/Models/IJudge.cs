@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Impartial
 {
-    public interface IJudge : IPersonModel
+    public interface IJudge : IUser
     {
+        public Guid JudgeId { get; set; }
         public List<IFinalScore> Scores { get; set; }
 
         public double Accuracy { get; }

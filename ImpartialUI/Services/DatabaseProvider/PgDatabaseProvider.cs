@@ -9,6 +9,7 @@ using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using System.Numerics;
 using ImpartialUI.Controls;
+using System.Net;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -243,14 +244,14 @@ namespace ImpartialUI.Services.DatabaseProvider
         {
             var userModel = new PgUserModel
             {
-                id = competitor.Id,
+                id = competitor.CompetitorId,
                 first_name = competitor.FirstName,
                 last_name = competitor.LastName,
             };
 
             var competitorProfileModel = new PgCompetitorProfileModel
             {
-                user_id = competitor.Id,
+                user_id = competitor.CompetitorId,
                 wsdc_id = competitor.WsdcId
             };
 
@@ -347,14 +348,14 @@ namespace ImpartialUI.Services.DatabaseProvider
         {
             var userModel = new PgUserModel
             {
-                id = judge.Id,
+                id = judge.JudgeId,
                 first_name = judge.FirstName,
                 last_name = judge.LastName,
             };
 
             var judgeModel = new PgJudgeProfileModel
             {
-                user_id = judge.Id,
+                user_id = judge.JudgeId,
             };
 
             await using var connection = await _dataSource.OpenConnectionAsync();
@@ -512,9 +513,8 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             await SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel);
 
-            // TODO: need to add competitor registrations
-
-            // TODO: need to add competitor records
+            var competitorRegistrations = new List<PgCompetitorRegistrationModel>();
+            var competitorRecords = new List<PgCompetitorRecordModel>();
 
             foreach (var pairedPrelimCompetition in competition.PairedPrelimCompetitions)
             {
@@ -526,12 +526,31 @@ namespace ImpartialUI.Services.DatabaseProvider
                     round = pairedPrelimCompetition.LeaderPrelimCompetition.Round,
                 };
 
+                foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
+                {
+                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).Any())
+                    {
+                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        {
+                            competitor_profile_id = competitor.CompetitorId
+                        });
+                    }
+
+                    if (!competitorRecords.Where(rec => rec.competitor_registration_id == competitor.CompetitorId).Any())
+                    {
+                        competitorRecords.Add(new PgCompetitorRecordModel
+                        {
+
+                        });
+                    }
+                }
+
                 foreach (var promotedCompetitor in pairedPrelimCompetition.LeaderPrelimCompetition.PromotedCompetitors)
                 {
                     var leaderPrelimPromotedCompetitorsModel = new PgPromotedCompetitorModel
                     {
                         prelim_competition_id = leaderPrelimCompetitionModel.id,
-                        competitor_id = promotedCompetitor.Id
+                        competitor_id = promotedCompetitor.CompetitorId
                     };
 
                     await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, leaderPrelimPromotedCompetitorsModel);
@@ -550,7 +569,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                     var followerPrelimPromotedCompetitorsModel = new PgPromotedCompetitorModel
                     {
                         prelim_competition_id = followerPrelimCompetitionModel.id,
-                        competitor_id = promotedCompetitor.Id
+                        competitor_id = promotedCompetitor.CompetitorId
                     };
 
                     await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, followerPrelimPromotedCompetitorsModel);
@@ -565,8 +584,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     {
                         id = prelimScore.Id,
                         prelim_competition_id = pairedPrelimCompetition.LeaderPrelimCompetition.Id,
-                        competitor_id = prelimScore.Competitor.Id,
-                        judge_id = prelimScore.Judge.Id,
+                        competitor_id = prelimScore.Competitor.CompetitorId,
+                        judge_id = prelimScore.Judge.JudgeId,
                         callbackscore = prelimScore.CallbackScore,
                     };
 
@@ -579,8 +598,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     {
                         id = prelimScore.Id,
                         prelim_competition_id = pairedPrelimCompetition.FollowerPrelimCompetition.Id,
-                        competitor_id = prelimScore.Competitor.Id,
-                        judge_id = prelimScore.Judge.Id,
+                        competitor_id = prelimScore.Competitor.CompetitorId,
+                        judge_id = prelimScore.Judge.JudgeId,
                         callbackscore = prelimScore.CallbackScore,
                     };
 
@@ -601,8 +620,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     var pgPlacementModel = new PgPlacementModel
                     {
                         final_competition_id = competition.FinalCompetition.Id,
-                        leader_id = couple.Leader.Id,
-                        follower_id = couple.Follower.Id,
+                        leader_id = couple.Leader.CompetitorId,
+                        follower_id = couple.Follower.CompetitorId,
                         placement = couple.Placement
                     };
 
@@ -614,9 +633,9 @@ namespace ImpartialUI.Services.DatabaseProvider
                     var pgFinalScoreModel = new PgFinalScoreModel
                     {
                         final_competition_id = competition.FinalCompetition.Id,
-                        judge_id = finalScore.Judge.Id,
-                        leader_id = finalScore.Leader.Id,
-                        follower_id = finalScore.Follower.Id,
+                        judge_id = finalScore.Judge.JudgeId,
+                        leader_id = finalScore.Leader.CompetitorId,
+                        follower_id = finalScore.Follower.CompetitorId,
                         score = finalScore.Score
                     };
 
@@ -726,7 +745,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                     {
                         Guid competitorId = reader.GetGuid(0);
 
-                        promotedCompetitors.Add(App.CompetitorsDb.Find(c => c.Id == competitorId));
+                        promotedCompetitors.Add(App.CompetitorsDb.Find(c => c.CompetitorId == competitorId));
                     }
                 }
 
@@ -796,8 +815,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                         int placement = reader.GetInt32(2);
 
                         couples.Add(new Couple(
-                            leader: App.CompetitorsDb.Where(c => c.Id == leaderId).FirstOrDefault(),
-                            follower: App.CompetitorsDb.Where(c => c.Id == followerId).FirstOrDefault(),
+                            leader: App.CompetitorsDb.Where(c => c.CompetitorId == leaderId).FirstOrDefault(),
+                            follower: App.CompetitorsDb.Where(c => c.CompetitorId == followerId).FirstOrDefault(),
                             placement: placement));
                     }
                 }
@@ -819,7 +838,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                         Guid leaderId = reader.GetGuid(2);
                         Guid followerId = reader.GetGuid(3);
                         int score = reader.GetInt32(4);
-                        int placement = couples.Where(c => c.Leader.Id == leaderId && c.Follower.Id == followerId).FirstOrDefault().Placement;
+                        int placement = couples.Where(c => c.Leader.CompetitorId == leaderId && c.Follower.CompetitorId == followerId).FirstOrDefault().Placement;
 
                         finalScores.Add(new FinalScore(
                             judgeId: judgeId,

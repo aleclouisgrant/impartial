@@ -3,27 +3,27 @@ using System;
 
 namespace ImpartialUI.Models
 {
-    public class Competitor : PersonModel, ICompetitor
+    public class Competitor : UserBase, ICompetitor
     {
-        // personal info
         public new string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
 
+        public Guid CompetitorId { get; set; }
         public int WsdcId { get; set; }
 
         public RoleStats LeadStats { get; set; } = new RoleStats();
         public RoleStats FollowStats { get; set; } = new RoleStats();
 
-        public Competitor(string firstName, string lastName)
+        public Competitor(string firstName, string lastName, Guid? id = null)
         {
-            Id = Guid.NewGuid();
+            CompetitorId = id ?? Guid.NewGuid();
 
             FirstName = firstName;
             LastName = lastName;
         }
 
-        public Competitor(string firstName, string lastName, int wsdcId)
+        public Competitor(string firstName, string lastName, int wsdcId, Guid? id = null)
         {
-            Id = Guid.NewGuid();
+            CompetitorId = id ?? Guid.NewGuid();
 
             FirstName = firstName;
             LastName = lastName;
@@ -32,7 +32,7 @@ namespace ImpartialUI.Models
 
         public Competitor(Guid id, int wsdcId, string firstName, string lastName, int leaderRating, double leaderVariance, int followerRating, double followerVariance)
         {
-            Id = id;
+            CompetitorId = id;
             FirstName = firstName;
             LastName = lastName;
             WsdcId = wsdcId;

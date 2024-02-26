@@ -5,8 +5,9 @@ using System.Linq;
 
 namespace ImpartialUI.Models
 {
-    public class Judge : PersonModel, IJudge
+    public class Judge : UserBase, IJudge
     {
+        public Guid JudgeId { get; set; }
         public List<IFinalScore> Scores { get; set; }
 
         public double Accuracy => Scores == null ? 0 : Math.Round(Scores.Sum(s => s.Accuracy) / Scores.Count, 2);
@@ -25,10 +26,7 @@ namespace ImpartialUI.Models
 
         public Judge(string firstName, string lastName, Guid? id = null)
         {
-            if (id == null)
-                Id = Guid.NewGuid();
-            else
-                Id = (Guid)id;
+            JudgeId = id ?? Guid.NewGuid();
 
             FirstName = firstName;
             LastName = lastName;

@@ -85,7 +85,7 @@ namespace ImpartialUI.Controls
             // judge names
             foreach (var judge in judges)
             {
-                judge.Scores = finalCompetition.FinalScores.Where(s => s.Judge.Id == judge.Id).ToList();
+                judge.Scores = finalCompetition.FinalScores.Where(s => s.Judge.JudgeId == judge.JudgeId).ToList();
 
                 viewer.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 

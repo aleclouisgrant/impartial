@@ -37,13 +37,13 @@ namespace ImpartialUI.Models
         public void SetJudge(Guid id)
         {
             _judgeId = id;
-            Judge = App.JudgesDb.Where(j => j.Id == _judgeId).FirstOrDefault();
+            Judge = App.JudgesDb.Where(j => j.JudgeId == _judgeId).FirstOrDefault();
         }
 
         public void SetCompetitor(Guid id)
         {
             _competitorId = id;
-            Competitor = App.CompetitorsDb.Where(j => j.Id == _competitorId).FirstOrDefault();
+            Competitor = App.CompetitorsDb.Where(c => c.CompetitorId == _competitorId).FirstOrDefault();
         }
     }
 }

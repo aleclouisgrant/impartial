@@ -55,7 +55,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
         public Task DeleteCompetitorAsync(Guid id)
         {
-            _competitors.RemoveWhere(c => c.Id == id);
+            _competitors.RemoveWhere(c => c.CompetitorId == id);
             return Task.CompletedTask;
         }
 
@@ -67,7 +67,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
         public Task DeleteJudgeAsync(Guid id)
         {
-            _judges.RemoveWhere(c => c.Id == id);
+            _judges.RemoveWhere(j => j.JudgeId == id);
             return Task.CompletedTask;
         }
 
@@ -114,7 +114,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public Task<ICompetitor> GetCompetitorAsync(Guid id)
         {
             var tcs = new TaskCompletionSource<ICompetitor>();
-            tcs.SetResult(_competitors.Where(c => c.Id == id).FirstOrDefault());
+            tcs.SetResult(_competitors.Where(c => c.CompetitorId == id).FirstOrDefault());
 
             return tcs.Task;
         }
@@ -138,7 +138,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public Task<IJudge> GetJudgeAsync(Guid id)
         {
             var tcs = new TaskCompletionSource<IJudge>();
-            tcs.SetResult(_judges.Where(c => c.Id == id).FirstOrDefault());
+            tcs.SetResult(_judges.Where(j => j.JudgeId == id).FirstOrDefault());
 
             return tcs.Task;
         }

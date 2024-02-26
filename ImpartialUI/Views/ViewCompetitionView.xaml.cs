@@ -15,6 +15,7 @@ namespace ImpartialUI.Views
 
         private void EditMode()
         {
+            //TODO:
             //if (CompetitionComboBox.SelectedValue != null)
             //{
             //    _editMode = true;

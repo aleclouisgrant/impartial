@@ -43,19 +43,19 @@ namespace ImpartialUI.Models
         public void SetJudge(Guid id)
         {
             _judgeId = id;
-            Judge = App.JudgesDb.Where(j => j.Id == _judgeId).FirstOrDefault();
+            Judge = App.JudgesDb.Where(j => j.JudgeId == _judgeId).FirstOrDefault();
         }
 
         public void SetLeader(Guid id)
         {
             _leaderId = id;
-            Leader = App.CompetitorsDb.Where(j => j.Id == _leaderId).FirstOrDefault();
+            Leader = App.CompetitorsDb.Where(j => j.CompetitorId == _leaderId).FirstOrDefault();
         }
 
         public void SetFollower(Guid id)
         {
             _followerId = id;
-            Follower = App.CompetitorsDb.Where(j => j.Id == _followerId).FirstOrDefault();
+            Follower = App.CompetitorsDb.Where(j => j.CompetitorId == _followerId).FirstOrDefault();
         }
     }
 }

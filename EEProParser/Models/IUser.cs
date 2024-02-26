@@ -2,9 +2,9 @@
 
 namespace Impartial
 {
-    public interface IPersonModel
+    public interface IUser
     {
-        Guid Id { get; set; }
+        Guid UserId { get; set; }
 
         // personal info
         string FirstName { get; set; }
@@ -12,9 +12,9 @@ namespace Impartial
         string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
     }
 
-    public abstract class PersonModel : IPersonModel 
+    public abstract class UserBase : IUser 
     {
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string FullName => LastName == string.Empty ? FirstName : FirstName + " " + LastName;
