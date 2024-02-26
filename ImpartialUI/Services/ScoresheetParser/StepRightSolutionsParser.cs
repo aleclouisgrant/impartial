@@ -12,28 +12,11 @@ namespace ImpartialUI.Services.ScoresheetParser
 {
     public class StepRightSolutionsParser : ScoresheetParserBase
     {
-        string _prelimsSheetDoc;
-        string _semisSheetDoc;
-        string _finalsSheetDoc;
-
-        public StepRightSolutionsParser(string prelimsPath = null, string semisPath = null, string finalsPath = null) : base(prelimsPath, semisPath)
-        {
-            bool prelimPathFound = !(prelimsPath == null || prelimsPath == string.Empty || !File.Exists(prelimsPath));
-            bool semisPathFound = !(semisPath == null || semisPath == string.Empty || !File.Exists(semisPath));
-            bool finalsPathFound = !(finalsPath == null || finalsPath == string.Empty || !File.Exists(finalsPath));
-
-            if (!prelimPathFound && !semisPathFound && !finalsPathFound)
-                throw new FileNotFoundException();
-
-            _prelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
-            _semisSheetDoc = semisPathFound ? File.ReadAllText(semisPath).Replace("\n", "").Replace("\r", "") : null;
-            _finalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
-        }
-
+        public StepRightSolutionsParser(string prelimsPath = null, string quartersPath = null, string semisPath = null, string finalsPath = null) : base(prelimsPath, quartersPath, semisPath, finalsPath) { }
         public override List<Division> GetDivisions()
         {
             var divisions = new List<Division>();
-            var divisionString = Util.GetSubString(_finalsSheetDoc, "<h3>", "</h3>");
+            var divisionString = Util.GetSubString(FinalsSheetDoc, "<h3>", "</h3>");
 
             if (divisionString.Contains("Masters"))
                 return divisions;
@@ -65,11 +48,14 @@ namespace ImpartialUI.Services.ScoresheetParser
             string sheet = "";
             switch (round)
             {
+                case Round.Quarterfinals:
+                    sheet = QuartersSheetDoc;
+                    break;
                 case Round.Semifinals:
-                    sheet = _semisSheetDoc;
+                    sheet = SemisSheetDoc;
                     break;
                 case Round.Prelims:
-                    sheet = _prelimsSheetDoc; 
+                    sheet = PrelimsSheetDoc; 
                     break;
                 default:
                     return null;
@@ -270,7 +256,7 @@ namespace ImpartialUI.Services.ScoresheetParser
             var judges = new List<IJudge>();
 
             string sub = Util.GetSubString(
-                s: _finalsSheetDoc,
+                s: FinalsSheetDoc,
                 from: "<div><b>Judges: </b>",
                 to: "</div>");
 
@@ -364,7 +350,7 @@ namespace ImpartialUI.Services.ScoresheetParser
         {
             Division div;
             var finals = Util.GetSubString(
-                s: _finalsSheetDoc,
+                s: FinalsSheetDoc,
                 from: "<div class=\"well clearfix\">",
                 to: "</tbody></table></div>");
 
@@ -402,14 +388,14 @@ namespace ImpartialUI.Services.ScoresheetParser
 
         public override string GetName()
         {
-            if (_finalsSheetDoc == null)
+            if (FinalsSheetDoc == null)
                 return string.Empty;
 
             var nameDoc = new HtmlDocument();
 
             nameDoc.LoadHtml(
                 Util.GetSubString(
-                    s: _finalsSheetDoc,
+                    s: FinalsSheetDoc,
                     from: "<h2>",
                     to: "</h2>"));
             string name = nameDoc.DocumentNode.SelectNodes("a")?.FirstOrDefault().InnerText;

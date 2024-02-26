@@ -5,15 +5,13 @@ using ImpartialUI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 
 namespace ImpartialUI.Services.ScoresheetParser
 {
     public class WorldDanceRegistryParser : ScoresheetParserBase
     {
-        //TODO: add semis and quarters sheets
-        public WorldDanceRegistryParser(string prelimsPath = null, string finalsPath = null) : base(prelimsPath, finalsPath) { }
+        public WorldDanceRegistryParser(string prelimsPath = null, string quartersPath = null, string semisPath = null, string finalsPath = null) : base(prelimsPath, quartersPath, semisPath, finalsPath) { }
 
         public override List<Division> GetDivisions()
         {
@@ -69,7 +67,23 @@ namespace ImpartialUI.Services.ScoresheetParser
 
         public override IPrelimCompetition GetPrelimCompetition(Division division, Round round, Role role)
         {
-            var prelims = GetPrelimsDocByDivision(division, role, round);
+            string sheet = "";
+            switch (round)
+            {
+                case Round.Quarterfinals:
+                    sheet = QuartersSheetDoc;
+                    break;
+                case Round.Semifinals:
+                    sheet = SemisSheetDoc;
+                    break;
+                case Round.Prelims:
+                    sheet = PrelimsSheetDoc;
+                    break;
+                default:
+                    return null;
+            }
+
+            var prelims = GetPrelimsDocByDivision(division, role, sheet);
             if (prelims == string.Empty)
                 return null;
 
@@ -84,7 +98,7 @@ namespace ImpartialUI.Services.ScoresheetParser
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(prelims);
             var nodes = doc.DocumentNode.SelectNodes("tr");
-            var judges = GetPrelimsJudgesByDivision(division, role, round);
+            var judges = GetPrelimsJudgesByDivision(division, role, sheet);
 
             int redactedCompetitors = 0;
 
@@ -144,7 +158,7 @@ namespace ImpartialUI.Services.ScoresheetParser
             if (sub == string.Empty)
                 return null;
             
-            var judges = GetFinalsJudgesByDivision(division);
+            var judges = GetFinalsJudges();
 
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(sub);
@@ -217,7 +231,7 @@ namespace ImpartialUI.Services.ScoresheetParser
             return new FinalCompetition(dateTime: DateTime.MinValue, division: division, finalScores: scores);
         }
 
-        private List<IJudge> GetPrelimsJudgesByDivision(Division division, Role role, Round round)
+        private List<IJudge> GetPrelimsJudgesByDivision(Division division, Role role, string sheet)
         {
             var judges = new List<IJudge>();
             string sub = string.Empty;
@@ -225,14 +239,14 @@ namespace ImpartialUI.Services.ScoresheetParser
             if (role == Role.Leader)
             {
                 sub = Util.GetSubString(
-                    s: PrelimsSheetDoc,
+                    s: sheet,
                     from: "</td>",
                     to: "<td class=\"fw-bold td-grey bg-darken-md\">Scores Sum");
             }
             else if (role == Role.Follower)
             {
                 sub = Util.GetSubString(
-                    s: PrelimsSheetDoc.Substring(PrelimsSheetDoc.IndexOf("<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers")),
+                    s: sheet.Substring(sheet.IndexOf("<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers")),
                     from: "</td>",
                     to: "<td class=\"fw-bold td-grey bg-darken-md\">Scores Sum");
             }
@@ -271,7 +285,7 @@ namespace ImpartialUI.Services.ScoresheetParser
 
             return judges;
         }
-        private List<IJudge> GetFinalsJudgesByDivision(Division division)
+        private List<IJudge> GetFinalsJudges()
         {
             var judges = new List<IJudge>();
 
@@ -318,17 +332,17 @@ namespace ImpartialUI.Services.ScoresheetParser
             return judges;
         }
 
-        private string GetPrelimsDocByDivision(Division division, Role role, Round round)
+        private string GetPrelimsDocByDivision(Division division, Role role, string sheet)
         {
             Division div;
             var doc = Util.GetSubString(
-                s: PrelimsSheetDoc,
+                s: sheet,
                 from: "<div class=\"pb-4\"><br>",
                 to: "</tbody></table></div>");
 
-            var divisionString = Util.GetSubString(doc, "<h3 class=\"text-center\">", "</h3>");
-
             doc = doc.Substring(doc.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length);
+
+            var divisionString = Util.GetSubString(doc, "<h3 class=\"text-center\">", "</h3>");
 
             if (divisionString.Contains("Masters"))
                 return string.Empty;
@@ -360,14 +374,14 @@ namespace ImpartialUI.Services.ScoresheetParser
             if (role == Role.Leader)
             {
                 prelims = Util.GetSubString(
-                    s: PrelimsSheetDoc,
+                    s: sheet,
                     from: "<td class=\"fw-bold td-grey bg-darken-md text-start\">Leaders",
                     to: "</tbody></table>");
             }
             else if (role == Role.Follower)
             {
                 prelims = Util.GetSubString(
-                    s: PrelimsSheetDoc,
+                    s: sheet,
                     from: "<td class=\"fw-bold td-grey bg-darken-md text-start\">Followers",
                     to: "</tbody></table></div></div>");
             }

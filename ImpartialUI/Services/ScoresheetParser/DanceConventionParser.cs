@@ -14,9 +14,9 @@ namespace ImpartialUI.Services.ScoresheetParser
         private ICompetition _advancedCompetition;
         private ICompetition _allStarCompetition;
 
-        public DanceConventionParser(string prelimsPath, string filePath)
+        public DanceConventionParser(string prelimsPath, string finalsPath)
         {
-            using (var doc = new PdfDocument(new PdfReader(filePath)))
+            using (var doc = new PdfDocument(new PdfReader(finalsPath)))
             {
 
             }

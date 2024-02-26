@@ -4,7 +4,6 @@ using ImpartialUI.Enums;
 using ImpartialUI.Models;
 using ImpartialUI.Services.ScoresheetParser;
 using Microsoft.Win32;
-using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -269,8 +268,8 @@ namespace ImpartialUI.ViewModels
             CancelCommand = new DelegateCommand(Clear);
             RefreshCacheCommand = new DelegateCommand(RefreshCache);
 
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
+            //_client = new HttpClient();
+            //_client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
             Competition = new Competition()
             { 
@@ -421,16 +420,16 @@ namespace ImpartialUI.ViewModels
             switch (ScoresheetSelector)
             {
                 case ScoresheetSelector.EEPro:
-                    _scoresheetParser = new EEProParser(prelimsPath, finalsPath);
+                    _scoresheetParser = new EEProParser(prelimsPath: prelimsPath, finalsPath: finalsPath);
                     break;
                 case ScoresheetSelector.DanceConvention:
-                    _scoresheetParser = new DanceConventionParser(prelimsPath, finalsPath);
+                    _scoresheetParser = new DanceConventionParser(prelimsPath: prelimsPath, finalsPath: finalsPath);
                     break;
                 case ScoresheetSelector.StepRightSolutions:
-                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, semisPath, finalsPath);
+                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath: prelimsPath, semisPath: semisPath, finalsPath: finalsPath);
                     break;
                 case ScoresheetSelector.WorldDanceRegistry:
-                    _scoresheetParser = new WorldDanceRegistryParser(prelimsPath, finalsPath);
+                    _scoresheetParser = new WorldDanceRegistryParser(prelimsPath: prelimsPath, semisPath: semisPath, finalsPath: finalsPath);
                     break;
                 case ScoresheetSelector.Other:
                 default:
@@ -476,10 +475,10 @@ namespace ImpartialUI.ViewModels
             ParseProgressPercentage = progress;
         }
 
-        public ScoresheetSelector SelectScoresheetParser(string finalsPath)
+        private ScoresheetSelector SelectScoresheetParser(string path)
         {
-            var finalsSheetDoc = File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "");
-            var parserString = Util.GetSubString(finalsSheetDoc, "<!-- saved from", " -->");
+            var sheet = File.ReadAllText(path).Replace("\n", "").Replace("\r", "");
+            var parserString = Util.GetSubString(sheet, "<!-- saved from", " -->");
 
             if (parserString.Contains("worlddanceregistry"))
                 return ScoresheetSelector.WorldDanceRegistry;
@@ -490,6 +489,5 @@ namespace ImpartialUI.ViewModels
             else
                 return ScoresheetSelector.Other;
         }
-        
     }
 }

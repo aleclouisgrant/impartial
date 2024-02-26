@@ -1,17 +1,16 @@
-﻿using HtmlAgilityPack;
-using Impartial.Enums;
-using Impartial;
+﻿using Impartial;
 using ImpartialUI.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace ImpartialUI.Services.ScoresheetParser
 {
     public abstract class ScoresheetParserBase : IScoresheetParser
     {
         public string PrelimsSheetDoc { get; set; }
+        public string QuartersSheetDoc { get; set; }
+        public string SemisSheetDoc { get; set; }
         public string FinalsSheetDoc { get; set; }
 
         public ScoresheetParserBase(string prelimsPath = null, string finalsPath = null)
@@ -23,6 +22,36 @@ namespace ImpartialUI.Services.ScoresheetParser
                 throw new FileNotFoundException();
 
             PrelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
+            FinalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
+        }
+
+        public ScoresheetParserBase(string prelimsPath = null, string semisPath = null, string finalsPath = null)
+        {
+            bool prelimPathFound = !(prelimsPath == null || prelimsPath == string.Empty || !File.Exists(prelimsPath));
+            bool semisPathFound = !(semisPath == null || semisPath == string.Empty || !File.Exists(semisPath));
+            bool finalsPathFound = !(finalsPath == null || finalsPath == string.Empty || !File.Exists(finalsPath));
+
+            if (!prelimPathFound && !semisPathFound && !finalsPathFound)
+                throw new FileNotFoundException();
+
+            PrelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
+            SemisSheetDoc = semisPathFound ? File.ReadAllText(semisPath).Replace("\n", "").Replace("\r", "") : null;
+            FinalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
+        }
+
+        public ScoresheetParserBase(string prelimsPath = null, string quartersPath = null, string semisPath = null, string finalsPath = null)
+        {
+            bool prelimPathFound = !(prelimsPath == null || prelimsPath == string.Empty || !File.Exists(prelimsPath));
+            bool quarterPathFound = !(quartersPath == null || quartersPath == string.Empty || !File.Exists(quartersPath));
+            bool semisPathFound = !(semisPath == null || semisPath == string.Empty || !File.Exists(semisPath));
+            bool finalsPathFound = !(finalsPath == null || finalsPath == string.Empty || !File.Exists(finalsPath));
+
+            if (!prelimPathFound && !quarterPathFound && !semisPathFound && !finalsPathFound)
+                throw new FileNotFoundException();
+
+            PrelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
+            QuartersSheetDoc = prelimPathFound ? File.ReadAllText(quartersPath).Replace("\n", "").Replace("\r", "") : null;
+            SemisSheetDoc = semisPathFound ? File.ReadAllText(semisPath).Replace("\n", "").Replace("\r", "") : null;
             FinalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
         }
 
