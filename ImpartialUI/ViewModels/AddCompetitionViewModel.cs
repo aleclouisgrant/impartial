@@ -283,6 +283,7 @@ namespace ImpartialUI.ViewModels
             DanceConventions.Add(newDanceConvention);
             SelectedDanceConvention = newDanceConvention;
             ScoresheetSelector = ScoresheetSelector.EEPro;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\prelims.html";
             FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\finals.html";
         }
 

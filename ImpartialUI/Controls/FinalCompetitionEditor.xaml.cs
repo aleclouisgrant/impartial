@@ -109,7 +109,13 @@ namespace ImpartialUI.Controls
                 searchTextBox.ItemsSource = Competitors;
 
                 if (selectedId != null)
+                {
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
+                }
+                else
+                {
+                    searchTextBox.SelectedPerson = null;
+                }
             }
         }
         public void UpdateJudges()
@@ -120,7 +126,13 @@ namespace ImpartialUI.Controls
                 searchTextBox.ItemsSource = Judges;
 
                 if (selectedId != null)
+                {
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
+                }
+                else
+                {
+                    searchTextBox.SelectedPerson = null;
+                }
             }
         }
 

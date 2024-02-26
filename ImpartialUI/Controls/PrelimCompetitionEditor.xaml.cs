@@ -124,6 +124,7 @@ namespace ImpartialUI.Controls
         }
         private static void OnCompetitorsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
+            ((PrelimCompetitionEditor)source).UpdateCompetitors();
         }
 
         public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
@@ -138,6 +139,7 @@ namespace ImpartialUI.Controls
         }
         private static void OnJudgesPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
+            ((PrelimCompetitionEditor)source).UpdateJudges();
         }
         #endregion
 
@@ -154,6 +156,9 @@ namespace ImpartialUI.Controls
         public PrelimCompetitionEditor()
         {
             InitializeComponent();
+
+            UpdateCompetitors();
+            UpdateJudges();
         }
 
         public void UpdateCompetitors()
@@ -164,7 +169,13 @@ namespace ImpartialUI.Controls
                 searchTextBox.ItemsSource = Competitors;
 
                 if (selectedId != null)
+                {
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.Id == selectedId);
+                }
+                else
+                {
+                    searchTextBox.SelectedPerson = null;
+                }
             }
         }
         public void UpdateJudges()
@@ -175,7 +186,13 @@ namespace ImpartialUI.Controls
                 searchTextBox.ItemsSource = Judges;
 
                 if (selectedId != null)
+                {
                     searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.Id == selectedId); ;
+                }
+                else
+                {
+                    searchTextBox.SelectedPerson = null;
+                }
             }
         }
 
@@ -250,7 +267,7 @@ namespace ImpartialUI.Controls
 
             if (competitor != null)
             {
-                competitorSearchBox.SelectedPerson = competitorSearchBox.ItemsSource.Where(c => c.Id == competitor.Id).FirstOrDefault();
+                competitorSearchBox.SelectedPerson = competitorSearchBox.ItemsSource.Where(c => c.FullName == competitor.FullName).FirstOrDefault();
 
                 if (competitorSearchBox.SelectedPerson == null)
                 {
@@ -367,7 +384,7 @@ namespace ImpartialUI.Controls
         {
             for (int j = 0; j < _judgeBoxes.Count(); j++)
             {
-                _scores[placement, j].SetCompetitor(newCompetitor.Id);
+                _scores[placement - 1, j].SetCompetitor(newCompetitor.Id);
             }
 
             OnPropertyChanged(nameof(PrelimCompetition));

@@ -43,13 +43,13 @@ namespace ImpartialUI.Services.ScoresheetParser
 
             var prelims = GetPairedPrelimCompetition(division, Round.Prelims);
             //TODO: var quarters = GetPairedPrelimCompetition(division, Round.Quarterfinals);
-            var semis = GetPairedPrelimCompetition(division, Round.Semifinals);
+            //var semis = GetPairedPrelimCompetition(division, Round.Semifinals);
 
             if (prelims.LeaderPrelimCompetition != null)
                 competition.PairedPrelimCompetitions.Add(prelims);
 
-            if (semis.LeaderPrelimCompetition != null)
-                competition.PairedPrelimCompetitions.Add(semis);
+            //if (semis.LeaderPrelimCompetition != null)
+            //    competition.PairedPrelimCompetitions.Add(semis);
 
             return competition;
         }
