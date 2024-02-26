@@ -288,12 +288,12 @@ namespace ImpartialUI.ViewModels
         private void TestData()
         {
             // EEPro
-            //var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
-            //DanceConventions.Add(newDanceConvention);
-            //SelectedDanceConvention = newDanceConvention;
-            //ScoresheetSelector = ScoresheetSelector.EEPro;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
+            var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
+            DanceConventions.Add(newDanceConvention);
+            SelectedDanceConvention = newDanceConvention;
+            ScoresheetSelector = ScoresheetSelector.EEPro;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
 
             // StepRightSolutions
             //var newDanceConvention = new DanceConvention("Boogie By The Bay", DateTime.Parse("2022-10-08"));
@@ -305,12 +305,12 @@ namespace ImpartialUI.ViewModels
             //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\finals.html";
 
             // WorldDanceRegistry
-            var newDanceConvention = new DanceConvention("Charlotte Westie Fest", DateTime.Parse("2023-02-03"));
-            DanceConventions.Add(newDanceConvention);
-            SelectedDanceConvention = newDanceConvention;
-            ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
-            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\prelims.html";
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\finals.html";
+            //var newDanceConvention = new DanceConvention("Charlotte Westie Fest", DateTime.Parse("2023-02-03"));
+            //DanceConventions.Add(newDanceConvention);
+            //SelectedDanceConvention = newDanceConvention;
+            //ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\finals.html";
         }
 
         private async void RefreshCache()
