@@ -263,6 +263,7 @@ namespace ImpartialUI.ViewModels
             AddCompetitionCommand = new DelegateCommand(AddCompetition);
             AddDanceConventionCommand = new DelegateCommand(AddDanceConvention);
             SelectPrelimsPathCommand = new DelegateCommand(SelectPrelimsPath);
+            SelectSemisPathCommand = new DelegateCommand(SelectSemisPath);
             SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
             ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
             CancelCommand = new DelegateCommand(Clear);
@@ -287,14 +288,23 @@ namespace ImpartialUI.ViewModels
 
         private void TestData()
         {
-            var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
+            // EEPro
+            //var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
+            //DanceConventions.Add(newDanceConvention);
+            //SelectedDanceConvention = newDanceConvention;
+            //ScoresheetSelector = ScoresheetSelector.EEPro;
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
+
+
+            // StepRightSolutions
+            var newDanceConvention = new DanceConvention("Boogie By The Bay", DateTime.Parse("2022-10-08"));
             DanceConventions.Add(newDanceConvention);
             SelectedDanceConvention = newDanceConvention;
-            ScoresheetSelector = ScoresheetSelector.EEPro;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\finals.html";
-            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
+            ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\prelims.html";
+            SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\semis.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\finals.html";
         }
 
         private async void RefreshCache()
@@ -409,10 +419,9 @@ namespace ImpartialUI.ViewModels
                 case ScoresheetSelector.DanceConvention:
                     _scoresheetParser = new DanceConventionParser(prelimsPath, finalsPath);
                     break;
-                //TODO: re-add this
-                //case ScoresheetSelector.StepRightSolutions:
-                //    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, semisPath, finalsPath);
-                //    break;
+                case ScoresheetSelector.StepRightSolutions:
+                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, semisPath, finalsPath);
+                    break;
                 case ScoresheetSelector.WorldDanceRegistry:
                     _scoresheetParser = new WorldDanceRegistryParser(prelimsPath, finalsPath);
                     break;

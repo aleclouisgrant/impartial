@@ -81,6 +81,12 @@ namespace ImpartialUI.Services.ScoresheetParser
 
         public override IPrelimCompetition? GetPrelimCompetition(Division division, Round round, Role role)
         {
+            string prelimsHtml = GetPrelimsDocByDivision(division, role, round);
+            if (prelimsHtml == string.Empty)
+            {
+                return null;
+            }
+
             var prelimCompetition = new PrelimCompetition(
                 dateTime: DateTime.MinValue,
                 division: division,
@@ -89,14 +95,8 @@ namespace ImpartialUI.Services.ScoresheetParser
                 prelimScores: new List<IPrelimScore>(),
                 promotedCompetitors: new List<ICompetitor>());
 
-            string prelims = GetPrelimsDocByDivision(division, role, round);
-            if (prelims == string.Empty)
-            {
-                return null;
-            }
-
             HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(prelims);
+            doc.LoadHtml(prelimsHtml);
             var nodes = doc.DocumentNode.SelectNodes("tr");
             var judges = GetPrelimsJudgesByDivision(division, role, round);
 
