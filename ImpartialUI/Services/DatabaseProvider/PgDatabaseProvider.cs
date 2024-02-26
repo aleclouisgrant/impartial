@@ -10,6 +10,7 @@ using ImpartialUI.Models.PgModels;
 using System.Numerics;
 using ImpartialUI.Controls;
 using System.Net;
+using Impartial.Enums;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -43,7 +44,14 @@ namespace ImpartialUI.Services.DatabaseProvider
                     port,
                     password);
 
-            _dataSource = NpgsqlDataSource.Create(_connectionString);
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
+            dataSourceBuilder.MapEnum<Division>();
+            dataSourceBuilder.MapEnum<Tier>();
+            dataSourceBuilder.MapEnum<Round>();
+            dataSourceBuilder.MapEnum<Role>();
+            dataSourceBuilder.MapEnum<CallbackScore>();
+
+            _dataSource = dataSourceBuilder.Build();
         }
 
         #region Helper
@@ -60,19 +68,26 @@ namespace ImpartialUI.Services.DatabaseProvider
             string columnNames = string.Empty;
             string parameterPositions = string.Empty;
 
-            if (properties[0].GetValue(parameters) != null)
+            int startingPos = 1;
+            while (startingPos <= properties.Length)
             {
-                columnNames += properties[0].Name;
-                parameterPositions += "$1";
-            }
-
-            for (int i = 1; i < properties.Length; i++)
-            {
-                if (properties[i].GetValue(parameters) != null)
+                if (properties[startingPos - 1].GetValue(parameters) != null)
                 {
-                    columnNames += ", " + properties[i].Name;
-                    parameterPositions += ", $" + (i + 1).ToString();
+                    columnNames += properties[startingPos - 1].Name;
+                    parameterPositions += "$1";
+
+                    for (int parameterIndex = startingPos; parameterIndex < properties.Length; parameterIndex++)
+                    {
+                        if (properties[parameterIndex].GetValue(parameters) != null)
+                        {
+                            columnNames += ", " + properties[parameterIndex].Name;
+                            parameterPositions += ", $" + (startingPos + 1).ToString();
+                        }
+                        startingPos++;
+                    }
                 }
+
+                startingPos++;
             }
 
             command += "(" + columnNames + ")";
@@ -95,22 +110,32 @@ namespace ImpartialUI.Services.DatabaseProvider
             string parameterPositions = string.Empty;
             string excluded = string.Empty;
 
-            if (properties[0].GetValue(parameters) != null)
+            int startingPos = 1;
+            while (startingPos <= properties.Length)
             {
-                columnNames += properties[0].Name;
-                excluded += properties[0].Name + " = EXCLUDED." + properties[0].Name;
-                parameterPositions += "$1";
+                if (properties[startingPos - 1].GetValue(parameters) != null)
+                {
+                    columnNames += properties[startingPos - 1].Name;
+                    parameterPositions += "$1";
+                    excluded += properties[startingPos].Name + " = EXCLUDED." + properties[startingPos].Name;
+
+                    for (int parameterIndex = startingPos; parameterIndex < properties.Length; parameterIndex++)
+                    {
+                        if (properties[parameterIndex].GetValue(parameters) != null)
+                        {
+                            columnNames += ", " + properties[parameterIndex].Name;
+                            parameterPositions += ", $" + (startingPos + 1).ToString();
+                            excluded += ", " + properties[parameterIndex].Name + " = EXCLUDED." + properties[parameterIndex].Name;
+                        }
+                        startingPos++;
+                    }
+                }
+
+                startingPos++;
             }
 
-            for (int i = 1; i < properties.Length; i++)
-            {
-                if (properties[i].GetValue(parameters) != null)
-                {
-                    columnNames += ", " + properties[i].Name;
-                    excluded += ", " + properties[i].Name + " = EXCLUDED." + properties[i].Name;
-                    parameterPositions += ", $" + (i + 1).ToString();
-                }
-            }
+            command += "(" + columnNames + ")";
+            command += " VALUES (" + parameterPositions + ")";
 
             command += "(" + columnNames + ")";
             command += " VALUES (" + parameterPositions + ")";
@@ -489,13 +514,14 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             var pgCompetitionModel = new PgCompetitionModel
             {
+                id = competition.Id,
                 dance_convention_id = danceConventionId,
                 division = competition.Division,
                 leader_tier = competition.LeaderTier,
                 follower_tier = competition.FollowerTier
             };
 
-            await SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel);
+            SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel).Wait();
 
             var competitorRegistrations = new List<PgCompetitorRegistrationModel>();
             var competitorRecords = new List<PgCompetitorRecordModel>();

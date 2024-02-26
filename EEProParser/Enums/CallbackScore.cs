@@ -7,6 +7,6 @@
         Alt2 = 43, 
         Alt3 = 42,
         No = 0,
-        NoScore = -1
+        Unscored = -1
     }
 }

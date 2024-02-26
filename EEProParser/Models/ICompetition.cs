@@ -9,8 +9,8 @@ namespace Impartial
         public Division Division { get; set; }
 
         public Guid DanceConventionId { get; set; }
-        public string Name { get; }
-        public DateTime Date { get; }
+        public string Name { get; set; }
+        public DateTime Date { get; set; }
 
         public Tier LeaderTier { get; }
 

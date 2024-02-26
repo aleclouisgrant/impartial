@@ -16,21 +16,23 @@ namespace ImpartialUI.Models.PgModels
         public Guid? user_id { get; set; }
         public int? wsdc_id { get; set; }
 
+        public int? leader_rating { get; set; }
+        public int? follower_rating { get; set; }
+
+
         public int? leader_newcomer_points { get; set; }
         public int? leader_novice_points { get; set; }
         public int? leader_intermediate_points { get; set; }
         public int? leader_advanced_points { get; set; }
-        public int? leader_allstar_points { get; set; }
+        public int? leader_all_star_points { get; set; }
         public int? leader_champion_points { get; set; }
-        public int? leader_rating { get; set; }
 
         public int? follower_newcomer_points { get; set; }
         public int? follower_novice_points { get; set; }
         public int? follower_intermediate_points { get; set; }
         public int? follower_advanced_points { get; set; }
-        public int? follower_allstar_points { get; set; }
+        public int? follower_all_star_points { get; set; }
         public int? follower_champion_points { get; set; }
-        public int? follower_rating { get; set; }
     }
 
     public class PgCompetitorRegistrationModel
@@ -80,8 +82,8 @@ namespace ImpartialUI.Models.PgModels
         public DateTime? date_time { get; set; }
         public Role? role { get; set; }
         public Round? round { get; set; }
-        public Guid? alternate_1_id { get; set; }
-        public Guid? alternate_2_id { get; set; }
+        public Guid? alternate1_id { get; set; }
+        public Guid? alternate2_id { get; set; }
     }
 
     public class PgPromotedCompetitorModel
@@ -113,7 +115,7 @@ namespace ImpartialUI.Models.PgModels
         public Guid? prelim_competition_id { get; set; }
         public Guid? judge_id { get; set; }
         public Guid? competitor_id { get; set; }
-        public CallbackScore? callbackscore { get; set; }
+        public CallbackScore? callback_score { get; set; }
     }
 
     public class PgFinalScoreModel

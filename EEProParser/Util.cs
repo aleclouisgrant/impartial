@@ -5,23 +5,12 @@ using System.Linq;
 
 namespace Impartial
 {
-    public enum Tier
-    {
-        Tier0,
-        Tier1,
-        Tier2,
-        Tier3,
-        Tier4,
-        Tier5,
-        Tier6
-    }
-
     public static class Util
     {
         public static Tier GetTier(int numberOfCompetitors)
         {
             if (numberOfCompetitors < 5 && numberOfCompetitors >= 1)
-                return Tier.Tier0;
+                return Tier.NoTier;
             else if (numberOfCompetitors >= 5 && numberOfCompetitors <= 10)
                 return Tier.Tier1;
             else if (numberOfCompetitors >= 11 && numberOfCompetitors <= 19)
@@ -41,7 +30,7 @@ namespace Impartial
         public static int GetAwardedPoints(int numberOfCompetitors, int placement)
         {
             if (numberOfCompetitors < 5 && numberOfCompetitors >= 1)
-                return GetAwardedPoints(Tier.Tier0, placement);
+                return GetAwardedPoints(Tier.NoTier, placement);
             else if (numberOfCompetitors >= 5 && numberOfCompetitors <= 10)
                 return GetAwardedPoints(Tier.Tier1, placement);
             else if (numberOfCompetitors >= 11 && numberOfCompetitors <= 19)
@@ -65,7 +54,7 @@ namespace Impartial
 
             switch (tier)
             {
-                case Tier.Tier0:
+                case Tier.NoTier:
                 default:
                     return 0;
                 case Tier.Tier1:
@@ -354,7 +343,7 @@ namespace Impartial
                 case "0":
                     return CallbackScore.No;
                 default:
-                    return CallbackScore.NoScore;
+                    return CallbackScore.Unscored;
             }
         }
         public static CallbackScore NumberToCallbackScore(double value)
@@ -372,7 +361,7 @@ namespace Impartial
                 case 0:
                     return CallbackScore.No;
                 default:
-                    return CallbackScore.NoScore;
+                    return CallbackScore.Unscored;
             }
         }
         public static Division GetDivisionFromString(string s)
@@ -443,7 +432,7 @@ namespace Impartial
                 case CallbackScore.No:
                     return "N";
                 default:
-                case CallbackScore.NoScore:
+                case CallbackScore.Unscored:
                     return "";
             }
         }

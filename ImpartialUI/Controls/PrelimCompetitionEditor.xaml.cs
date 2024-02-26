@@ -426,7 +426,7 @@ namespace ImpartialUI.Controls
                 var newPrelimScore = new PrelimScore(
                     judgeId: ((IJudge)_judgeBoxes.ElementAt(judgeIndex).SelectedPerson).JudgeId,
                     competitorId: Guid.Empty,
-                    callbackScore: CallbackScore.NoScore);
+                    callbackScore: CallbackScore.Unscored);
 
                 scores[scores.GetLength(0) - 1, judgeIndex] = newPrelimScore;
                 newScores.Add(newPrelimScore);
@@ -458,7 +458,7 @@ namespace ImpartialUI.Controls
                 var newPrelimScore = new PrelimScore(
                     judgeId: Guid.Empty,
                     competitorId: ((ICompetitor)_competitorBoxes.ElementAt(competitorIndex).SelectedPerson).CompetitorId,
-                    callbackScore: CallbackScore.NoScore);
+                    callbackScore: CallbackScore.Unscored);
 
                 scores[competitorIndex, scores.GetLength(1) - 1] = newPrelimScore;
                 newScores.Add(newPrelimScore);

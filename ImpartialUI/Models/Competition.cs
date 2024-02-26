@@ -24,8 +24,8 @@ namespace ImpartialUI.Models
         public Division Division { get; set; }
 
         public Guid DanceConventionId { get; set; }
-        public string Name { get; }
-        public DateTime Date { get; }
+        public string Name { get; set; }
+        public DateTime Date { get; set; }
 
         public Tier LeaderTier => PairedPrelimCompetitions.Count > 0 ?
             Util.GetTier(PairedPrelimCompetitions[0].LeaderPrelimCompetition.Competitors.Count) :
@@ -69,9 +69,8 @@ namespace ImpartialUI.Models
                 str += pairedPrelimCompetition.LeaderPrelimCompetition.ToLongString();
                 str += Environment.NewLine;
                 str += pairedPrelimCompetition.FollowerPrelimCompetition.ToLongString();
+                str += Environment.NewLine;
             }
-
-            str += Environment.NewLine;
 
             if (FinalCompetition != null)
             {

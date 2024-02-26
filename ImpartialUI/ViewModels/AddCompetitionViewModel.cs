@@ -477,8 +477,18 @@ namespace ImpartialUI.ViewModels
         }
         private void AddCompetition()
         {
+            // Set date times to match the selected dance convention for now
+            Competition.Date = SelectedDanceConvention.Date;
+            Competition.FinalCompetition.DateTime = SelectedDanceConvention.Date;
+            foreach (var competition in Competition.PairedPrelimCompetitions)
+            {
+                competition.LeaderPrelimCompetition.DateTime = SelectedDanceConvention.Date;
+                competition.FollowerPrelimCompetition.DateTime = SelectedDanceConvention.Date;
+            }
+
             Trace.WriteLine(Competition.ToLongString());
-            //App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+            App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+
             Clear();
         }
 
