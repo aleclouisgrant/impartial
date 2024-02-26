@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Impartial;
 using ImpartialUI.Models;
+using Org.BouncyCastle.Math.EC.Endo;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -191,6 +192,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             IJudge bryn = new Judge("Bryn", "Anderson");
             IJudge john = new Judge("John", "Lindo");
             IJudge lemery = new Judge("Lemery", "Rollinscott");
+            IJudge greg = new Judge("Greg", "Rollinscott");
+            IJudge victoria = new Judge("Victoria", "Henk");
 
             ICompetitor brandon = new Competitor("Brandon", "Rasmussen");
             ICompetitor melodie = new Competitor("Melodie", "Paletta");
@@ -216,6 +219,24 @@ namespace ImpartialUI.Services.DatabaseProvider
             ICompetitor olivia = new Competitor("Olivia", "Burnsed");
             ICompetitor david = new Competitor("David", "Carrington");
             ICompetitor jesann = new Competitor("Jes Ann", "Nail");
+
+            ICompetitor roberto = new Competitor("Roberto", "Corporan");
+            ICompetitor glen = new Competitor("Glen", "Acheampong");
+            ICompetitor chris = new Competitor("Chris", "Lo");
+            ICompetitor simon = new Competitor("Simon", "Girard");
+            ICompetitor kevin = new Competitor("Kevin", "Balcom");
+            ICompetitor vincent = new Competitor("Vincent", "Van Mierlo");
+            ICompetitor alex = new Competitor("Alex", "Glover");
+            ICompetitor matt = new Competitor("Matt", "Davis");
+            ICompetitor frank = new Competitor("Frank", "Moda");
+            ICompetitor christopher = new Competitor("Christopher", "Muise");
+
+            ICompetitor alyx = new Competitor("Alyx", "McCarthey");
+            ICompetitor jacqueline = new Competitor("Jacqueline", "Lo");
+            ICompetitor maya = new Competitor("Maya", "Tydykov");
+            ICompetitor kendra = new Competitor("Kendra", "Zara");
+            ICompetitor isabelle = new Competitor("Isabelle", "Roy");
+            ICompetitor brianna = new Competitor("Brianna", "Miller");
 
             competition.FinalCompetition = new FinalCompetition(
                 dateTime: competition.Date, 
@@ -286,6 +307,196 @@ namespace ImpartialUI.Services.DatabaseProvider
             competition.FinalCompetition.FinalScores.Add(new FinalScore(lemery, kaiano, liz, 6, 10));
             competition.FinalCompetition.FinalScores.Add(new FinalScore(lemery, alec, olivia, 8, 11));
             competition.FinalCompetition.FinalScores.Add(new FinalScore(lemery, david, jesann, 11, 12));
+
+            var leaderPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Leader, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>());
+            var followerPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Follower, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>());
+            competition.PairedPrelimCompetitions.Add(new PairedPrelimCompetition(Round.Prelims, leaderPrelimComp, followerPrelimComp));
+
+            followerPrelimComp.PromotedCompetitors.Add(saya);
+            followerPrelimComp.PromotedCompetitors.Add(shanna);
+            followerPrelimComp.PromotedCompetitors.Add(olivia);
+            followerPrelimComp.PromotedCompetitors.Add(liz);
+            followerPrelimComp.PromotedCompetitors.Add(elli);
+            followerPrelimComp.PromotedCompetitors.Add(jia);
+            followerPrelimComp.PromotedCompetitors.Add(melodie);
+            followerPrelimComp.PromotedCompetitors.Add(kristen);
+            followerPrelimComp.PromotedCompetitors.Add(rachel);
+            followerPrelimComp.PromotedCompetitors.Add(jen);
+            followerPrelimComp.PromotedCompetitors.Add(jesann);
+            followerPrelimComp.PromotedCompetitors.Add(dimitri);
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, saya, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, saya, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, saya, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, shanna, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, shanna, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, shanna, Impartial.Enums.CallbackScore.Yes));
+            
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, olivia, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, olivia, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, olivia, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, liz, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, liz, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, liz, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, elli, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, elli, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, elli, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, jia, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, jia, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, jia, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, melodie, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, melodie, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, melodie, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, kristen, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, kristen, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, kristen, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, rachel, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, rachel, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, rachel, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, jen, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, jen, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, jen, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, jesann, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, jesann, Impartial.Enums.CallbackScore.Alt1));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, jesann, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, dimitri, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, dimitri, Impartial.Enums.CallbackScore.No));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, dimitri, Impartial.Enums.CallbackScore.Yes));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, alyx, Impartial.Enums.CallbackScore.Alt1));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, alyx, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, alyx, Impartial.Enums.CallbackScore.No));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, jacqueline, Impartial.Enums.CallbackScore.Alt2));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, jacqueline, Impartial.Enums.CallbackScore.Yes));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, jacqueline, Impartial.Enums.CallbackScore.No));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, maya, Impartial.Enums.CallbackScore.Alt3));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, maya, Impartial.Enums.CallbackScore.Alt3));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, maya, Impartial.Enums.CallbackScore.Alt3));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, kendra, Impartial.Enums.CallbackScore.No));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, kendra, Impartial.Enums.CallbackScore.Alt2));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, kendra, Impartial.Enums.CallbackScore.Alt1));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, isabelle, Impartial.Enums.CallbackScore.No));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, isabelle, Impartial.Enums.CallbackScore.No));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, isabelle, Impartial.Enums.CallbackScore.Alt2));
+
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, brianna, Impartial.Enums.CallbackScore.No));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, brianna, Impartial.Enums.CallbackScore.No));
+            followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, brianna, Impartial.Enums.CallbackScore.No));
+
+            leaderPrelimComp.PromotedCompetitors.Add(kyle);
+            leaderPrelimComp.PromotedCompetitors.Add(kaiano);
+            leaderPrelimComp.PromotedCompetitors.Add(roberto);
+            leaderPrelimComp.PromotedCompetitors.Add(neil);
+            leaderPrelimComp.PromotedCompetitors.Add(david);
+            leaderPrelimComp.PromotedCompetitors.Add(brandon);
+            leaderPrelimComp.PromotedCompetitors.Add(glen);
+            leaderPrelimComp.PromotedCompetitors.Add(sam);
+            leaderPrelimComp.PromotedCompetitors.Add(alec);
+            leaderPrelimComp.PromotedCompetitors.Add(edem);
+            leaderPrelimComp.PromotedCompetitors.Add(joshu);
+            leaderPrelimComp.PromotedCompetitors.Add(oscar);
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, kyle, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, saya, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, saya, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, kaiano, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, kaiano, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, kaiano, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, roberto, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, roberto, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, roberto, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, neil, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, neil, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, neil, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, david, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, david, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, david, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, brandon, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, brandon, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, brandon, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, glen, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, glen, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, glen, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, sam, Impartial.Enums.CallbackScore.Alt2));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, sam, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, sam, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, alec, Impartial.Enums.CallbackScore.Alt3));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, alec, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, alec, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, edem, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, edem, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, edem, Impartial.Enums.CallbackScore.No));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, joshu, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, joshu, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, joshu, Impartial.Enums.CallbackScore.No));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, oscar, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, oscar, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, oscar, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, maxwell, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, maxwell, Impartial.Enums.CallbackScore.Alt3));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, maxwell, Impartial.Enums.CallbackScore.Alt1));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, lucky, Impartial.Enums.CallbackScore.Alt1));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, lucky, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, lucky, Impartial.Enums.CallbackScore.No));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, chris, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, chris, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, chris, Impartial.Enums.CallbackScore.No));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, simon, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, simon, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, simon, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, kevin, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, kevin, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, kevin, Impartial.Enums.CallbackScore.Yes));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, vincent, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, vincent, Impartial.Enums.CallbackScore.Alt2));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, vincent, Impartial.Enums.CallbackScore.Alt2));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, alex, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, alex, Impartial.Enums.CallbackScore.Alt1));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, alex, Impartial.Enums.CallbackScore.No));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, matt, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, matt, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, matt, Impartial.Enums.CallbackScore.Alt3));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, frank, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, frank, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, frank, Impartial.Enums.CallbackScore.No));
+
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, christopher, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, christopher, Impartial.Enums.CallbackScore.No));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, christopher, Impartial.Enums.CallbackScore.No));
 
             _danceConventions.Add(danceConvention);
 

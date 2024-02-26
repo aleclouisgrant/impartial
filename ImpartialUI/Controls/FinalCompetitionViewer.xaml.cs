@@ -75,12 +75,12 @@ namespace ImpartialUI.Controls
             if (finalCompetition == null)
                 return;
 
-            viewer.TitleTextBlock.Text = "Jack & Jill " + Util.DivisionToString(finalCompetition.Division) + " Finals";
+            //TODO: date and division are being incorrectly passed for some reason
+            //viewer.TitleTextBlock.Text = "Jack & Jill " + Util.DivisionToString(finalCompetition.Division) + " Finals";
+            viewer.TitleTextBlock.Text = "Jack & Jill Finals";
 
             var judges = finalCompetition.Judges?.OrderBy(j => j.FullName);
             var couples = finalCompetition.Couples;
-
-            //competition.Scores = competition.Scores.OrderBy(s => s.ActualPlacement).ThenBy(s => s.Judge.FullName).ToList();
 
             // judge names
             foreach (var judge in judges)
