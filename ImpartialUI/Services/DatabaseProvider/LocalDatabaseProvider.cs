@@ -411,8 +411,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             leaderPrelimComp.PromotedCompetitors.Add(oscar);
 
             leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, kyle, Impartial.Enums.CallbackScore.Yes));
-            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, saya, Impartial.Enums.CallbackScore.Yes));
-            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, saya, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, kyle, Impartial.Enums.CallbackScore.Yes));
+            leaderPrelimComp.PrelimScores.Add(new PrelimScore(lemery, kyle, Impartial.Enums.CallbackScore.Yes));
 
             leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, kaiano, Impartial.Enums.CallbackScore.Yes));
             leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, kaiano, Impartial.Enums.CallbackScore.Yes));

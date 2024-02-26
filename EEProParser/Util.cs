@@ -155,10 +155,6 @@ namespace Impartial
             }
         }
 
-
-
-
-
         public static double GetAccuracy(int placement, int actualPlacement)
         {
             return Math.Abs(placement - actualPlacement);
@@ -168,6 +164,24 @@ namespace Impartial
             return Math.Abs(
                 placement * GetAwardedPoints(totalCouples, placement) - 
                 actualPlacement * GetAwardedPoints(totalCouples, actualPlacement));
+        }
+
+        public static double GetCallbackScoreValue(CallbackScore callbackScore)
+        {
+            switch (callbackScore)
+            {
+                case CallbackScore.Yes:
+                    return 10;
+                case CallbackScore.Alt1:
+                    return 4.5f;
+                case CallbackScore.Alt2:
+                    return 4.3;
+                case CallbackScore.Alt3:
+                    return 4.2;
+                case CallbackScore.No:
+                default:
+                    return 0;
+            }
         }
 
         public static int GetEditDistance(string s, string t)

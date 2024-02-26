@@ -14,6 +14,13 @@ namespace ImpartialUI.Controls
 {
     public partial class PrelimCompetitionViewer : UserControl
     {
+        private class PrelimCompetitorScores
+        {
+            public ICompetitor Competitor { get; set; }
+            public List<IPrelimScore> PrelimScores { get; set; } = new List<IPrelimScore>();
+            public double TotalScore { get; set; }
+        }
+
         #region DependencyProperties
 
         public static readonly DependencyProperty PrelimCompetitionProperty = DependencyProperty.Register(
@@ -135,28 +142,29 @@ namespace ImpartialUI.Controls
             Grid.SetColumn(scoreBorder, control.ScoreGrid.Children.Count - 1);
             Grid.SetRow(scoreBorder, 0);
 
-            List<ICompetitor> c = competition.Competitors ?? new();
+            var competitorNodes = new LinkedList<PrelimCompetitorScores>();
 
-            var competitors = new LinkedList<Tuple<ICompetitor, List<IPrelimScore>>>();
-
-            foreach (var competitor in c)
+            foreach (var competitor in competition?.Competitors)
             {
                 var prelimScores = competition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
 
-                competitors.AddLast(new Tuple<ICompetitor, List<IPrelimScore>>(
-                    item1: competitor, 
-                    item2: prelimScores));
+                competitorNodes.AddLast(new PrelimCompetitorScores
+                {
+                    Competitor = competitor,
+                    PrelimScores = prelimScores,
+                    TotalScore = prelimScores.Sum(s => Util.GetCallbackScoreValue(s.CallbackScore))
+                });
             }
 
-            competitors = new LinkedList<Tuple<ICompetitor, List<IPrelimScore>>>(competitors.OrderBy(s => s.Item2.FirstOrDefault()));
+            competitorNodes = new(competitorNodes.OrderByDescending(s => s.TotalScore));
 
             int i = 1;
             int count = 1;
             int sameCount = 0;
-            for (var competitor = competitors.First; competitor != null; competitor = competitor.Next)
+            for (var competitorNode = competitorNodes.First; competitorNode != null; competitorNode = competitorNode.Next)
             {
                 control.ScoreGrid.RowDefinitions.Add(new RowDefinition());
-                bool finaled = control.PrelimCompetition.PromotedCompetitors.Contains(competitor.Value.Item1);
+                bool finaled = control.PrelimCompetition.PromotedCompetitors.Contains(competitorNode.Value.Competitor);
 
                 // placement
                 var competitorCountBorder = new Border()
@@ -167,9 +175,9 @@ namespace ImpartialUI.Controls
                     Height = 24
                 };
 
-                if (competitor.Previous != null)
+                if (competitorNode.Previous != null)
                 {
-                    if (competitor.Value.Item2.Sum(s => (int)s.CallbackScore) == competitor.Previous.Value.Item2.Sum(s => (int)s.CallbackScore))
+                    if (competitorNode.Value.TotalScore == competitorNode.Previous.Value.TotalScore)
                     {
                         sameCount++;
                     }
@@ -203,7 +211,7 @@ namespace ImpartialUI.Controls
 
                 var nameTextBlock = new TextBlock()
                 {
-                    Text = competitor.Value.Item1.FullName,
+                    Text = competitorNode.Value.Competitor.FullName,
                     Margin = new Thickness(1)
                 };
 
@@ -221,7 +229,7 @@ namespace ImpartialUI.Controls
 
                 // scores
                 int j = 2;
-                foreach (var score in competitor.Value.Item2.OrderBy(c => c.Judge.FullName))
+                foreach (var score in competitorNode.Value.PrelimScores.OrderBy(c => c.Judge.FullName))
                 {
                     var border = new Border()
                     {
@@ -258,7 +266,7 @@ namespace ImpartialUI.Controls
 
                 var callbackTextBlock = new TextBlock()
                 {
-                    Text = (competitor.Value.Item2.Sum(s => (int)s.CallbackScore) / 10.0f).ToString(),
+                    Text = Math.Round(competitorNode.Value.TotalScore, 1).ToString(),
                     Margin = new Thickness(1)
                 };
 

@@ -14,6 +14,13 @@ namespace ImpartialUI.Controls
 {
     public partial class PrelimCompetitionEditor : UserControl
     {
+        private class PrelimCompetitorScores
+        {
+            public ICompetitor Competitor { get; set; }
+            public List<IPrelimScore> PrelimScores { get; set; } = new List<IPrelimScore>();
+            public double TotalScore { get; set; }
+        }
+
         #region DependencyProperties
         public static readonly DependencyProperty PrelimCompetitionProperty = DependencyProperty.Register(
             nameof(PrelimCompetition),
@@ -34,26 +41,33 @@ namespace ImpartialUI.Controls
                 return;
 
             var judges = new List<IJudge>();
-            List<Tuple<ICompetitor, List<IPrelimScore>>> c = new();
+            List<PrelimCompetitorScores> competitorScoresList = new();
 
             foreach (var competitor in competition.Competitors)
             {
-                c.Add(new(competitor, competition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).OrderBy(c => c.Judge.FullName).ToList()));
+                var prelimScores = competition.PrelimScores.Where(s => s.Competitor.Id == competitor.Id).OrderBy(c => c.Judge.FullName).ToList();
+
+                competitorScoresList.Add(new PrelimCompetitorScores 
+                    {
+                        Competitor = competitor,
+                        PrelimScores = prelimScores,
+                        TotalScore = prelimScores.Sum(c => Util.GetCallbackScoreValue(c.CallbackScore))
+                    });
             }
             
             judges = competition.Judges.OrderBy(j => j.FullName).ToList();
             
-            c = c.OrderBy(cc => cc.Item2.FirstOrDefault()).ToList();
+            competitorScoresList = competitorScoresList.OrderByDescending(c => c.TotalScore).ToList();
 
             control.Clear();
 
-            control._scores = new IPrelimScore[c.Count, judges.Count];
+            control._scores = new IPrelimScore[competitorScoresList.Count, judges.Count];
 
-            for (int competitorIndex = 0; competitorIndex < c.Count; competitorIndex++)
+            for (int competitorIndex = 0; competitorIndex < competitorScoresList.Count; competitorIndex++)
             {
                 for (int judgeIndex = 0; judgeIndex < judges.Count; judgeIndex++)
                 {
-                    control._scores[competitorIndex, judgeIndex] = c[competitorIndex].Item2.ElementAt(judgeIndex);
+                    control._scores[competitorIndex, judgeIndex] = competitorScoresList[competitorIndex].PrelimScores.ElementAt(judgeIndex);
                 }
             }
 
@@ -62,9 +76,9 @@ namespace ImpartialUI.Controls
                 control.AddJudge(judge);
             }
 
-            foreach (var competitor in c)
+            foreach (var competitor in competitorScoresList)
             {
-                control.AddCompetitor(competitor.Item1, competitor.Item2);
+                control.AddCompetitor(competitor.Competitor, competitor.PrelimScores);
             }
         }
 
@@ -223,7 +237,7 @@ namespace ImpartialUI.Controls
             var competitorSearchBox = new SearchTextBox()
             {
                 Margin = new Thickness(1),
-                ItemsSource = (IEnumerable<PersonModel>)Competitors,
+                ItemsSource = Competitors,
                 SelectedPerson = null,
                 Placement = _competitorBoxes.Count() + 1
             };
@@ -300,7 +314,7 @@ namespace ImpartialUI.Controls
 
             SearchTextBox judgeSearchBox = new SearchTextBox()
             {
-                ItemsSource = (IEnumerable<PersonModel>)Judges,                
+                ItemsSource = Judges,                
             };
 
             _judgeBoxes.Add(judgeSearchBox);

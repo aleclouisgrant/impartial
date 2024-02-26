@@ -36,8 +36,8 @@ namespace ImpartialUI.ViewModels
                 OnPropertyChanged(nameof(FinalCompetition));
 
                 ShowFinals = SelectedCompetition?.FinalCompetition != null;
-                ShowPrelims = SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault() != null;
-                ShowSemis = SelectedCompetition.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault() != null;
+                ShowPrelims = SelectedCompetition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault() != null;
+                ShowSemis = SelectedCompetition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault() != null;
 
                 OnPropertyChanged(nameof(ShowPrelims));
                 OnPropertyChanged(nameof(ShowSemis));
