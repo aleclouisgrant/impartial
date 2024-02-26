@@ -242,7 +242,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task<ICompetitor?> GetCompetitorAsync(Guid id)
         {
-            string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
+            string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
                 + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
                 + " WHERE competitor_profiles.id = " + id;
 
@@ -251,14 +251,15 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 while (await reader.ReadAsync())
                 {
-                    Guid competitorId = reader.GetGuid(0);
-                    string competitorFirstName = reader.GetString(1);
-                    string competitorLastName = reader.GetString(2);
-                    int competitorWsdcId = reader.GetInt32(3);
-                    int leaderRating = reader.GetInt32(4);
-                    int followerRating = reader.GetInt32(5);
+                    Guid usersId = reader.GetGuid(0);
+                    Guid competitorId = reader.GetGuid(1);
+                    string competitorFirstName = reader.GetString(2);
+                    string competitorLastName = reader.GetString(3);
+                    int competitorWsdcId = reader.GetInt32(4);
+                    int leaderRating = reader.GetInt32(5);
+                    int followerRating = reader.GetInt32(6);
 
-                    return new Competitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
+                    return new Competitor(usersId, competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
                 }
             }
 
@@ -266,7 +267,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task<ICompetitor?> GetCompetitorAsync(string firstName, string lastName)
         {
-            string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
+            string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
                + " WHERE users.first_name = " + firstName + " AND users.last_name = " + lastName;
 
@@ -275,14 +276,15 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 while (await reader.ReadAsync())
                 {
-                    Guid competitorId = reader.GetGuid(0);
-                    string competitorFirstName = reader.GetString(1);
-                    string competitorLastName = reader.GetString(2);
-                    int competitorWsdcId = reader.GetInt32(3);
-                    int leaderRating = reader.GetInt32(4);
-                    int followerRating = reader.GetInt32(5);
+                    Guid userId = reader.GetGuid(0);
+                    Guid competitorId = reader.GetGuid(1);
+                    string competitorFirstName = reader.GetString(2);
+                    string competitorLastName = reader.GetString(3);
+                    int competitorWsdcId = reader.GetInt32(4);
+                    int leaderRating = reader.GetInt32(5);
+                    int followerRating = reader.GetInt32(6);
 
-                    return new Competitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
+                    return new Competitor(userId, competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0);
                 }
             }
 
@@ -290,8 +292,8 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task<IEnumerable<ICompetitor>> GetAllCompetitorsAsync()
         {
-            string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id, competitor_profiles.leader_rating, competitor_profiles.follower_rating"
-            + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id";
+            string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id, competitor_profiles.leader_rating, competitor_profiles.follower_rating"
+            + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id";
             var results = new List<ICompetitor>();
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -299,14 +301,15 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 while (await reader.ReadAsync())
                 {
-                    Guid competitorId = reader.GetGuid(0);
-                    string competitorFirstName = reader.GetString(1);
-                    string competitorLastName = reader.GetString(2);
-                    int competitorWsdcId = reader.GetInt32(3);
-                    int leaderRating = reader.GetInt32(4);
-                    int followerRating = reader.GetInt32(5);
+                    Guid userId = reader.GetGuid(0);
+                    Guid competitorId = reader.GetGuid(1);
+                    string competitorFirstName = reader.GetString(2);
+                    string competitorLastName = reader.GetString(3);
+                    int competitorWsdcId = reader.GetInt32(4);
+                    int leaderRating = reader.GetInt32(5);
+                    int followerRating = reader.GetInt32(6);
 
-                    results.Add(new Competitor(competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0));
+                    results.Add(new Competitor(userId, competitorId, competitorWsdcId, competitorFirstName, competitorLastName, leaderRating, 0, followerRating, 0));
                 }
             }
 
@@ -332,20 +335,21 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             var judgeModel = new PgJudgeProfileModel
             {
+                id = Guid.NewGuid(),
                 user_id = judge.JudgeId,
             };
 
             await using var connection = await _dataSource.OpenConnectionAsync();
             await using var transaction = await connection.BeginTransactionAsync();
 
-            await SaveDataAsync(PG_USERS_TABLE_NAME, userModel);
-            await SaveDataAsync(PG_JUDGE_PROFILES_TABLE_NAME, judgeModel);
+            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, "id");
+            await UpsertDataAsync(PG_JUDGE_PROFILES_TABLE_NAME, judgeModel, "user_id");
 
             await transaction.CommitAsync();
         }
         public async Task<IJudge?> GetJudgeAsync(Guid id)
         {
-            string query = "SELECT judge_profiles.id, users.first_name, users.last_name"
+            string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
                 + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
                 + " WHERE judge_profiles.id = " + id;
 
@@ -354,11 +358,12 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 while (await reader.ReadAsync())
                 {
-                    Guid judgeId = reader.GetGuid(0);
-                    string judgeFirstName = reader.GetString(1);
-                    string judgeLastName = reader.GetString(2);
+                    Guid userId = reader.GetGuid(0);
+                    Guid judgeId = reader.GetGuid(1);
+                    string judgeFirstName = reader.GetString(2);
+                    string judgeLastName = reader.GetString(3);
 
-                    return new Judge(judgeFirstName, judgeLastName, judgeId);
+                    return new Judge(userId, judgeId, judgeFirstName, judgeLastName);
                 }
             }
 
@@ -366,7 +371,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task<IJudge?> GetJudgeAsync(string firstName, string lastName)
         {
-            string query = "SELECT users.id, users.first_name, users.last_name"
+            string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
                 + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
                + " WHERE users.first_name = " + firstName + " AND users.last_name = " + lastName;
 
@@ -375,11 +380,12 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 while (await reader.ReadAsync())
                 {
-                    Guid judgeId = reader.GetGuid(0);
-                    string judgeFirstName = reader.GetString(1);
-                    string judgeLastName = reader.GetString(2);
+                    Guid userId = reader.GetGuid(0);
+                    Guid judgeId = reader.GetGuid(1);
+                    string judgeFirstName = reader.GetString(2);
+                    string judgeLastName = reader.GetString(3);
 
-                    return new Judge(judgeFirstName, judgeLastName, judgeId);
+                    return new Judge(userId, judgeId, judgeFirstName, judgeLastName);
                 }
             }
 
@@ -387,8 +393,8 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task<IEnumerable<IJudge>> GetAllJudgesAsync()
         {
-            string query = "SELECT judge_profiles.id, users.first_name, users.last_name"
-                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id";
+            string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
+                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id";
 
             var results = new List<IJudge>();
 
@@ -397,11 +403,12 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 while (await reader.ReadAsync())
                 {
-                    Guid judgeId = reader.GetGuid(0);
-                    string judgeFirstName = reader.GetString(1);
-                    string judgeLastName = reader.GetString(2);
+                    Guid userId = reader.GetGuid(0);
+                    Guid judgeId = reader.GetGuid(1);
+                    string judgeFirstName = reader.GetString(2);
+                    string judgeLastName = reader.GetString(3);
 
-                    results.Add(new Judge(judgeFirstName, judgeLastName, judgeId));
+                    results.Add(new Judge(userId, judgeId, judgeFirstName, judgeLastName));
                 }
             }
 
@@ -423,7 +430,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 date = convention.Date,
             };
 
-            await SaveDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, pgDanceConventionModel);
+            await UpsertDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, pgDanceConventionModel, "id");
         }
         public async Task<IDanceConvention?> GetDanceConventionAsync(Guid id)
         {
@@ -458,9 +465,9 @@ namespace ImpartialUI.Services.DatabaseProvider
                 {
                     Guid danceConventionId = reader.GetGuid(0);
                     string danceConventionName = reader.GetString(1);
-                    string danceConventionDateString = reader.GetString(2);
+                    DateTime danceConventionDateString = reader.GetDateTime(2);
 
-                    results.Add(new DanceConvention(danceConventionName, DateTime.Parse(danceConventionDateString), danceConventionId));
+                    results.Add(new DanceConvention(danceConventionName, danceConventionDateString, danceConventionId));
                 }
             }
 
@@ -477,6 +484,9 @@ namespace ImpartialUI.Services.DatabaseProvider
 
         public async Task UpsertCompetitionAsync(ICompetition competition, Guid danceConventionId)
         {
+            await using var connection = await _dataSource.OpenConnectionAsync();
+            await using var transaction = await connection.BeginTransactionAsync();
+
             var pgCompetitionModel = new PgCompetitionModel
             {
                 dance_convention_id = danceConventionId,
@@ -484,9 +494,6 @@ namespace ImpartialUI.Services.DatabaseProvider
                 leader_tier = competition.LeaderTier,
                 follower_tier = competition.FollowerTier
             };
-
-            await using var connection = await _dataSource.OpenConnectionAsync();
-            await using var transaction = await connection.BeginTransactionAsync();
 
             await SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel);
 

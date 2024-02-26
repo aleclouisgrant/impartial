@@ -287,13 +287,19 @@ namespace ImpartialUI.ViewModels
 
         private void TestData()
         {
-            // EEPro
-            var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
-            DanceConventions.Add(newDanceConvention);
-            SelectedDanceConvention = newDanceConvention;
+            JudgeFirstName = "Arjay";
+            JudgeLastName = "Centeno";
+
             ScoresheetSelector = ScoresheetSelector.EEPro;
-            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-01-20 derby city swing\finals.html";
+
+            // EEPro
+            //var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
+            //DanceConventions.Add(newDanceConvention);
+            //SelectedDanceConvention = newDanceConvention;
+            //ScoresheetSelector = ScoresheetSelector.EEPro;
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
 
             // StepRightSolutions
             //var newDanceConvention = new DanceConvention("Boogie By The Bay", DateTime.Parse("2022-10-08"));
@@ -452,7 +458,7 @@ namespace ImpartialUI.ViewModels
         private void AddCompetition()
         {
             Trace.WriteLine(Competition.ToLongString());
-            App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+            //App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
             Clear();
         }
 

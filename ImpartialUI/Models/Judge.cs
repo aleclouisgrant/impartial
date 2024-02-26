@@ -24,9 +24,19 @@ namespace ImpartialUI.Models
             }
         }
 
-        public Judge(string firstName, string lastName, Guid? id = null)
+        public Judge(string firstName, string lastName)
         {
-            JudgeId = id ?? Guid.NewGuid();
+            UserId = Guid.NewGuid();
+            JudgeId = Guid.NewGuid();
+
+            FirstName = firstName;
+            LastName = lastName;
+        }
+
+        public Judge(Guid userId, Guid judgeId, string firstName, string lastName)
+        {
+            UserId = userId;
+            JudgeId = judgeId;
 
             FirstName = firstName;
             LastName = lastName;

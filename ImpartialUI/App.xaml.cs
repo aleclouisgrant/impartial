@@ -28,7 +28,7 @@ namespace ImpartialUI
             //CompetitorsDb = (await pgDbProvider.GetAllCompetitorsAsync()).OrderBy(c => c.FullName).ToList();
 
             CompetitorsDb = (await DatabaseProvider.GetAllCompetitorsAsync()).OrderBy(c => c.FullName).ToList();
-            //JudgesDb = (await DatabaseProvider.GetAllJudgesAsync()).OrderBy(c => c.FullName).ToList();
+            JudgesDb = (await DatabaseProvider.GetAllJudgesAsync()).OrderBy(c => c.FullName).ToList();
         }
     }
 }
