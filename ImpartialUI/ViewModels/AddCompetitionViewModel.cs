@@ -161,6 +161,17 @@ namespace ImpartialUI.ViewModels
             }
         }
 
+        public ICompetitor _selectedCompetitor;
+        public ICompetitor SelectedCompetitor
+        {
+            get { return _selectedCompetitor; }
+            set
+            {
+                _selectedCompetitor = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ScoresheetSelector _scoresheetSelector;
         public ScoresheetSelector ScoresheetSelector
         {
@@ -246,6 +257,7 @@ namespace ImpartialUI.ViewModels
 
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand AddJudgeCommand { get; set; }
+        public ICommand AddJudgeProfileCommand { get; set; }
         public ICommand AddDanceConventionCommand { get; set; }
         public ICommand AddCompetitionCommand { get; set; }
         public ICommand ParseScoreSheetsCommand { get; set; }
@@ -259,6 +271,7 @@ namespace ImpartialUI.ViewModels
         {
             AddCompetitorCommand = new DelegateCommand(AddCompetitor);
             AddJudgeCommand = new DelegateCommand(AddJudge);
+            AddJudgeProfileCommand = new DelegateCommand(AddJudgeProfile);
             AddCompetitionCommand = new DelegateCommand(AddCompetition);
             AddDanceConventionCommand = new DelegateCommand(AddDanceConvention);
             SelectPrelimsPathCommand = new DelegateCommand(SelectPrelimsPath);
@@ -287,9 +300,6 @@ namespace ImpartialUI.ViewModels
 
         private void TestData()
         {
-            JudgeFirstName = "Arjay";
-            JudgeLastName = "Centeno";
-
             ScoresheetSelector = ScoresheetSelector.EEPro;
             FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-01-20 derby city swing\finals.html";
 
@@ -366,6 +376,16 @@ namespace ImpartialUI.ViewModels
 
             JudgeFirstName = string.Empty;
             JudgeLastName = string.Empty;
+        }
+        private async void AddJudgeProfile()
+        {
+            var newJudge = new Judge(SelectedCompetitor.UserId, Guid.NewGuid(), SelectedCompetitor.FirstName, SelectedCompetitor.LastName);
+
+            await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
+            Judges.Add(newJudge);
+            Judges = Judges.OrderBy(j => j.FullName).ToList();
+
+            SelectedCompetitor = null;
         }
         private async void AddDanceConvention()
         {

@@ -176,7 +176,10 @@
                         IsDefault="True"
                         Margin="10 10 5 10"/>
 
-                    <c:SearchTextBox Width="150" ItemsSource="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <c:SearchTextBox Width="150" ItemsSource="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" SelectedPerson="{Binding SelectedCompetitor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Content="Add Judge Profile" FontWeight="Bold" Command="{Binding AddJudgeProfileCommand}" Padding="5 2"/>
+                    </StackPanel>
 
                 </StackPanel>
 
