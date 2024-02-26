@@ -73,7 +73,9 @@ namespace ImpartialUI.Services.ScoresheetParser
                 round: round,
                 role: role,
                 prelimScores: new List<IPrelimScore>(),
-                promotedCompetitors: new List<ICompetitor>());
+                promotedCompetitors: new List<ICompetitor>(),
+                alternate1: null,
+                alternate2: null);
 
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(prelimsHtml);

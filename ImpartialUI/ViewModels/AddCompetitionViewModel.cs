@@ -337,8 +337,9 @@ namespace ImpartialUI.ViewModels
 
         private async void AddCompetitor()
         {
-            if (int.TryParse(WsdcId, out int id)) {
-                var newCompetitor = new Competitor(FirstName, LastName, int.Parse(WsdcId));
+            if (int.TryParse(WsdcId, out int id))
+            {
+                var newCompetitor = new Competitor(FirstName, LastName, id);
 
                 await App.DatabaseProvider.UpsertCompetitorAsync(newCompetitor);
                 Competitors.Add(newCompetitor);

@@ -22,6 +22,9 @@ namespace ImpartialUI.Models
 
         public List<ICompetitor> PromotedCompetitors { get; set; } = new();
 
+        public ICompetitor Alternate1 { get; set; }
+        public ICompetitor Alternate2 { get; set; }
+
         public PrelimCompetition(Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
@@ -34,6 +37,8 @@ namespace ImpartialUI.Models
             Role role,
             IEnumerable<IPrelimScore> prelimScores,
             IEnumerable<ICompetitor> promotedCompetitors,
+            ICompetitor alternate1,
+            ICompetitor alternate2,
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
@@ -42,6 +47,9 @@ namespace ImpartialUI.Models
             Division = division;
             Round = round;
             Role = role;
+
+            Alternate1 = alternate1;
+            Alternate2 = alternate2;
 
             PrelimScores = prelimScores.ToList();
 

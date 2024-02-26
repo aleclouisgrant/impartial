@@ -80,6 +80,8 @@ namespace ImpartialUI.Models.PgModels
         public DateTime? date_time { get; set; }
         public Role? role { get; set; }
         public Round? round { get; set; }
+        public Guid? alternate_1_id { get; set; }
+        public Guid? alternate_2_id { get; set; }
     }
 
     public class PgPromotedCompetitorModel

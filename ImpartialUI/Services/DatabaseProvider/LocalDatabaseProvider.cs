@@ -308,8 +308,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             competition.FinalCompetition.FinalScores.Add(new FinalScore(lemery, alec, olivia, 8, 11));
             competition.FinalCompetition.FinalScores.Add(new FinalScore(lemery, david, jesann, 11, 12));
 
-            var leaderPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Leader, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>());
-            var followerPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Follower, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>());
+            var leaderPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Leader, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>(), maxwell, lucky);
+            var followerPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Follower, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>(), alyx, jacqueline);
             competition.PairedPrelimCompetitions.Add(new PairedPrelimCompetition(Round.Prelims, leaderPrelimComp, followerPrelimComp));
 
             followerPrelimComp.PromotedCompetitors.Add(saya);

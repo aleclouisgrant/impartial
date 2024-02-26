@@ -19,6 +19,9 @@ namespace Impartial
 
         public List<ICompetitor> PromotedCompetitors { get; set; }
 
+        public ICompetitor Alternate1 { get; set; }
+        public ICompetitor Alternate2 { get; set; }
+
         public string ToLongString();
 
         public void Clear();

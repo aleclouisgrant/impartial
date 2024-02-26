@@ -52,38 +52,32 @@ namespace ImpartialUI.Services.DatabaseProvider
             PropertyInfo[] properties = typeof(U).GetProperties();
             string command = "INSERT INTO " + table;
 
+            if (properties.Length == 0)
+                return command + ";";
+
+            command += " ";
+
             string columnNames = string.Empty;
-            if (properties.Length != 0)
+            string parameterPositions = string.Empty;
+
+            if (properties[0].GetValue(parameters) != null)
             {
-                for (int i = 0; i < properties.Length; i++)
-                {
-                    if (properties[i].GetValue(parameters) != null)
-                    {
-                        columnNames += properties[i].Name;
-                        if (i != properties.Length)
-                        {
-                            columnNames += ", ";
-                        }
-                    }
-                }
+                columnNames += properties[0].Name;
+                parameterPositions += "$1";
+            }
 
-                if (columnNames != string.Empty)
+            for (int i = 1; i < properties.Length; i++)
+            {
+                if (properties[i].GetValue(parameters) != null)
                 {
-                    command += "(" + columnNames + ")";
-                    command += " VALUES ";
-
-                    int count = 1;
-                    for (int i = 1; i <= properties.Length; i++)
-                    {
-                        command += "($" + count + ")";
-                        if (i != properties.Length)
-                        {
-                            command += ", ";
-                        }
-                        count++;
-                    }
+                    columnNames += ", " + properties[i].Name;
+                    parameterPositions += ", $" + (i + 1).ToString();
                 }
             }
+
+            command += "(" + columnNames + ")";
+            command += " VALUES (" + parameterPositions + ")";
+            command += ";";
 
             return command;
         }
@@ -92,56 +86,37 @@ namespace ImpartialUI.Services.DatabaseProvider
             PropertyInfo[] properties = typeof(U).GetProperties();
             string command = "INSERT INTO " + table;
 
+            if (properties.Length == 0)
+                return command + ";";
+            
+            command += " ";
+
             string columnNames = string.Empty;
-            if (properties.Length != 0)
+            string parameterPositions = string.Empty;
+            string excluded = string.Empty;
+
+            if (properties[0].GetValue(parameters) != null)
             {
-                for (int i = 0; i < properties.Length; i++)
-                {
-                    if (properties[i].GetValue(parameters) != null)
-                    {
-                        columnNames += properties[i].Name;
-                        if (i != properties.Length)
-                        {
-                            columnNames += ", ";
-                        }
-                    }
-                }
-
-                if (columnNames != string.Empty)
-                {
-                    command += "(" + columnNames + ")";
-                    command += " VALUES ";
-
-                    int count = 1;
-                    for (int i = 1; i <= properties.Length; i++)
-                    {
-                        command += "($" + count + ")";
-                        if (i != properties.Length)
-                        {
-                            command += ", ";
-                        }
-                        count++;
-                    }
-                }
+                columnNames += properties[0].Name;
+                excluded += properties[0].Name + " = EXCLUDED." + properties[0].Name;
+                parameterPositions += "$1";
             }
 
-            command += " ON CONFLICT (" + conflictParameter + ")";
-            command += " DO UPDATE SET ";
-
-            string excluded = string.Empty;
-            for (int i = 0; i < properties.Length; i++)
+            for (int i = 1; i < properties.Length; i++)
             {
                 if (properties[i].GetValue(parameters) != null)
                 {
-                    excluded += properties[i].Name + " = EXCLUDED." + properties[i].Name;
-                    if (i != properties.Length)
-                    {
-                        columnNames += ", ";
-                    }
+                    columnNames += ", " + properties[i].Name;
+                    excluded += ", " + properties[i].Name + " = EXCLUDED." + properties[i].Name;
+                    parameterPositions += ", $" + (i + 1).ToString();
                 }
             }
 
-            command += excluded + ";";
+            command += "(" + columnNames + ")";
+            command += " VALUES (" + parameterPositions + ")";
+            command += " ON CONFLICT (" + conflictParameter + ")";
+            command += " DO UPDATE SET " + excluded;
+            command += ";";
 
             return command;
         }
@@ -178,7 +153,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 foreach (PropertyInfo property in properties)
                 {
-                    cmd.Parameters.AddWithValue(property.Name, property.GetValue(parameters));
+                    if (property.GetValue(parameters) != null)
+                        cmd.Parameters.AddWithValue(property.GetValue(parameters));
                 }
 
                 await cmd.ExecuteNonQueryAsync();
@@ -193,7 +169,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 foreach (PropertyInfo property in properties)
                 {
-                    cmd.Parameters.AddWithValue(property.Name, property.GetValue(parameters));
+                    if (property.GetValue(parameters) != null)
+                        cmd.Parameters.AddWithValue(property.GetValue(parameters));
                 }
 
                 await cmd.ExecuteNonQueryAsync();
@@ -258,8 +235,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             await using var connection = await _dataSource.OpenConnectionAsync();
             await using var transaction = await connection.BeginTransactionAsync();
 
-            await SaveDataAsync(PG_USERS_TABLE_NAME, userModel);
-            await SaveDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME, competitorProfileModel);
+            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, "id");
+            await UpsertDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME, competitorProfileModel, "user_id");
 
             await transaction.CommitAsync();
         }
@@ -524,6 +501,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     date_time = pairedPrelimCompetition.LeaderPrelimCompetition.DateTime,
                     role = Role.Leader,
                     round = pairedPrelimCompetition.LeaderPrelimCompetition.Round,
+                    alternate_1_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate1.CompetitorId,
+                    alternate_2_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate2.CompetitorId,
                 };
 
                 foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
@@ -532,7 +511,10 @@ namespace ImpartialUI.Services.DatabaseProvider
                     {
                         competitorRegistrations.Add(new PgCompetitorRegistrationModel
                         {
-                            competitor_profile_id = competitor.CompetitorId
+                            competitor_profile_id = competitor.CompetitorId,
+                            dance_convention_id = danceConventionId,
+                            //TODO:
+                            //bib_number = 
                         });
                     }
 
@@ -540,7 +522,9 @@ namespace ImpartialUI.Services.DatabaseProvider
                     {
                         competitorRecords.Add(new PgCompetitorRecordModel
                         {
-
+                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).FirstOrDefault().id,
+                            //TODO:
+                            //pre_rating = competitor.LeadStats.Rating
                         });
                     }
                 }
@@ -562,7 +546,33 @@ namespace ImpartialUI.Services.DatabaseProvider
                     date_time = pairedPrelimCompetition.FollowerPrelimCompetition.DateTime,
                     role = Role.Follower,
                     round = pairedPrelimCompetition.FollowerPrelimCompetition.Round,
+                    alternate_1_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate1.CompetitorId,
+                    alternate_2_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate2.CompetitorId,
                 };
+
+                foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
+                {
+                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).Any())
+                    {
+                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        {
+                            competitor_profile_id = competitor.CompetitorId,
+                            dance_convention_id = danceConventionId,
+                            //TODO:
+                            //bib_number = 
+                        });
+                    }
+
+                    if (!competitorRecords.Where(rec => rec.competitor_registration_id == competitor.CompetitorId).Any())
+                    {
+                        competitorRecords.Add(new PgCompetitorRecordModel
+                        {
+                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).FirstOrDefault().id,
+                            //TODO:
+                            //pre_rating = competitor.FollowStats.Rating
+                        });
+                    }
+                }
 
                 foreach (var promotedCompetitor in pairedPrelimCompetition.FollowerPrelimCompetition.PromotedCompetitors)
                 {
@@ -625,6 +635,61 @@ namespace ImpartialUI.Services.DatabaseProvider
                         placement = couple.Placement
                     };
 
+                    // in case we're only uploading a final competition, need to add registrations and records
+                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).Any())
+                    {
+                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        {
+                            competitor_profile_id = couple.Leader.CompetitorId,
+                            dance_convention_id = danceConventionId,
+                            //TODO:
+                            //bib_number = 
+                        });
+                    }
+
+                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).Any())
+                    {
+                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        {
+                            competitor_profile_id = couple.Follower.CompetitorId,
+                            dance_convention_id = danceConventionId,
+                            //TODO:
+                            //bib_number = 
+                        });
+                    }
+
+                    var leaderRecord = competitorRecords.Where(rec => rec.competitor_registration_id == couple.Leader.CompetitorId).FirstOrDefault();
+                    if (leaderRecord == null)
+                    {
+                        competitorRecords.Add(new PgCompetitorRecordModel
+                        {
+                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).FirstOrDefault().id,
+                            //TODO:
+                            //pre_rating = competitor.LeadStats.Rating
+                        });
+                    }
+                    else
+                    {
+                        leaderRecord.placement = couple.Placement;
+                        leaderRecord.points_earned = Util.GetAwardedPoints(competition.LeaderTier, couple.Placement, competition.Date);
+                    }
+
+                    var followerRecord = competitorRecords.Where(rec => rec.competitor_registration_id == couple.Leader.CompetitorId).FirstOrDefault();
+                    if (followerRecord == null)
+                    {
+                        competitorRecords.Add(new PgCompetitorRecordModel
+                        {
+                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).FirstOrDefault().id,
+                            //TODO:
+                            //pre_rating = competitor.LeadStats.Rating
+                        });
+                    }
+                    else
+                    {
+                        followerRecord.placement = couple.Placement;
+                        followerRecord.points_earned = Util.GetAwardedPoints(competition.FollowerTier, couple.Placement, competition.Date);
+                    }
+
                     await SaveDataAsync(PG_PLACEMENTS_TABLE_NAME, pgPlacementModel);
                 }
 
@@ -641,6 +706,16 @@ namespace ImpartialUI.Services.DatabaseProvider
 
                     await SaveDataAsync(PG_FINAL_SCORES_TABLE_NAME, pgFinalScoreModel);
                 }
+            }
+
+            foreach (var registration in competitorRegistrations)
+            {
+                await SaveDataAsync(PG_COMPETITOR_REGISTRATIONS_TABLE_NAME, registration);
+            }
+
+            foreach (var record in competitorRecords)
+            {
+                await SaveDataAsync(PG_COMPETITOR_RECORDS_TABLE_NAME, record);
             }
 
             await transaction.CommitAsync();
@@ -675,7 +750,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             List<IPrelimCompetition> prelimCompetitions = new();
 
             string prelimCompetitionQuery =
-                "SELECT prelim_competitions.id, prelim_competitions.datetime, prelim_competitions.role, prelim_competitions.round"
+                "SELECT id, datetime, role, round, alternate_1_id, alternate_2_id"
                 + " FROM " + PG_PRELIM_COMPETITIONS_TABLE_NAME
                 + " WHERE prelim_competitions.competition_id = " + id;
 
@@ -688,6 +763,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     string prelimCompetitionDateString = reader.GetString(1);
                     string prelimCompetitionRoleString = reader.GetString(2);
                     string prelimCompetitionRoundString = reader.GetString(3);
+                    Guid alternate1Id = reader.GetGuid(4);
+                    Guid alternate2Id = reader.GetGuid(5);
 
                     DateTime dateTime = DateTime.Parse(prelimCompetitionDateString);
                     Role role = Util.GetRoleFromString(prelimCompetitionRoleString);
@@ -700,6 +777,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                         role: role,
                         prelimScores: null,
                         promotedCompetitors: null,
+                        alternate1: App.CompetitorsDb.Where(c => c.CompetitorId == alternate1Id).First(),
+                        alternate2: App.CompetitorsDb.Where(c => c.CompetitorId == alternate2Id).First(),
                         id: prelimCompetitionId));
                 }
             }
