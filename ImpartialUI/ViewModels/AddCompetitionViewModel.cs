@@ -197,6 +197,17 @@ namespace ImpartialUI.ViewModels
                 OnPropertyChanged(nameof(LeaderSemis));
                 OnPropertyChanged(nameof(FollowerSemis));
                 OnPropertyChanged(nameof(FinalCompetition));
+
+                ShowFinals = Competition?.FinalCompetition != null;
+                ShowPrelims = Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Prelims).FirstOrDefault() != null;
+                ShowSemis = Competition?.PairedPrelimCompetitions.Where(c => c.Round == Round.Semifinals).FirstOrDefault() != null;
+
+                ShowCompetition = ShowFinals || ShowPrelims || ShowSemis;
+
+                OnPropertyChanged(nameof(ShowPrelims));
+                OnPropertyChanged(nameof(ShowSemis));
+                OnPropertyChanged(nameof(ShowFinals));
+                OnPropertyChanged(nameof(ShowCompetition));
             }
         }
 
@@ -220,6 +231,11 @@ namespace ImpartialUI.ViewModels
         }
 
         private IProgress<double> _parseProgress;
+
+        public bool ShowPrelims { get; set; }
+        public bool ShowSemis { get; set; }
+        public bool ShowFinals { get; set; }
+        public bool ShowCompetition { get; set; }
 
         public ICommand AddCompetitorCommand { get; set; }
         public ICommand AddJudgeCommand { get; set; }
@@ -252,30 +268,38 @@ namespace ImpartialUI.ViewModels
                 Division = Division.AllStar 
             };
             ScoresheetSelector = ScoresheetSelector.Auto;
-
             NewDanceConventionDate = DateTime.Now;
 
             _parseProgress = new Progress<double>(ReportProgress);
 
             RefreshCache();
-            
-            //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-04-01 city of angels\prelims.html";
-            //SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\semis.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-04-01 city of angels\finals.html";
-            //ParseScoreSheets();
+
+            TestData();
+        }
+
+        private void TestData()
+        {
+            var newDanceConvention = new DanceConvention("Swing Fling", DateTime.Parse("8-14-2022"));
+            DanceConventions.Add(newDanceConvention);
+            SelectedDanceConvention = newDanceConvention;
+            ScoresheetSelector = ScoresheetSelector.EEPro;
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-08-14 swing fling\finals.html";
         }
 
         private async void RefreshCache()
         {
             DanceConventions = (await App.DatabaseProvider.GetAllDanceConventionsAsync()).OrderBy(c => c.Date).ToList();
-            Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).OrderBy(c => c.FullName).ToList();
-            Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList().OrderBy(c => c.FullName).ToList();
+            //Competitors = (await App.DatabaseProvider.GetAllCompetitorsAsync()).OrderBy(c => c.FullName).ToList();
+            //Judges = (await App.DatabaseProvider.GetAllJudgesAsync()).ToList().OrderBy(c => c.FullName).ToList();
+
+            Competitors = App.CompetitorsDb;
+            Judges = App.JudgesDb;
         }
 
         private void Clear()
         {
             Competition = new Competition() { Division = Division.AllStar };
+
             PrelimsPath = string.Empty;
             SemisPath = string.Empty;
             FinalsPath = string.Empty;
@@ -291,6 +315,7 @@ namespace ImpartialUI.ViewModels
 
                 await App.DatabaseProvider.UpsertCompetitorAsync(newCompetitor);
                 Competitors.Add(newCompetitor);
+                Competitors = Competitors.OrderBy(c => c.FullName).ToList();
 
                 FirstName = string.Empty;
                 LastName = string.Empty;
@@ -303,6 +328,7 @@ namespace ImpartialUI.ViewModels
 
             await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
             Judges.Add(newJudge);
+            Judges = Judges.OrderBy(j => j.FullName).ToList();
 
             JudgeFirstName = string.Empty;
             JudgeLastName = string.Empty;
@@ -373,7 +399,7 @@ namespace ImpartialUI.ViewModels
                 case ScoresheetSelector.DanceConvention:
                     _scoresheetParser = new DanceConventionParser(prelimsPath, finalsPath);
                     break;
-                //TODO: readd this
+                //TODO: re-add this
                 //case ScoresheetSelector.StepRightSolutions:
                 //    _scoresheetParser = new StepRightSolutionsParser(prelimsPath, semisPath, finalsPath);
                 //    break;
@@ -539,16 +565,6 @@ namespace ImpartialUI.ViewModels
 
                 if (serverLeader != null)
                 {
-                    serverLeader = new Competitor(
-                        serverLeader.Id, 
-                        serverLeader.WsdcId,
-                        serverLeader.FirstName, 
-                        serverLeader.LastName,
-                        serverLeader.LeadStats.Rating, 
-                        serverLeader.LeadStats.Variance,
-                        serverLeader.FollowStats.Rating, 
-                        serverLeader.FollowStats.Variance);
-
                     var scores = comp.FinalCompetition.FinalScores.Where(s => s.Leader.FullName == couple.Leader.FullName).ToList();
                     foreach (var score in scores)
                     {
@@ -574,16 +590,6 @@ namespace ImpartialUI.ViewModels
 
                 if (serverFollower != null)
                 {
-                    serverFollower = new Competitor(
-                        serverFollower.Id, 
-                        serverFollower.WsdcId,
-                        serverFollower.FirstName, 
-                        serverFollower.LastName,
-                        serverFollower.LeadStats.Rating, 
-                        serverFollower.LeadStats.Variance,
-                        serverFollower.FollowStats.Rating, 
-                        serverFollower.FollowStats.Variance);
-
                     var scores = comp.FinalCompetition.FinalScores.Where(s => s.Follower.FullName == couple.Follower.FullName).ToList();
                     foreach (var score in scores)
                     {

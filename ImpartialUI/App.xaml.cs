@@ -1,6 +1,7 @@
 ﻿using Impartial;
 using ImpartialUI.Services.DatabaseProvider;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -17,14 +18,17 @@ namespace ImpartialUI
 
         public App()
         {
+            RefreshCaches().Wait();
             InitializeComponent();
-            RefreshCaches();
         }
 
         public async Task RefreshCaches()
         {
-            JudgesDb = (List<IJudge>)await DatabaseProvider.GetAllJudgesAsync();
-            CompetitorsDb = (List<ICompetitor>)await DatabaseProvider.GetAllCompetitorsAsync();
+            var pgDbProvider = new PgDatabaseProvider(host: "localhost", user: "postgres", dbName: "WCS-SS-DB", port: "5432", password: "*Firenice18");
+            CompetitorsDb = (await pgDbProvider.GetAllCompetitorsAsync()).OrderBy(c => c.FullName).ToList();
+
+            JudgesDb = (await DatabaseProvider.GetAllJudgesAsync()).OrderBy(c => c.FullName).ToList();
+            //CompetitorsDb = (await DatabaseProvider.GetAllCompetitorsAsync()).OrderBy(c => c.FullName).ToList();
         }
     }
 }

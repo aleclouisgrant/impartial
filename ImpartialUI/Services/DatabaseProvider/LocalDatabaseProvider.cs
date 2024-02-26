@@ -507,6 +507,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             _judges.Add(bryn);
             _judges.Add(john);
             _judges.Add(lemery);
+            _judges.Add(victoria);
+            _judges.Add(greg);
 
             _competitors.Add(brandon);
             _competitors.Add(melodie);

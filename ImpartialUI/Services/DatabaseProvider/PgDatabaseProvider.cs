@@ -8,6 +8,7 @@ using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using System.Numerics;
+using ImpartialUI.Controls;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -311,9 +312,8 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task<IEnumerable<ICompetitor>> GetAllCompetitorsAsync()
         {
-            string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
-                + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id";
-
+            string query = "SELECT competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id, competitor_profiles.leader_rating, competitor_profiles.follower_rating"
+            + " FROM " + PG_USERS_TABLE_NAME + " LEFT JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id";
             var results = new List<ICompetitor>();
 
             await using (var cmd = _dataSource.CreateCommand(query))

@@ -210,14 +210,19 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            
-            <ComboBox ItemsSource="{Binding DanceConventions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedDanceConvention, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                      Margin="5" 
-                      Width="500" 
-                      HorizontalAlignment="Left"/>
-            <TabControl Grid.Row="1">
-            <TabItem Header="Prelims (Leaders)" IsSelected="True">
+
+            <StackPanel Orientation="Horizontal">
+                <ComboBox ItemsSource="{Binding DanceConventions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedItem="{Binding SelectedDanceConvention, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                          Margin="5" 
+                          Width="500" 
+                          HorizontalAlignment="Left"/>
+            </StackPanel>
+
+            <TabControl Grid.Row="1"
+                        Visibility="{Binding ShowCompetition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TabItem Header="Prelims (Leaders)"
+                     Visibility="{Binding ShowPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer Margin="10 5">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -230,7 +235,6 @@
                             Grid.Column="0" 
                             PrelimCompetition="{Binding LeaderPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <c:PrelimCompetitionEditor
-                            x:Name="LeaderPrelimsAdder" 
                             Grid.Column="2" 
                             Round="{x:Static imp:Round.Prelims}" 
                             PrelimCompetition="{Binding LeaderPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -239,7 +243,8 @@
                     </Grid>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Prelims (Followers)">
+            <TabItem Header="Prelims (Followers)"
+                     Visibility="{Binding ShowPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer Margin="10 5">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -262,7 +267,8 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Semis (Leaders)" Visibility="{Binding LeaderSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TabItem Header="Semis (Leaders)" 
+                     Visibility="{Binding ShowSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer Margin="10 5">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -284,7 +290,8 @@
                     </Grid>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Semis (Followers)" Visibility="{Binding FollowerSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TabItem Header="Semis (Followers)" 
+                     Visibility="{Binding ShowSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer Margin="10 5">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -307,7 +314,8 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Finals">
+            <TabItem Header="Finals"
+                     Visibility="{Binding ShowFinals, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer>
                     <Grid>
                         <Grid.RowDefinitions>

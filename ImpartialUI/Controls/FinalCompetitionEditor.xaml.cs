@@ -66,6 +66,7 @@ namespace ImpartialUI.Controls
         }
         private static void OnCompetitorsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
+            ((FinalCompetitionEditor)source).UpdateCompetitors();
         }
 
         public static readonly DependencyProperty JudgesProperty = DependencyProperty.Register(
@@ -80,6 +81,7 @@ namespace ImpartialUI.Controls
         }
         private static void OnJudgesPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
+            ((FinalCompetitionEditor)source).UpdateJudges();
         }
         #endregion
 
@@ -101,7 +103,6 @@ namespace ImpartialUI.Controls
 
         public void UpdateCompetitors()
         {
-            return; //the following may not be necessary - testing
             foreach (SearchTextBox searchTextBox in _competitorBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
@@ -113,14 +114,13 @@ namespace ImpartialUI.Controls
         }
         public void UpdateJudges()
         {
-            return; //the following may not be necessary - testing
             foreach (SearchTextBox searchTextBox in _judgeBoxes)
             {
                 var selectedId = searchTextBox.SelectedPerson?.Id;
                 searchTextBox.ItemsSource = Judges;
 
                 if (selectedId != null)
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault(); ;
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.Id == selectedId).FirstOrDefault();
             }
         }
 
