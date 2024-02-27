@@ -41,6 +41,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                     port,
                     password);
 
+            _connectionString += ";INCLUDEERRORDETAIL=true";
+
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
             dataSourceBuilder.MapEnum<Division>();
             dataSourceBuilder.MapEnum<Tier>();
@@ -176,16 +178,14 @@ namespace ImpartialUI.Services.DatabaseProvider
             PropertyInfo[] properties = typeof(U).GetProperties();
             string command = CreateInsertQuery(table, parameters);
 
-            await using (var cmd = _dataSource.CreateCommand(command))
-            {
-                foreach (PropertyInfo property in properties)
-                {
-                    if (property.GetValue(parameters) != null)
-                        cmd.Parameters.AddWithValue(property.GetValue(parameters));
-                }
+            var cmd = _dataSource.CreateCommand(command);
 
-                await cmd.ExecuteNonQueryAsync();
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.GetValue(parameters) != null)
+                    cmd.Parameters.AddWithValue(property.GetValue(parameters));
             }
+            await cmd.ExecuteNonQueryAsync();
         }
         private async Task UpsertDataAsync<U>(string table, U parameters, string conflictParameter)
         {
@@ -656,14 +656,18 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 var finalCompetitionModel = new PgFinalCompetitionModel
                 {
+                    id = competition.FinalCompetition.Id,
                     competition_id = competition.Id,
                     datetime = competition.FinalCompetition.DateTime
                 };
+
+                await SaveDataAsync(PG_FINAL_COMPETITIONS_TABLE_NAME, finalCompetitionModel);
 
                 foreach (var couple in competition.FinalCompetition.Couples)
                 {
                     var pgPlacementModel = new PgPlacementModel
                     {
+                        id = Guid.NewGuid(),
                         final_competition_id = competition.FinalCompetition.Id,
                         leader_id = couple.Leader.CompetitorId,
                         follower_id = couple.Follower.CompetitorId,
@@ -699,8 +703,11 @@ namespace ImpartialUI.Services.DatabaseProvider
                         competitorRecords.Add(new PgCompetitorRecordModel
                         {
                             competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).FirstOrDefault().id,
+                            placement = couple.Placement,
+                            points_earned = Util.GetAwardedPoints(competition.LeaderTier, couple.Placement, competition.Date)
                             //TODO:
                             //pre_rating = competitor.LeadStats.Rating
+                            //post_rating = 
                         });
                     }
                     else
@@ -715,8 +722,11 @@ namespace ImpartialUI.Services.DatabaseProvider
                         competitorRecords.Add(new PgCompetitorRecordModel
                         {
                             competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).FirstOrDefault().id,
+                            placement = couple.Placement,
+                            points_earned = Util.GetAwardedPoints(competition.FollowerTier, couple.Placement, competition.Date)
                             //TODO:
                             //pre_rating = competitor.LeadStats.Rating
+                            //post_rating = 
                         });
                     }
                     else
@@ -743,6 +753,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 }
             }
 
+            // TODO: these need to be moved up and added to DB before adding anything that uses it
             foreach (var registration in competitorRegistrations)
             {
                 await SaveDataAsync(PG_COMPETITOR_REGISTRATIONS_TABLE_NAME, registration);
