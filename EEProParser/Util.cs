@@ -369,16 +369,46 @@ namespace Impartial
             switch (s)
             {
                 case "Newcomer":
+                case "newcomer":
+                case "NEW":
+                case "New":
+                case "new":
                     return Division.Newcomer;
                 case "Novice":
+                case "novice":
+                case "NOV":
+                case "Nov":
+                case "nov":
                     return Division.Novice;
                 case "Intermediate":
+                case "intermediate":
+                case "INT":
+                case "Int":
+                case "int":
                     return Division.Intermediate;
                 case "Advanced":
+                case "advanced":
+                case "ADV":
+                case "Adv":
+                case "adv":
                     return Division.Advanced;
                 case "AllStar":
+                case "All Star":
+                case "all_star":
+                case "allstar":
+                case "all star":
+                case "All-Star":
+                case "all-star":
+                case "ALS":
+                case "Als":
+                case "als":
                     return Division.AllStar;
                 case "Champion":
+                case "champion":
+                case "Champ":
+                case "champ":
+                case "CHM":
+                case "CMP":
                     return Division.Champion;
                 default:
                     return Division.Open;

@@ -838,7 +838,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 "SELECT dance_conventions.id, dance_conventions.name, dance_conventions.date, competitions.division"
                 + " FROM " + PG_COMPETITIONS_TABLE_NAME
                 + " INNER JOIN " + PG_DANCE_CONVENTIONS_TABLE_NAME + " ON dance_conventions.id = competitions.dance_convention_id"
-                + " WHERE competitions.id = " + id;
+                + " WHERE competitions.id = \'" + id + "\';";
 
             await using (var cmd = _dataSource.CreateCommand(query))
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -847,10 +847,9 @@ namespace ImpartialUI.Services.DatabaseProvider
                 {
                     Guid danceConventionId = reader.GetGuid(0);
                     string danceConventionName = reader.GetString(1);
-                    string danceConventionDateString = reader.GetString(2);
+                    DateTime date = reader.GetDateTime(2);
                     string divisionString = reader.GetString(3);
-
-                    DateTime date = DateTime.Parse(danceConventionDateString);
+    
                     Division division = Util.GetDivisionFromString(divisionString);
 
                     competition = new Competition(danceConventionId, danceConventionName, date, division, id);
@@ -860,9 +859,9 @@ namespace ImpartialUI.Services.DatabaseProvider
             List<IPrelimCompetition> prelimCompetitions = new();
 
             string prelimCompetitionQuery =
-                "SELECT id, datetime, role, round, alternate_1_id, alternate_2_id"
+                "SELECT id, datetime, role, round, alternate1_id, alternate2_id"
                 + " FROM " + PG_PRELIM_COMPETITIONS_TABLE_NAME
-                + " WHERE prelim_competitions.competition_id = " + id;
+                + " WHERE prelim_competitions.competition_id = \'" + id + "\';";
 
             await using (var cmd = _dataSource.CreateCommand(prelimCompetitionQuery))
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -887,8 +886,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                         role: role,
                         prelimScores: null,
                         promotedCompetitors: null,
-                        alternate1: App.CompetitorsDb.Where(c => c.CompetitorId == alternate1Id).First(),
-                        alternate2: App.CompetitorsDb.Where(c => c.CompetitorId == alternate2Id).First(),
+                        alternate1: App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == alternate1Id),
+                        alternate2: App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == alternate2Id),
                         id: prelimCompetitionId));
                 }
             }
@@ -900,7 +899,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 string prelimScoresQuery =
                     "SELECT id, judge_id, competitor_id, callbackscore"
                     + " FROM prelim_scores"
-                    + " WHERE prelim_competition_id = " + prelimCompetition.Id;
+                    + " WHERE prelim_competition_id = \'" + prelimCompetition.Id + "\';";
 
                 await using (var cmd = _dataSource.CreateCommand(prelimScoresQuery))
                 await using (var reader = await cmd.ExecuteReaderAsync())
@@ -925,7 +924,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 string promotedCompetitorsQuery =
                     "SELECT competitor_id"
                     + " FROM promoted_competitors"
-                    + " WHERE prelim_competition_id = " + prelimCompetition.Id;
+                    + " WHERE prelim_competition_id = \'" + prelimCompetition.Id + "\';";
 
                 await using (var cmd = _dataSource.CreateCommand(promotedCompetitorsQuery))
                 await using (var reader = await cmd.ExecuteReaderAsync())
@@ -965,7 +964,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             string finalCompetitionQuery =
                 "SELECT id, datetime"
                 + " FROM " + PG_FINAL_COMPETITIONS_TABLE_NAME
-                + " WHERE competition_id = " + id;
+                + " WHERE competition_id = \'" + id + "\';";
 
             await using (var cmd = _dataSource.CreateCommand(finalCompetitionQuery))
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -973,9 +972,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 while (await reader.ReadAsync())
                 {
                     Guid finalCompetitionId = reader.GetGuid(0);
-                    string finalCompetitionDateString = reader.GetString(1);
-
-                    DateTime dateTime = DateTime.Parse(finalCompetitionDateString);
+                    DateTime dateTime = reader.GetDateTime(1);
 
                     finalCompetition = new FinalCompetition(
                         dateTime: dateTime,
@@ -990,9 +987,9 @@ namespace ImpartialUI.Services.DatabaseProvider
                 List<ICouple> couples = new();
 
                 string placementsQuery =
-                    "SELECT leader_id, follower_id, score"
+                    "SELECT leader_id, follower_id, placement"
                     + " FROM placements"
-                    + " WHERE final_competition_id = " + finalCompetition.Id;
+                    + " WHERE final_competition_id = \'" + finalCompetition.Id + "\';";
 
                 await using (var cmd = _dataSource.CreateCommand(placementsQuery))
                 await using (var reader = await cmd.ExecuteReaderAsync())
@@ -1015,7 +1012,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 string finalScoresQuery =
                     "SELECT id, judge_id, leader_id, follower_id, score"
                     + " FROM final_scores"
-                    + " WHERE final_competition_id = " + finalCompetition.Id;
+                    + " WHERE final_competition_id = \'" + finalCompetition.Id + "\';";
 
                 await using (var cmd = _dataSource.CreateCommand(finalScoresQuery))
                 await using (var reader = await cmd.ExecuteReaderAsync())
@@ -1089,7 +1086,6 @@ namespace ImpartialUI.Services.DatabaseProvider
         {
             _dataSource?.Dispose();
         }
-
 
         private async Task DeleteHangingCompetitorRegistrations()
         {
