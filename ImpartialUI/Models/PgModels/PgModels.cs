@@ -13,12 +13,12 @@ namespace ImpartialUI.Models.PgModels
 
     public class PgCompetitorProfileModel
     {
+        public Guid? id { get; set; }
         public Guid? user_id { get; set; }
         public int? wsdc_id { get; set; }
 
         public int? leader_rating { get; set; }
         public int? follower_rating { get; set; }
-
 
         public int? leader_newcomer_points { get; set; }
         public int? leader_novice_points { get; set; }

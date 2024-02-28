@@ -8,9 +8,7 @@ using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using Impartial.Enums;
-using System.Net;
-using static iText.IO.Image.Jpeg2000ImageData;
-using MongoDB.Driver;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -270,7 +268,6 @@ namespace ImpartialUI.Services.DatabaseProvider
                 await cmd.ExecuteNonQueryAsync();
             }
         }
-        
         #endregion
 
         public async Task UpsertCompetitorAsync(ICompetitor competitor)
@@ -373,11 +370,11 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteCompetitorAsync(Guid id)
         {
-
+            await DeleteDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME, nameof(PgCompetitorProfileModel.id), id);
         }
         public async Task DeleteAllCompetitorsAsync()
         {
-
+            await DeleteAllDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME);
         }
 
         public async Task UpsertJudgeAsync(IJudge judge)
@@ -472,9 +469,11 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteJudgeAsync(Guid id)
         {
+            await DeleteDataAsync(PG_JUDGE_PROFILES_TABLE_NAME, nameof(PgJudgeProfileModel.id), id);
         }
         public async Task DeleteAllJudgesAsync()
         {
+            await DeleteAllDataAsync(PG_JUDGE_PROFILES_TABLE_NAME);
         }
 
         public async Task UpsertDanceConventionAsync(IDanceConvention convention)
@@ -531,11 +530,11 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteDanceConventionAsync(Guid id)
         {
-
+            await DeleteDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, nameof(PgDanceConventionModel.id), id);
         }
         public async Task DeleteAllDanceConventionsAsync()
         {
-
+            await DeleteAllDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME);
         }
 
         public async Task UpsertCompetitionAsync(ICompetition competition, Guid danceConventionId)
