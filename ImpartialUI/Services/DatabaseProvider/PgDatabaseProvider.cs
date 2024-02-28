@@ -9,6 +9,8 @@ using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using Impartial.Enums;
 using System.Net;
+using static iText.IO.Image.Jpeg2000ImageData;
+using MongoDB.Driver;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -55,9 +57,9 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
 
         #region Helper
-        private string CreateSelectQuery<U>(string table, U parameters)
+        private string CreateSelectQuery<T>(string table, T parameters)
         {
-            PropertyInfo[] properties = typeof(U).GetProperties();
+            PropertyInfo[] properties = typeof(T).GetProperties();
 
             string columnNames = string.Empty;
             if (properties.Length != 0)
@@ -77,9 +79,9 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             return "SELECT " + columnNames + " FROM " + table;
         }
-        private string CreateInsertQuery<U>(string table, U parameters)
+        private string CreateInsertQuery<T>(string table, T parameters)
         {
-            PropertyInfo[] properties = typeof(U).GetProperties();
+            PropertyInfo[] properties = typeof(T).GetProperties();
             string command = "INSERT INTO " + table;
 
             if (properties.Length == 0)
@@ -121,9 +123,9 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             return command;
         }
-        private string CreateUpsertQuery<U>(string table, U parameters, string conflictParameter)
+        private string CreateUpsertQuery<T>(string table, T parameters, string conflictParameter)
         {
-            PropertyInfo[] properties = typeof(U).GetProperties();
+            PropertyInfo[] properties = typeof(T).GetProperties();
             string command = "INSERT INTO " + table;
 
             if (properties.Length == 0)
@@ -172,18 +174,18 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             return command;
         }
-        private string CreateDeleteAllQuery<U>(string table)
+        private string CreateDeleteAllQuery(string table)
         {
             return "DELETE FROM " + table + ";";
         }
-        private string CreateDeleteWhereQuery<U>(string table, U parameters, string whereClause)
+        private string CreateDeleteWhereQuery<T>(string table, string parameter, T value)
         {
-            return "DELETE FROM " + table + "WHERE " + whereClause + ";";
+            return "DELETE FROM " + table + "WHERE " + parameter + " = " + value.ToString() + ";";
         }
 
-        private async Task SaveDataAsync<U>(string table, U parameters)
+        private async Task SaveDataAsync<T>(string table, T parameters)
         {
-            PropertyInfo[] properties = typeof(U).GetProperties();
+            PropertyInfo[] properties = typeof(T).GetProperties();
             string command = CreateInsertQuery(table, parameters);
 
             var cmd = _dataSource.CreateCommand(command);
@@ -195,9 +197,9 @@ namespace ImpartialUI.Services.DatabaseProvider
             }
             await cmd.ExecuteNonQueryAsync();
         }
-        private async Task UpsertDataAsync<U>(string table, U parameters, string conflictParameter)
+        private async Task UpsertDataAsync<T>(string table, T parameters, string conflictParameter)
         {
-            PropertyInfo[] properties = typeof(U).GetProperties();
+            PropertyInfo[] properties = typeof(T).GetProperties();
             string command = CreateUpsertQuery(table, parameters, conflictParameter);
 
             await using (var cmd = _dataSource.CreateCommand(command))
@@ -250,6 +252,25 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             return data;
         }
+        
+        private async Task DeleteAllDataAsync(string table)
+        {
+            string command = CreateDeleteAllQuery(table);
+
+            await using (var cmd = _dataSource.CreateCommand(command))
+            {
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+        private async Task DeleteDataAsync<T>(string table, string parameter, T value)
+        {
+            string command = CreateDeleteWhereQuery<T>(table, parameter, value);
+            await using (var cmd = _dataSource.CreateCommand(command))
+            {
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+        
         #endregion
 
         public async Task UpsertCompetitorAsync(ICompetitor competitor)
@@ -270,8 +291,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             await using var connection = await _dataSource.OpenConnectionAsync();
             await using var transaction = await connection.BeginTransactionAsync();
 
-            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, "id");
-            await UpsertDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME, competitorProfileModel, "user_id");
+            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, nameof(PgUserModel.id));
+            await UpsertDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME, competitorProfileModel, nameof(PgCompetitorProfileModel.user_id));
 
             await transaction.CommitAsync();
         }
@@ -377,8 +398,8 @@ namespace ImpartialUI.Services.DatabaseProvider
             await using var connection = await _dataSource.OpenConnectionAsync();
             await using var transaction = await connection.BeginTransactionAsync();
 
-            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, "id");
-            await UpsertDataAsync(PG_JUDGE_PROFILES_TABLE_NAME, judgeModel, "user_id");
+            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, nameof(PgUserModel.id));
+            await UpsertDataAsync(PG_JUDGE_PROFILES_TABLE_NAME, judgeModel, nameof(PgJudgeProfileModel.user_id));
 
             await transaction.CommitAsync();
         }
@@ -465,7 +486,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 date = convention.Date,
             };
 
-            await UpsertDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, pgDanceConventionModel, "id");
+            await UpsertDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, pgDanceConventionModel, nameof(PgDanceConventionModel.id));
         }
         public async Task<IDanceConvention?> GetDanceConventionAsync(Guid id)
         {
@@ -1055,9 +1076,22 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteCompetitionAsync(Guid id)
         {
+            await DeleteDataAsync(PG_COMPETITIONS_TABLE_NAME, nameof(PgCompetitionModel.id), id);
+
+            string query = "DELETE FROM " + PG_COMPETITOR_REGISTRATIONS_TABLE_NAME
+                + " WHERE NOT EXISTS ("
+                + "SELECT FROM " + PG_COMPETITOR_RECORDS_TABLE_NAME
+                + " WHERE competitor_records.competitor_registration.id = competitor_registrations.id"
+                + ");";
+
+            await using (var cmd = _dataSource.CreateCommand(query))
+            {
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
         public async Task DeleteAllCompetitionsAsync()
         {
+            await DeleteAllDataAsync(PG_COMPETITIONS_TABLE_NAME);
         }
 
         public void Dispose()
