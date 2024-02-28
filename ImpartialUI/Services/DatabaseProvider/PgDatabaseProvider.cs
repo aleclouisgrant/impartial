@@ -1077,7 +1077,22 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task DeleteCompetitionAsync(Guid id)
         {
             await DeleteDataAsync(PG_COMPETITIONS_TABLE_NAME, nameof(PgCompetitionModel.id), id);
+            await DeleteHangingCompetitorRegistrations();
+        }
+        public async Task DeleteAllCompetitionsAsync()
+        {
+            await DeleteAllDataAsync(PG_COMPETITIONS_TABLE_NAME);
+            await DeleteHangingCompetitorRegistrations();
+        }
 
+        public void Dispose()
+        {
+            _dataSource?.Dispose();
+        }
+
+
+        private async Task DeleteHangingCompetitorRegistrations()
+        {
             string query = "DELETE FROM " + PG_COMPETITOR_REGISTRATIONS_TABLE_NAME
                 + " WHERE NOT EXISTS ("
                 + "SELECT FROM " + PG_COMPETITOR_RECORDS_TABLE_NAME
@@ -1088,15 +1103,6 @@ namespace ImpartialUI.Services.DatabaseProvider
             {
                 await cmd.ExecuteNonQueryAsync();
             }
-        }
-        public async Task DeleteAllCompetitionsAsync()
-        {
-            await DeleteAllDataAsync(PG_COMPETITIONS_TABLE_NAME);
-        }
-
-        public void Dispose()
-        {
-            _dataSource?.Dispose();
         }
     }
 }
