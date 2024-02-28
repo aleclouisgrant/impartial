@@ -46,6 +46,7 @@ namespace ImpartialUI.Models.PgModels
     public class PgCompetitorRecordModel
     {
         public Guid? id { get; set; }
+        public Guid? competition_id { get; set; }
         public Guid? competitor_registration_id { get; set; }
         public int? placement { get; set; }
         public int? points_earned { get; set; }

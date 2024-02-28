@@ -8,6 +8,7 @@ using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using Impartial.Enums;
+using System.Net;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -54,6 +55,28 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
 
         #region Helper
+        private string CreateSelectQuery<U>(string table, U parameters)
+        {
+            PropertyInfo[] properties = typeof(U).GetProperties();
+
+            string columnNames = string.Empty;
+            if (properties.Length != 0)
+            {
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    if (properties[i].GetValue(parameters) != null)
+                    {
+                        columnNames += properties[i].Name;
+                        if (i != properties.Length)
+                        {
+                            columnNames += ", ";
+                        }
+                    }
+                }
+            }
+
+            return "SELECT " + columnNames + " FROM " + table;
+        }
         private string CreateInsertQuery<U>(string table, U parameters)
         {
             PropertyInfo[] properties = typeof(U).GetProperties();
@@ -149,28 +172,13 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             return command;
         }
-
-        private string CreateSelectQuery<U>(string table, U parameters)
+        private string CreateDeleteAllQuery<U>(string table)
         {
-            PropertyInfo[] properties = typeof(U).GetProperties();
-
-            string columnNames = string.Empty;
-            if (properties.Length != 0)
-            {
-                for (int i = 0; i < properties.Length; i++)
-                {
-                    if (properties[i].GetValue(parameters) != null)
-                    {
-                        columnNames += properties[i].Name;
-                        if (i != properties.Length)
-                        {
-                            columnNames += ", ";
-                        }
-                    }
-                }
-            }
-
-            return "SELECT " + columnNames + " FROM " + table;
+            return "DELETE FROM " + table + ";";
+        }
+        private string CreateDeleteWhereQuery<U>(string table, U parameters, string whereClause)
+        {
+            return "DELETE FROM " + table + "WHERE " + whereClause + ";";
         }
 
         private async Task SaveDataAsync<U>(string table, U parameters)
@@ -525,11 +533,18 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             await SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel);
 
-            var competitorRegistrations = new List<PgCompetitorRegistrationModel>();
-            var competitorRecords = new List<PgCompetitorRecordModel>();
+            var uploadedCompetitorRegistrations = new List<PgCompetitorRegistrationModel>();
+            var uploadedCompetitorRecords = new List<PgCompetitorRecordModel>();
 
             foreach (var pairedPrelimCompetition in competition.PairedPrelimCompetitions)
             {
+                var prelimScores = new List<PgPrelimScoreModel>();
+                var prelimCompetitorRegistrations = new List<PgCompetitorRegistrationModel>();
+                var prelimCompetitorRecords = new List<PgCompetitorRecordModel>();
+                
+                var leaderPromotedCompetitors = new List<PgPromotedCompetitorModel>();
+                var followerPromotedCompetitors = new List<PgPromotedCompetitorModel>();
+
                 var leaderPrelimCompetitionModel = new PgPrelimCompetitionModel
                 {
                     competition_id = competition.Id,
@@ -539,41 +554,6 @@ namespace ImpartialUI.Services.DatabaseProvider
                     alternate1_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate1.CompetitorId,
                     alternate2_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate2.CompetitorId,
                 };
-
-                foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
-                {
-                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).Any())
-                    {
-                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
-                        {
-                            competitor_profile_id = competitor.CompetitorId,
-                            dance_convention_id = danceConventionId,
-                            //TODO:
-                            //bib_number = 
-                        });
-                    }
-
-                    if (!competitorRecords.Where(rec => rec.competitor_registration_id == competitor.CompetitorId).Any())
-                    {
-                        competitorRecords.Add(new PgCompetitorRecordModel
-                        {
-                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).FirstOrDefault().id,
-                            //TODO:
-                            //pre_rating = competitor.LeadStats.Rating
-                        });
-                    }
-                }
-
-                foreach (var promotedCompetitor in pairedPrelimCompetition.LeaderPrelimCompetition.PromotedCompetitors)
-                {
-                    var leaderPrelimPromotedCompetitorsModel = new PgPromotedCompetitorModel
-                    {
-                        prelim_competition_id = leaderPrelimCompetitionModel.id,
-                        competitor_id = promotedCompetitor.CompetitorId
-                    };
-
-                    await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, leaderPrelimPromotedCompetitorsModel);
-                }
 
                 var followerPrelimCompetitionModel = new PgPrelimCompetitionModel
                 {
@@ -585,75 +565,137 @@ namespace ImpartialUI.Services.DatabaseProvider
                     alternate2_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate2.CompetitorId,
                 };
 
-                foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
+                foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
                 {
-                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).Any())
+                    if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
                     {
-                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
                         {
+                            id = Guid.NewGuid(),
                             competitor_profile_id = competitor.CompetitorId,
                             dance_convention_id = danceConventionId,
-                            //TODO:
-                            //bib_number = 
                         });
                     }
 
-                    if (!competitorRecords.Where(rec => rec.competitor_registration_id == competitor.CompetitorId).Any())
+                    if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                        && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                        && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Leader.CompetitorId == competitor.CompetitorId))
                     {
-                        competitorRecords.Add(new PgCompetitorRecordModel
+                        prelimCompetitorRecords.Add(new PgCompetitorRecordModel
                         {
-                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == competitor.CompetitorId).FirstOrDefault().id,
-                            //TODO:
-                            //pre_rating = competitor.FollowStats.Rating
+                            competition_id = competition.Id,
+                            competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                        });
+                    }
+                }
+
+                foreach (var promotedCompetitor in pairedPrelimCompetition.LeaderPrelimCompetition.PromotedCompetitors)
+                {
+                    leaderPromotedCompetitors.Add(new PgPromotedCompetitorModel
+                    {
+                        prelim_competition_id = leaderPrelimCompetitionModel.id,
+                        competitor_id = promotedCompetitor.CompetitorId
+                    });
+                }
+
+                foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
+                {
+                    if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
+                    {
+                        prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        {
+                            id = Guid.NewGuid(),
+                            competitor_profile_id = competitor.CompetitorId,
+                            dance_convention_id = danceConventionId,
+                        });
+                    }
+
+                    if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                        && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                        && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Follower.CompetitorId == competitor.CompetitorId))
+                    {
+                        prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                        {
+                            competition_id = competition.Id,
+                            competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
                         });
                     }
                 }
 
                 foreach (var promotedCompetitor in pairedPrelimCompetition.FollowerPrelimCompetition.PromotedCompetitors)
                 {
-                    var followerPrelimPromotedCompetitorsModel = new PgPromotedCompetitorModel
+                    followerPromotedCompetitors.Add(new PgPromotedCompetitorModel
                     {
                         prelim_competition_id = followerPrelimCompetitionModel.id,
                         competitor_id = promotedCompetitor.CompetitorId
-                    };
-
-                    await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, followerPrelimPromotedCompetitorsModel);
+                    });
                 }
-
-                await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, leaderPrelimCompetitionModel);
-                await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, followerPrelimCompetitionModel);
 
                 foreach (var prelimScore in pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores)
                 {
-                    var scoreModel = new PgPrelimScoreModel
+                    prelimScores.Add(new PgPrelimScoreModel
                     {
                         id = prelimScore.Id,
                         prelim_competition_id = pairedPrelimCompetition.LeaderPrelimCompetition.Id,
                         competitor_id = prelimScore.Competitor.CompetitorId,
                         judge_id = prelimScore.Judge.JudgeId,
                         callback_score = prelimScore.CallbackScore,
-                    };
-
-                    await SaveDataAsync(PG_PRELIM_SCORES_TABLE_NAME, prelimScore);
+                    });
                 }
 
                 foreach (var prelimScore in pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores)
                 {
-                    var scoreModel = new PgPrelimScoreModel
+                    prelimScores.Add(new PgPrelimScoreModel
                     {
                         id = prelimScore.Id,
                         prelim_competition_id = pairedPrelimCompetition.FollowerPrelimCompetition.Id,
                         competitor_id = prelimScore.Competitor.CompetitorId,
                         judge_id = prelimScore.Judge.JudgeId,
                         callback_score = prelimScore.CallbackScore,
-                    };
+                    });
+                }
 
+                // Save all data
+                foreach (var competitorRegistration in prelimCompetitorRegistrations)
+                {
+                    await SaveDataAsync(PG_COMPETITOR_REGISTRATIONS_TABLE_NAME, competitorRegistration);
+                }
+
+                foreach (var competitorRecord in prelimCompetitorRecords)
+                {
+                    await SaveDataAsync(PG_COMPETITOR_RECORDS_TABLE_NAME, competitorRecord);
+                }
+
+                await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, leaderPrelimCompetitionModel);
+                await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, followerPrelimCompetitionModel);
+                
+                foreach (var leaderPromotedCompetitor in leaderPromotedCompetitors)
+                {
+                    await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, leaderPromotedCompetitor);
+                }
+
+                foreach (var followerPromotedCompetitor in followerPromotedCompetitors)
+                {
+                    await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, followerPromotedCompetitor);
+                }
+
+                foreach (var prelimScore in prelimScores)
+                {
                     await SaveDataAsync(PG_PRELIM_SCORES_TABLE_NAME, prelimScore);
                 }
+
+                uploadedCompetitorRegistrations.AddRange(prelimCompetitorRegistrations);
+                uploadedCompetitorRecords.AddRange(prelimCompetitorRecords);
             }
 
             if (competition.FinalCompetition != null)
             {
+                var finalCompetitorRegistrations = new List<PgCompetitorRegistrationModel>();
+                var finalCompetitorRecords = new List<PgCompetitorRecordModel>();
+
+                var placements = new List<PgPlacementModel>();
+                var finalScores = new List<PgFinalScoreModel>();
+
                 var finalCompetitionModel = new PgFinalCompetitionModel
                 {
                     id = competition.FinalCompetition.Id,
@@ -661,107 +703,108 @@ namespace ImpartialUI.Services.DatabaseProvider
                     datetime = competition.FinalCompetition.DateTime
                 };
 
-                await SaveDataAsync(PG_FINAL_COMPETITIONS_TABLE_NAME, finalCompetitionModel);
-
                 foreach (var couple in competition.FinalCompetition.Couples)
                 {
-                    var pgPlacementModel = new PgPlacementModel
+                    placements.Add(new PgPlacementModel
                     {
                         id = Guid.NewGuid(),
                         final_competition_id = competition.FinalCompetition.Id,
                         leader_id = couple.Leader.CompetitorId,
                         follower_id = couple.Follower.CompetitorId,
                         placement = couple.Placement
-                    };
+                    });
 
                     // in case we're only uploading a final competition, need to add registrations and records
-                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).Any())
+                    if (!uploadedCompetitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).Any()
+                        && !finalCompetitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).Any())
                     {
-                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        finalCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
                         {
+                            id = Guid.NewGuid(),
                             competitor_profile_id = couple.Leader.CompetitorId,
                             dance_convention_id = danceConventionId,
-                            //TODO:
-                            //bib_number = 
                         });
                     }
 
-                    if (!competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).Any())
+                    if (!uploadedCompetitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).Any()
+                        && !finalCompetitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).Any())
                     {
-                        competitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        finalCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
                         {
+                            id = Guid.NewGuid(),
                             competitor_profile_id = couple.Follower.CompetitorId,
                             dance_convention_id = danceConventionId,
-                            //TODO:
-                            //bib_number = 
                         });
                     }
 
-                    var leaderRecord = competitorRecords.Where(rec => rec.competitor_registration_id == couple.Leader.CompetitorId).FirstOrDefault();
+                    var leaderRecord = finalCompetitorRecords.Where(rec => rec.competitor_registration_id == couple.Leader.CompetitorId).FirstOrDefault();
                     if (leaderRecord == null)
                     {
-                        competitorRecords.Add(new PgCompetitorRecordModel
+                        var registrationId =
+                            uploadedCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == couple.Leader.CompetitorId)?.id ??
+                            finalCompetitorRegistrations.First(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).id;
+
+                        finalCompetitorRecords.Add(new PgCompetitorRecordModel
                         {
-                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).FirstOrDefault().id,
+                            competition_id = competition.Id,
+                            competitor_registration_id = registrationId,
                             placement = couple.Placement,
                             points_earned = Util.GetAwardedPoints(competition.LeaderTier, couple.Placement, competition.Date)
-                            //TODO:
-                            //pre_rating = competitor.LeadStats.Rating
-                            //post_rating = 
                         });
                     }
-                    else
-                    {
-                        leaderRecord.placement = couple.Placement;
-                        leaderRecord.points_earned = Util.GetAwardedPoints(competition.LeaderTier, couple.Placement, competition.Date);
-                    }
 
-                    var followerRecord = competitorRecords.Where(rec => rec.competitor_registration_id == couple.Leader.CompetitorId).FirstOrDefault();
+                    var followerRecord = finalCompetitorRecords.Where(rec => rec.competitor_registration_id == couple.Leader.CompetitorId).FirstOrDefault();
                     if (followerRecord == null)
                     {
-                        competitorRecords.Add(new PgCompetitorRecordModel
+                        var registrationId = 
+                            uploadedCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == couple.Leader.CompetitorId)?.id ??
+                            finalCompetitorRegistrations.First(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).id;
+
+                        finalCompetitorRecords.Add(new PgCompetitorRecordModel
                         {
-                            competitor_registration_id = competitorRegistrations.Where(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).FirstOrDefault().id,
+                            competition_id = competition.Id,
+                            competitor_registration_id = registrationId,
                             placement = couple.Placement,
                             points_earned = Util.GetAwardedPoints(competition.FollowerTier, couple.Placement, competition.Date)
-                            //TODO:
-                            //pre_rating = competitor.LeadStats.Rating
-                            //post_rating = 
                         });
                     }
-                    else
-                    {
-                        followerRecord.placement = couple.Placement;
-                        followerRecord.points_earned = Util.GetAwardedPoints(competition.FollowerTier, couple.Placement, competition.Date);
-                    }
-
-                    await SaveDataAsync(PG_PLACEMENTS_TABLE_NAME, pgPlacementModel);
                 }
 
                 foreach (var finalScore in competition.FinalCompetition.FinalScores)
                 {
-                    var pgFinalScoreModel = new PgFinalScoreModel
+                    finalScores.Add(new PgFinalScoreModel
                     {
+                        id = finalScore.Id,
                         final_competition_id = competition.FinalCompetition.Id,
                         judge_id = finalScore.Judge.JudgeId,
                         leader_id = finalScore.Leader.CompetitorId,
                         follower_id = finalScore.Follower.CompetitorId,
                         score = finalScore.Score
-                    };
-
-                    await SaveDataAsync(PG_FINAL_SCORES_TABLE_NAME, pgFinalScoreModel);
+                    });
                 }
-            }
 
-            // TODO: these need to be moved up and added to DB before adding anything that uses it
-            foreach (var registration in competitorRegistrations)
-            {
-                await SaveDataAsync(PG_COMPETITOR_REGISTRATIONS_TABLE_NAME, registration);
-            }
+                // Sava all data
+                foreach (var registration in finalCompetitorRegistrations)
+                {
+                    await SaveDataAsync(PG_COMPETITOR_REGISTRATIONS_TABLE_NAME, registration);
+                }
 
-            foreach (var record in competitorRecords)
-            {
-                await SaveDataAsync(PG_COMPETITOR_RECORDS_TABLE_NAME, record);
+                foreach (var record in finalCompetitorRecords)
+                {
+                    await SaveDataAsync(PG_COMPETITOR_RECORDS_TABLE_NAME, record);
+                }
+
+                await SaveDataAsync(PG_FINAL_COMPETITIONS_TABLE_NAME, finalCompetitionModel);
+
+                foreach (var placementModel in placements)
+                {
+                    await SaveDataAsync(PG_PLACEMENTS_TABLE_NAME, placementModel);
+                }
+
+                foreach (var finalScore in finalScores)
+                {
+                    await SaveDataAsync(PG_FINAL_SCORES_TABLE_NAME, finalScore);
+                }
             }
 
             await transaction.CommitAsync();
