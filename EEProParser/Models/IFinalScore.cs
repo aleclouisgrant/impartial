@@ -13,5 +13,9 @@ namespace Impartial
         public int Placement { get; set; }
 
         public double Accuracy { get; }
+
+        public void SetJudge(Guid? id);
+        public void SetLeader(Guid? id);
+        public void SetFollower(Guid? id);
     }
 }

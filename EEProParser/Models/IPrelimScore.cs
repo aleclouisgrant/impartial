@@ -10,7 +10,7 @@ namespace Impartial
         public ICompetitor Competitor { get; }
         public CallbackScore CallbackScore { get; set; }
 
-        public void SetJudge(Guid id);
-        public void SetCompetitor(Guid id);
+        public void SetJudge(Guid? id);
+        public void SetCompetitor(Guid? id);
     }
 }

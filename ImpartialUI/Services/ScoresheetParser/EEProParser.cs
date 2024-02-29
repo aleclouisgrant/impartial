@@ -394,21 +394,8 @@ namespace ImpartialUI.Services.ScoresheetParser
 
                 string divisionString = "";
 
-                try
-                {
-                    divisionString = Util.GetSubString(finals, "<td colspan=\"13\">Division", "</td></tr><tr>");
-                }
-                catch
-                {
-                    try
-                    {
-                        divisionString = Util.GetSubString(finals, "<td colspan=\"15\">Division", "</td></tr><tr>");
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                }
+                divisionString = Util.GetSubString(finals, "Division", "</td></tr><tr>");
+                
 
                 if (divisionString.Contains("Masters"))
                     continue;

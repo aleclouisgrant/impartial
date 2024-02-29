@@ -51,9 +51,9 @@ namespace ImpartialUI.Models
             Alternate1 = alternate1;
             Alternate2 = alternate2;
 
-            PrelimScores = prelimScores.ToList();
+            PrelimScores = prelimScores?.ToList();
 
-            PromotedCompetitors = promotedCompetitors.ToList();
+            PromotedCompetitors = promotedCompetitors?.ToList();
         }
 
         public string ToLongString()

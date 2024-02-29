@@ -6,9 +6,9 @@ namespace ImpartialUI.Models
 {
     public class FinalScore : IFinalScore
     {
-        private Guid _judgeId;
-        private Guid _leaderId;
-        private Guid _followerId;
+        private Guid? _judgeId;
+        private Guid? _leaderId;
+        private Guid? _followerId;
 
         public Guid Id { get; set; }
         public IJudge Judge { get; set; }
@@ -28,7 +28,7 @@ namespace ImpartialUI.Models
             Score = score; Placement = placement;
         }
 
-        public FinalScore(Guid judgeId, Guid leaderId, Guid followerId, int score, int placement, Guid? id = null)
+        public FinalScore(Guid? judgeId, Guid? leaderId, Guid? followerId, int score, int placement, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
 
@@ -40,19 +40,19 @@ namespace ImpartialUI.Models
             SetFollower(followerId);
         }
 
-        public void SetJudge(Guid id)
+        public void SetJudge(Guid? id)
         {
             _judgeId = id;
             Judge = App.JudgesDb.Where(j => j.JudgeId == _judgeId).FirstOrDefault();
         }
 
-        public void SetLeader(Guid id)
+        public void SetLeader(Guid? id)
         {
             _leaderId = id;
             Leader = App.CompetitorsDb.Where(j => j.CompetitorId == _leaderId).FirstOrDefault();
         }
 
-        public void SetFollower(Guid id)
+        public void SetFollower(Guid? id)
         {
             _followerId = id;
             Follower = App.CompetitorsDb.Where(j => j.CompetitorId == _followerId).FirstOrDefault();

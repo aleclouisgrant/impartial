@@ -25,13 +25,13 @@ namespace ImpartialUI.Models
             Id = id ?? Guid.NewGuid();
         }
 
-        public FinalCompetition(DateTime dateTime, Division division, List<IFinalScore> finalScores, Guid? id = null)
+        public FinalCompetition(DateTime dateTime, Division division, IEnumerable<IFinalScore> finalScores, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
 
             DateTime = dateTime;
             Division = division;
-            FinalScores = finalScores;
+            FinalScores = finalScores?.ToList();
         }
 
         private List<ICompetitor> GetLeaders()

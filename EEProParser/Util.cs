@@ -319,25 +319,45 @@ namespace Impartial
         {
             switch (score)
             {
+                case "a1":
                 case "A1":
+                case "alt1":
                 case "Alt1":
                 case "Alternate1":
+                case "alternate1":
+                case "alternate_1":
                 case "45":
+                case "4.5":
                     return CallbackScore.Alt1;
+                case "a2":
                 case "A2":
+                case "alt2":
                 case "Alt2":
                 case "Alternate2":
+                case "alternate2":
+                case "alternate_2":
                 case "43":
+                case "4.3":
                     return CallbackScore.Alt2;
+                case "a3":
                 case "A3":
+                case "alt3":
                 case "Alt3":
                 case "Alternate3":
+                case "alternate3":
+                case "alternate_3":
                 case "42":
+                case "4.2":
                     return CallbackScore.Alt3;
+                case "y":
                 case "Y":
+                case "yes":
                 case "Yes":
                 case "100":
+                case "10":
                     return CallbackScore.Yes;
+                case "n":
+                case "no":
                 case "N":
                 case "No":
                 case "0":
@@ -393,6 +413,8 @@ namespace Impartial
                 case "adv":
                     return Division.Advanced;
                 case "AllStar":
+                case "Allstar":
+                case "allStar":
                 case "All Star":
                 case "all_star":
                 case "allstar":
@@ -431,16 +453,23 @@ namespace Impartial
         {
             switch (s)
             {
+                case "prelims":
                 case "Prelims":
+                case "preliminaries":
                 case "Preliminaries":
                     return Round.Prelims;
+                case "quarters":
                 case "Quarters":
+                case "quarterfinals":
                 case "Quarterfinals":
                     return Round.Quarterfinals;
+                case "semis":
                 case "Semis":
+                case "semifinals":
                 case "Semifinals":
                     return Round.Semifinals;
                 default:
+                case "finals":
                 case "Finals":
                     return Round.Finals;
             }

@@ -262,23 +262,30 @@ namespace ImpartialUI.Controls
             competitorSearchBox.SelectionChanged += (o, e) =>
             {
                 if (e.AddedItems.Count > 0 && e.RemovedItems.Count <= 0)
+                {
                     UpdateCompetitorInScores(e.Placement, (ICompetitor)e.AddedItems[0]);
+                }
             };
 
             if (competitor != null)
             {
-                competitorSearchBox.SelectedPerson = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, (IEnumerable<ICompetitor>)competitorSearchBox.ItemsSource);
+                var oldCompetitor = competitorSearchBox.SelectedPerson;
+                var newCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, (IEnumerable<ICompetitor>)competitorSearchBox.ItemsSource);
+                competitorSearchBox.SelectedPerson = newCompetitor;
 
-                if (competitorSearchBox.SelectedPerson == null)
+                if (newCompetitor != null)
                 {
-                    competitorSearchBox.AddMode(competitor.FirstName, competitor.LastName, competitor.WsdcId);
+                    if (oldCompetitor == null || newCompetitor.UserId != oldCompetitor?.UserId)
+                    {
+                        foreach (var prelimScore in competitorPrelimScores)
+                        {
+                            prelimScore.SetCompetitor(newCompetitor.CompetitorId);
+                        }
+                    }
                 }
                 else
                 {
-                    foreach (var prelimScore in competitorPrelimScores)
-                    {
-                        prelimScore.SetCompetitor(competitorSearchBox.SelectedPerson.UserId);
-                    }
+                    competitorSearchBox.AddMode(competitor.FirstName, competitor.LastName, competitor.WsdcId);
                 }
             }
 
@@ -362,7 +369,7 @@ namespace ImpartialUI.Controls
 
             for (int i = 1; i < ScoreGrid.RowDefinitions.Count - 1; i++)
             {
-                ICompetitor competitor = _competitorBoxes.Where(c => c.Placement == i).FirstOrDefault().SelectedPerson as Competitor;
+                ICompetitor competitor = (ICompetitor)_competitorBoxes.Where(c => c.Placement == i).FirstOrDefault().SelectedPerson;
 
                 int competitorIndex = i - 1;
                 int judgeIndex = _judgeBoxes.Count() - 1;

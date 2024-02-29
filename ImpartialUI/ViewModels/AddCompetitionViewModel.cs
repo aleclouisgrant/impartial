@@ -300,16 +300,10 @@ namespace ImpartialUI.ViewModels
 
         private void TestData()
         {
-            ScoresheetSelector = ScoresheetSelector.EEPro;
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-01-20 derby city swing\finals.html";
-
             // EEPro
-            //var newDanceConvention = new DanceConvention("MADJam", DateTime.Parse("2023-03-04"));
-            //DanceConventions.Add(newDanceConvention);
-            //SelectedDanceConvention = newDanceConvention;
-            //ScoresheetSelector = ScoresheetSelector.EEPro;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
+            ScoresheetSelector = ScoresheetSelector.EEPro;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
 
             // StepRightSolutions
             //var newDanceConvention = new DanceConvention("Boogie By The Bay", DateTime.Parse("2022-10-08"));
@@ -369,7 +363,7 @@ namespace ImpartialUI.ViewModels
         private async void AddJudge()
         {
             var newJudge = new Judge(JudgeFirstName, JudgeLastName);
-
+            
             await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
             Judges.Add(newJudge);
             Judges = Judges.OrderBy(j => j.FullName).ToList();
@@ -473,6 +467,8 @@ namespace ImpartialUI.ViewModels
                 return;
             }
 
+            Match(comp);
+
             Competition = comp;
         }
         private void AddCompetition()
@@ -525,6 +521,68 @@ namespace ImpartialUI.ViewModels
                 return ScoresheetSelector.EEPro;
             else
                 return ScoresheetSelector.Other;
+        }
+
+        /// <summary>
+        /// Match competitors and judges to their DB counterpart
+        /// </summary>
+        /// <param name="competition"></param>
+        private void Match(ICompetition competition)
+        {
+            foreach (var pairedPrelimCompetition in competition.PairedPrelimCompetitions)
+            {
+                foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
+                {
+                    MatchCompetitor(competitor);
+                }
+                foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
+                {
+                    MatchCompetitor(competitor);
+                }
+
+                foreach (var judge in pairedPrelimCompetition.LeaderPrelimCompetition.Judges)
+                {
+                    MatchJudge(judge);
+                }
+                foreach (var judge in pairedPrelimCompetition.FollowerPrelimCompetition.Judges)
+                {
+                    MatchJudge(judge);
+                }
+            }
+            foreach (var couple in competition.FinalCompetition.Couples)
+            {
+                MatchCompetitor(couple.Leader);
+                MatchCompetitor(couple.Follower);
+            }
+            foreach (var judge in competition.FinalCompetition.Judges)
+            {
+                MatchJudge(judge);
+            }
+        }
+        private void MatchCompetitor(ICompetitor competitor)
+        {
+            var dbCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, App.CompetitorsDb);
+            if (dbCompetitor != null)
+            {
+                competitor.UserId = dbCompetitor.UserId;
+                competitor.CompetitorId = dbCompetitor.CompetitorId;
+                competitor.WsdcId = dbCompetitor.WsdcId;
+                competitor.FirstName = dbCompetitor.FirstName;
+                competitor.LastName = dbCompetitor.LastName;
+                competitor.LeadStats = dbCompetitor.LeadStats;
+                competitor.FollowStats = dbCompetitor.FollowStats;
+            }
+        }
+        private void MatchJudge(IJudge judge)
+        {
+            var dbJudge = Util.FindJudgeInCache(judge.FirstName, judge.LastName, App.JudgesDb);
+            if (dbJudge != null)
+            {
+                judge.UserId = dbJudge.UserId;
+                judge.JudgeId = dbJudge.JudgeId;
+                judge.FirstName = dbJudge.FirstName;
+                judge.LastName = dbJudge.LastName;
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using Impartial.Enums;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -274,14 +274,15 @@ namespace ImpartialUI.Services.DatabaseProvider
         {
             var userModel = new PgUserModel
             {
-                id = competitor.CompetitorId,
+                id = competitor.UserId,
                 first_name = competitor.FirstName,
                 last_name = competitor.LastName,
             };
 
             var competitorProfileModel = new PgCompetitorProfileModel
             {
-                user_id = competitor.CompetitorId,
+                id = competitor.CompetitorId,
+                user_id = competitor.UserId,
                 wsdc_id = competitor.WsdcId
             };
 
@@ -381,15 +382,15 @@ namespace ImpartialUI.Services.DatabaseProvider
         {
             var userModel = new PgUserModel
             {
-                id = judge.JudgeId,
+                id = judge.UserId,
                 first_name = judge.FirstName,
                 last_name = judge.LastName,
             };
 
             var judgeModel = new PgJudgeProfileModel
             {
-                id = Guid.NewGuid(),
-                user_id = judge.JudgeId,
+                id = judge.JudgeId,
+                user_id = judge.UserId,
             };
 
             await using var connection = await _dataSource.OpenConnectionAsync();
@@ -565,114 +566,125 @@ namespace ImpartialUI.Services.DatabaseProvider
                 var leaderPromotedCompetitors = new List<PgPromotedCompetitorModel>();
                 var followerPromotedCompetitors = new List<PgPromotedCompetitorModel>();
 
-                var leaderPrelimCompetitionModel = new PgPrelimCompetitionModel
-                {
-                    competition_id = competition.Id,
-                    date_time = pairedPrelimCompetition.LeaderPrelimCompetition.DateTime,
-                    role = Role.Leader,
-                    round = pairedPrelimCompetition.LeaderPrelimCompetition.Round,
-                    alternate1_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate1.CompetitorId,
-                    alternate2_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate2.CompetitorId,
-                };
+                PgPrelimCompetitionModel leaderPrelimCompetitionModel = null;
+                PgPrelimCompetitionModel followerPrelimCompetitionModel = null;
 
-                var followerPrelimCompetitionModel = new PgPrelimCompetitionModel
+                if (pairedPrelimCompetition.LeaderPrelimCompetition != null)
                 {
-                    competition_id = competition.Id,
-                    date_time = pairedPrelimCompetition.FollowerPrelimCompetition.DateTime,
-                    role = Role.Follower,
-                    round = pairedPrelimCompetition.FollowerPrelimCompetition.Round,
-                    alternate1_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate1.CompetitorId,
-                    alternate2_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate2.CompetitorId,
-                };
-
-                foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
-                {
-                    if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
+                    leaderPrelimCompetitionModel = new PgPrelimCompetitionModel
                     {
-                        prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
+                        id = pairedPrelimCompetition.LeaderPrelimCompetition.Id,
+                        competition_id = competition.Id,
+                        date_time = pairedPrelimCompetition.LeaderPrelimCompetition.DateTime,
+                        role = Role.Leader,
+                        round = pairedPrelimCompetition.LeaderPrelimCompetition.Round,
+                        alternate1_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate1?.CompetitorId,
+                        alternate2_id = pairedPrelimCompetition.LeaderPrelimCompetition.Alternate2?.CompetitorId,
+                    };
+
+                    foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
+                    {
+                        if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
                         {
-                            id = Guid.NewGuid(),
-                            competitor_profile_id = competitor.CompetitorId,
-                            dance_convention_id = danceConventionId,
+                            prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
+                            {
+                                id = Guid.NewGuid(),
+                                competitor_profile_id = competitor.CompetitorId,
+                                dance_convention_id = danceConventionId,
+                            });
+                        }
+
+                        if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                            && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                            && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Leader.CompetitorId == competitor.CompetitorId))
+                        {
+                            prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                            {
+                                competition_id = competition.Id,
+                                competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                            });
+                        }
+                    }
+
+                    foreach (var promotedCompetitor in pairedPrelimCompetition.LeaderPrelimCompetition.PromotedCompetitors)
+                    {
+                        leaderPromotedCompetitors.Add(new PgPromotedCompetitorModel
+                        {
+                            prelim_competition_id = leaderPrelimCompetitionModel.id,
+                            competitor_id = promotedCompetitor.CompetitorId
                         });
                     }
 
-                    if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                        && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                        && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Leader.CompetitorId == competitor.CompetitorId))
+                    foreach (var prelimScore in pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores)
                     {
-                        prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                        prelimScores.Add(new PgPrelimScoreModel
                         {
-                            competition_id = competition.Id,
-                            competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
-                        });
-                    }
-                }
-
-                foreach (var promotedCompetitor in pairedPrelimCompetition.LeaderPrelimCompetition.PromotedCompetitors)
-                {
-                    leaderPromotedCompetitors.Add(new PgPromotedCompetitorModel
-                    {
-                        prelim_competition_id = leaderPrelimCompetitionModel.id,
-                        competitor_id = promotedCompetitor.CompetitorId
-                    });
-                }
-
-                foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
-                {
-                    if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
-                    {
-                        prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
-                        {
-                            id = Guid.NewGuid(),
-                            competitor_profile_id = competitor.CompetitorId,
-                            dance_convention_id = danceConventionId,
-                        });
-                    }
-
-                    if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                        && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                        && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Follower.CompetitorId == competitor.CompetitorId))
-                    {
-                        prelimCompetitorRecords.Add(new PgCompetitorRecordModel
-                        {
-                            competition_id = competition.Id,
-                            competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                            id = prelimScore.Id,
+                            prelim_competition_id = pairedPrelimCompetition.LeaderPrelimCompetition.Id,
+                            competitor_id = prelimScore.Competitor?.CompetitorId,
+                            judge_id = prelimScore.Judge?.JudgeId,
+                            callback_score = prelimScore.CallbackScore,
                         });
                     }
                 }
 
-                foreach (var promotedCompetitor in pairedPrelimCompetition.FollowerPrelimCompetition.PromotedCompetitors)
-                {
-                    followerPromotedCompetitors.Add(new PgPromotedCompetitorModel
+                if (pairedPrelimCompetition.FollowerPrelimCompetition != null) 
+                { 
+                    followerPrelimCompetitionModel = new PgPrelimCompetitionModel
                     {
-                        prelim_competition_id = followerPrelimCompetitionModel.id,
-                        competitor_id = promotedCompetitor.CompetitorId
-                    });
-                }
+                        id = pairedPrelimCompetition.FollowerPrelimCompetition.Id,
+                        competition_id = competition.Id,
+                        date_time = pairedPrelimCompetition.FollowerPrelimCompetition.DateTime,
+                        role = Role.Follower,
+                        round = pairedPrelimCompetition.FollowerPrelimCompetition.Round,
+                        alternate1_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate1?.CompetitorId,
+                        alternate2_id = pairedPrelimCompetition.FollowerPrelimCompetition.Alternate2?.CompetitorId,
+                    };
 
-                foreach (var prelimScore in pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores)
-                {
-                    prelimScores.Add(new PgPrelimScoreModel
+                    foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
                     {
-                        id = prelimScore.Id,
-                        prelim_competition_id = pairedPrelimCompetition.LeaderPrelimCompetition.Id,
-                        competitor_id = prelimScore.Competitor.CompetitorId,
-                        judge_id = prelimScore.Judge.JudgeId,
-                        callback_score = prelimScore.CallbackScore,
-                    });
-                }
+                        if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
+                        {
+                            prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
+                            {
+                                id = Guid.NewGuid(),
+                                competitor_profile_id = competitor.CompetitorId,
+                                dance_convention_id = danceConventionId,
+                            });
+                        }
 
-                foreach (var prelimScore in pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores)
-                {
-                    prelimScores.Add(new PgPrelimScoreModel
+                        if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                            && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
+                            && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Follower.CompetitorId == competitor.CompetitorId))
+                        {
+                            prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                            {
+                                competition_id = competition.Id,
+                                competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                            });
+                        }
+                    }
+
+                    foreach (var promotedCompetitor in pairedPrelimCompetition.FollowerPrelimCompetition.PromotedCompetitors)
                     {
-                        id = prelimScore.Id,
-                        prelim_competition_id = pairedPrelimCompetition.FollowerPrelimCompetition.Id,
-                        competitor_id = prelimScore.Competitor.CompetitorId,
-                        judge_id = prelimScore.Judge.JudgeId,
-                        callback_score = prelimScore.CallbackScore,
-                    });
+                        followerPromotedCompetitors.Add(new PgPromotedCompetitorModel
+                        {
+                            prelim_competition_id = followerPrelimCompetitionModel.id,
+                            competitor_id = promotedCompetitor.CompetitorId
+                        });
+                    }
+
+                    foreach (var prelimScore in pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores)
+                    {
+                        prelimScores.Add(new PgPrelimScoreModel
+                        {
+                            id = prelimScore.Id,
+                            prelim_competition_id = pairedPrelimCompetition.FollowerPrelimCompetition.Id,
+                            competitor_id = prelimScore.Competitor?.CompetitorId,
+                            judge_id = prelimScore.Judge?.JudgeId,
+                            callback_score = prelimScore.CallbackScore,
+                        });
+                    }
                 }
 
                 // Save all data
@@ -686,17 +698,34 @@ namespace ImpartialUI.Services.DatabaseProvider
                     await SaveDataAsync(PG_COMPETITOR_RECORDS_TABLE_NAME, competitorRecord);
                 }
 
-                await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, leaderPrelimCompetitionModel);
-                await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, followerPrelimCompetitionModel);
-                
-                foreach (var leaderPromotedCompetitor in leaderPromotedCompetitors)
+                if (pairedPrelimCompetition.LeaderPrelimCompetition != null)
                 {
-                    await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, leaderPromotedCompetitor);
+                    await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, leaderPrelimCompetitionModel);
+
+                    foreach (var leaderPromotedCompetitor in leaderPromotedCompetitors)
+                    {
+                        await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, leaderPromotedCompetitor);
+                    }
+
+                    foreach (var judge in pairedPrelimCompetition.LeaderPrelimCompetition.Judges)
+                    {
+                        await UpsertJudgeAsync(judge);
+                    }
                 }
 
-                foreach (var followerPromotedCompetitor in followerPromotedCompetitors)
+                if (pairedPrelimCompetition.FollowerPrelimCompetition != null)
                 {
-                    await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, followerPromotedCompetitor);
+                    await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, followerPrelimCompetitionModel);
+                
+                    foreach (var followerPromotedCompetitor in followerPromotedCompetitors)
+                    {
+                        await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, followerPromotedCompetitor);
+                    }
+
+                    foreach (var judge in pairedPrelimCompetition.FollowerPrelimCompetition.Judges)
+                    {
+                        await UpsertJudgeAsync(judge);
+                    }
                 }
 
                 foreach (var prelimScore in prelimScores)
@@ -720,7 +749,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 {
                     id = competition.FinalCompetition.Id,
                     competition_id = competition.Id,
-                    datetime = competition.FinalCompetition.DateTime
+                    date_time = competition.FinalCompetition.DateTime
                 };
 
                 foreach (var couple in competition.FinalCompetition.Couples)
@@ -821,6 +850,11 @@ namespace ImpartialUI.Services.DatabaseProvider
                     await SaveDataAsync(PG_PLACEMENTS_TABLE_NAME, placementModel);
                 }
 
+                foreach (var judge in competition.FinalCompetition.Judges)
+                {
+                    await UpsertJudgeAsync(judge);
+                }
+
                 foreach (var finalScore in finalScores)
                 {
                     await SaveDataAsync(PG_FINAL_SCORES_TABLE_NAME, finalScore);
@@ -858,7 +892,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             List<IPrelimCompetition> prelimCompetitions = new();
 
             string prelimCompetitionQuery =
-                "SELECT id, datetime, role, round, alternate1_id, alternate2_id"
+                "SELECT id, date_time, role, round, alternate1_id, alternate2_id"
                 + " FROM " + PG_PRELIM_COMPETITIONS_TABLE_NAME
                 + " WHERE prelim_competitions.competition_id = \'" + id + "\';";
 
@@ -868,13 +902,29 @@ namespace ImpartialUI.Services.DatabaseProvider
                 while (await reader.ReadAsync())
                 {
                     Guid prelimCompetitionId = reader.GetGuid(0);
-                    string prelimCompetitionDateString = reader.GetString(1);
+                    DateTime dateTime = reader.GetDateTime(1);
                     string prelimCompetitionRoleString = reader.GetString(2);
                     string prelimCompetitionRoundString = reader.GetString(3);
-                    Guid alternate1Id = reader.GetGuid(4);
-                    Guid alternate2Id = reader.GetGuid(5);
+                    Guid? alternate1Id = null;
+                    Guid? alternate2Id = null;
 
-                    DateTime dateTime = DateTime.Parse(prelimCompetitionDateString);
+                    try
+                    {
+                        alternate1Id = reader.GetGuid(4);
+                    } catch (InvalidCastException)
+                    {
+                        alternate1Id = null;
+                    }
+
+                    try
+                    {
+                        alternate2Id = reader.GetGuid(5);
+                    }
+                    catch (InvalidCastException)
+                    {
+                        alternate2Id = null;
+                    }
+
                     Role role = Util.GetRoleFromString(prelimCompetitionRoleString);
                     Round round = Util.GetRoundFromString(prelimCompetitionRoundString);
 
@@ -896,7 +946,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 List<IPrelimScore> prelimScores = new();
 
                 string prelimScoresQuery =
-                    "SELECT id, judge_id, competitor_id, callbackscore"
+                    "SELECT id, judge_id, competitor_id, callback_score"
                     + " FROM prelim_scores"
                     + " WHERE prelim_competition_id = \'" + prelimCompetition.Id + "\';";
 
@@ -906,9 +956,18 @@ namespace ImpartialUI.Services.DatabaseProvider
                     while (await reader.ReadAsync())
                     {
                         Guid prelimScoreId = reader.GetGuid(0);
-                        Guid judgeId = reader.GetGuid(1);
                         Guid competitorId = reader.GetGuid(2);
                         string callbackScore = reader.GetString(3);
+
+                        Guid? judgeId = null;
+                        try
+                        {
+                            judgeId = reader.GetGuid(1);
+                        }
+                        catch (InvalidCastException)
+                        {
+                            judgeId = null;
+                        }
 
                         prelimScores.Add(new PrelimScore(
                             judgeId: judgeId,
@@ -961,7 +1020,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             IFinalCompetition? finalCompetition = null;
 
             string finalCompetitionQuery =
-                "SELECT id, datetime"
+                "SELECT id, date_time"
                 + " FROM " + PG_FINAL_COMPETITIONS_TABLE_NAME
                 + " WHERE competition_id = \'" + id + "\';";
 
@@ -995,9 +1054,27 @@ namespace ImpartialUI.Services.DatabaseProvider
                 {
                     while (await reader.ReadAsync())
                     {
-                        Guid leaderId = reader.GetGuid(0);
-                        Guid followerId = reader.GetGuid(1);
                         int placement = reader.GetInt32(2);
+
+                        Guid? leaderId = null;
+                        Guid? followerId = null;
+                        try
+                        {
+                            leaderId = reader.GetGuid(0);
+                        }
+                        catch (InvalidCastException)
+                        {
+                            leaderId = null;
+                        }
+
+                        try
+                        {
+                            followerId = reader.GetGuid(1);
+                        }
+                        catch (InvalidCastException)
+                        {
+                            followerId = null;
+                        }
 
                         couples.Add(new Couple(
                             leader: App.CompetitorsDb.Where(c => c.CompetitorId == leaderId).FirstOrDefault(),
@@ -1019,10 +1096,40 @@ namespace ImpartialUI.Services.DatabaseProvider
                     while (await reader.ReadAsync())
                     {
                         Guid finalScoreId = reader.GetGuid(0);
-                        Guid judgeId = reader.GetGuid(1);
-                        Guid leaderId = reader.GetGuid(2);
-                        Guid followerId = reader.GetGuid(3);
                         int score = reader.GetInt32(4);
+
+                        Guid? judgeId = null;
+                        Guid? leaderId = null;
+                        Guid? followerId = null;
+
+
+                        try
+                        {
+                            judgeId = reader.GetGuid(1);
+                        }
+                        catch (InvalidCastException)
+                        {
+                            judgeId = null;
+                        }
+
+                        try
+                        {
+                            leaderId = reader.GetGuid(2);
+                        }
+                        catch (InvalidCastException)
+                        {
+                            leaderId = null;
+                        }
+
+                        try
+                        {
+                            followerId = reader.GetGuid(3);
+                        }
+                        catch (InvalidCastException)
+                        {
+                            followerId = null;
+                        }
+
                         int placement = couples.Where(c => c.Leader.CompetitorId == leaderId && c.Follower.CompetitorId == followerId).FirstOrDefault().Placement;
 
                         finalScores.Add(new FinalScore(

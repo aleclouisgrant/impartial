@@ -241,7 +241,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             competition.FinalCompetition = new FinalCompetition(
                 dateTime: competition.Date, 
                 division: competition.Division, 
-                finalScores: new());
+                finalScores: new List<IFinalScore>());
 
             competition.FinalCompetition.FinalScores.Add(new FinalScore(anne, brandon, melodie, 1, 1));
             competition.FinalCompetition.FinalScores.Add(new FinalScore(anne, neil, kristen, 4, 2));

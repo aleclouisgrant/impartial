@@ -98,7 +98,7 @@ namespace ImpartialUI.Models.PgModels
     {
         public Guid? id { get; set; }
         public Guid? competition_id { get; set; }
-        public DateTime? datetime { get; set; }
+        public DateTime? date_time { get; set; }
     }
 
     public class PgPlacementModel
