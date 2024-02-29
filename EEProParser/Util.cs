@@ -245,7 +245,8 @@ namespace Impartial
         public static string GetSubString(string s, string from, string to)
         {
             if (s.IndexOf(from) == -1)
-                throw new Exception("String \'" + from + "\' not found in searched string");
+                return "";
+                //throw new Exception("String \'" + from + "\' not found in searched string");
 
             int fromIndex = s.IndexOf(from) + from.Length;
             string choppedString = s.Substring(fromIndex, s.Length - fromIndex);
@@ -515,6 +516,148 @@ namespace Impartial
                     return "Open";
             }
         }
+        
+        public static Division? ContainsDivisionString(string s)
+        {
+            if (s.Contains("Newcomer") ||
+                s.Contains("newcomer") ||
+                s.Contains("NEWCOMER") ||
+                s.Contains("NEW") ||
+                s.Contains("New") ||
+                s.Contains("new"))
+                    return Division.Newcomer;
+
+            if (s.Contains("Novice") ||
+                s.Contains("novice") ||
+                s.Contains("NOV") ||
+                s.Contains("Nov") ||
+                s.Contains("nov"))
+                    return Division.Novice;
+
+            if (s.Contains("Intermediate") ||
+                s.Contains("intermediate") ||
+                s.Contains("INTERMEDIATE") ||
+                s.Contains("INT") ||
+                s.Contains("Int") ||
+                s.Contains("int"))
+                    return Division.Intermediate;
+
+            if (s.Contains("Advanced") ||
+                s.Contains("ADVANCED") ||
+                s.Contains("advanced") ||
+                s.Contains("ADV") ||
+                s.Contains("Adv") ||
+                s.Contains("adv"))
+                    return Division.Advanced;
+                
+            if (s.Contains("AllStar") ||
+                s.Contains("Allstar") ||
+                s.Contains("ALLSTAR") ||
+                s.Contains("ALL STAR") ||
+                s.Contains("ALL-STAR") ||
+                s.Contains("allStar") ||
+                s.Contains("All Star") ||
+                s.Contains("all_star") ||
+                s.Contains("allstar") ||
+                s.Contains("all star") ||
+                s.Contains("All-Star") ||
+                s.Contains("all-star") ||
+                s.Contains("ALS") ||
+                s.Contains("Als") ||
+                s.Contains("als"))
+                    return Division.AllStar;
+               
+            if (s.Contains("Champion") ||
+                s.Contains("champion") ||
+                s.Contains("CHAMPION") ||
+                s.Contains("CHAMP") ||
+                s.Contains("Champ") ||
+                s.Contains("champ")||
+                s.Contains("CHM") ||
+                s.Contains("CMP"))
+                    return Division.Champion;
+
+            if (s.Contains("Open") ||
+                s.Contains("OPEN") ||
+                s.Contains("open"))
+                return Division.Open;
+
+            return null;
+        }
+        public static Role? ContainsRoleString(string s)
+        {
+            if (s.Contains("LEADER") ||
+                s.Contains("leader") ||
+                s.Contains("Leader") ||
+                s.Contains("LEAD") ||
+                s.Contains("lead") ||
+                s.Contains("Lead"))
+                return Role.Leader;
+
+            if (s.Contains("Follower") ||
+                s.Contains("FOLLOWER") ||
+                s.Contains("follower") ||
+                s.Contains("follow") ||
+                s.Contains("FOLLOW") ||
+                s.Contains("Follow"))
+                return Role.Follower;
+
+            return null;
+        }
+        public static Round? ContainsRoundString(string s)
+        {
+            if (s.Contains("Prelims") ||
+                s.Contains("PRELIMS") ||
+                s.Contains("prelims") ||
+                s.Contains("Prelim") ||
+                s.Contains("PRELIM") ||
+                s.Contains("prelim") ||
+                s.Contains("Preliminaries") ||
+                s.Contains("preliminaries") ||
+                s.Contains("PRELIMINARIES") ||
+                s.Contains("Preliminary") ||
+                s.Contains("preliminary") ||
+                s.Contains("PRELIMINARY"))
+                return Round.Prelims;
+
+            if (s.Contains("Quarterfinals") ||
+                s.Contains("QUARTERFINALS") ||
+                s.Contains("quarterfinals") ||
+                s.Contains("Quarters") ||
+                s.Contains("QUARTERS") ||
+                s.Contains("quarters") ||
+                s.Contains("Quarterfinal") ||
+                s.Contains("QUARTERFINAL") ||
+                s.Contains("quarterfinal") ||
+                s.Contains("Quarter") ||
+                s.Contains("QUARTER") ||
+                s.Contains("quarter"))
+                return Round.Quarterfinals;
+
+            if (s.Contains("Semifinals") ||
+                s.Contains("SEMIFINALS") ||
+                s.Contains("semifinals") ||
+                s.Contains("Semis") ||
+                s.Contains("SEMIS") ||
+                s.Contains("semis") ||
+                s.Contains("Semifinal") ||
+                s.Contains("SEMIFINAL") ||
+                s.Contains("semifinal") ||
+                s.Contains("Semi") ||
+                s.Contains("SEMI") ||
+                s.Contains("semi"))
+                return Round.Semifinals;
+
+            if (s.Contains("finals") ||
+                s.Contains("FINALS") ||
+                s.Contains("finals") ||
+                s.Contains("final") ||
+                s.Contains("FINAL") ||
+                s.Contains("final"))
+                return Round.Finals;
+
+            return null;
+        }
 
         public static IEnumerable<T> RemoveWhere<T>(this IEnumerable<T> query, Predicate<T> predicate)
         {
@@ -595,6 +738,7 @@ namespace Impartial
                     return competitors.Where(c => c.FullName == "Fae Ashley")?.FirstOrDefault();
                 case "Jung Won Choe":
                 case "Jung Won Cho":
+                case "Jung choe":
                     return competitors.Where(c => c.FullName == "Jung Choe")?.FirstOrDefault();
                 case "Joanna Mienl":
                     return competitors.Where(c => c.FullName == "Joanna Meinl")?.FirstOrDefault();
@@ -662,6 +806,8 @@ namespace Impartial
                     return judges.Where(c => c.FullName == "Jessica McCurdy")?.FirstOrDefault();
                 case "Phillipe Berne":
                     return judges.Where(c => c.FullName == "Philippe Berne")?.FirstOrDefault();
+                case "Robin (Pro)":
+                    return judges.Where(c => c.FullName == "Robin Smith")?.FirstOrDefault();
 
                 default:
                     return judges.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();

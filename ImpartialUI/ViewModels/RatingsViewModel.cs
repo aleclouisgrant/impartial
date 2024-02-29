@@ -180,7 +180,6 @@ namespace ImpartialUI.ViewModels
             }));
 
             Competitors = new ObservableCollection<ICompetitor>(App.CompetitorsDb);
-            //_competitions = competitions;
 
             _crunchProgress = new Progress<double>(ReportProgress);
             CrunchEnabled = true;

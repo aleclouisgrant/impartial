@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
 using Impartial;
@@ -305,129 +306,77 @@ namespace ImpartialUI.Services.ScoresheetParser
         {
             for (int c = 1; c < 30; c++)
             {
-                Division div;
-                var prelims = Util.GetSubStringN(
+                var sheet = Util.GetSubStringN(
                     s: PrelimsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c);
 
-                string divisionString = "";
+                string titleString = string.Empty;
 
-                try
-                {
-                    divisionString = Util.GetSubString(prelims, "<td colspan=\"11\">Jack", "</td></tr><tr>");
-                }
-                catch
-                {
-                    try
-                    {
-                        divisionString = Util.GetSubString(prelims, "<td colspan=\"13\">Jack", "</td></tr><tr>");
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                }
+                titleString = Util.GetSubString(sheet, "Jack &amp; Jill", "</td></tr><tr>");
 
-                if (divisionString == string.Empty)
-                    return "";
+                Trace.WriteLine("TITLE: " + titleString);
+
+                if (titleString == string.Empty)
+                    return string.Empty;
+
+                Division? div;
+                Role? rl;
+                Round? rnd;
+
+                rnd = Util.ContainsRoundString(titleString);
 
                 if (round == Round.Prelims)
                 {
-                    if (divisionString.Contains("Semis") || divisionString.Contains("Quarters"))
+                    if (rnd == Round.Semifinals || rnd == Round.Quarterfinals)
                         continue;
                 }
                 else if (round == Round.Semifinals)
                 {
-                    if (divisionString.Contains("Prelims") || divisionString.Contains("Quarters"))
+                    if (rnd == Round.Prelims || rnd == Round.Quarterfinals)
                         continue;
                 }
                 else if (round == Round.Quarterfinals)
                 {
-                    if (divisionString.Contains("Prelims") || divisionString.Contains("Semis"))
+                    if (rnd == Round.Prelims || rnd == Round.Semifinals)
                         continue;
                 }
 
-                if (divisionString.Contains("Newcomer"))
-                    div = Division.Newcomer;
-                else if (divisionString.Contains("Novice"))
-                    div = Division.Novice;
-                else if (divisionString.Contains("Intermediate"))
-                    div = Division.Intermediate;
-                else if (divisionString.Contains("Advanced"))
-                    div = Division.Advanced;
-                else if (divisionString.Contains("All-Star"))
-                    div = Division.AllStar;
-                else if (divisionString.Contains("All Star"))
-                    div = Division.AllStar;
-                else if (divisionString.Contains("Allstar"))
-                    div = Division.AllStar;
-                else if (divisionString.Contains("Champion"))
-                    div = Division.Champion;
-                else
-                    div = Division.Open;
+                div = Util.ContainsDivisionString(titleString);
+                rl = Util.ContainsRoleString(titleString);
 
-                Role r;
-                if (divisionString.Contains("Leader") || divisionString.Contains("LEADER"))
-                    r = Role.Leader;
-                else if (divisionString.Contains("Follower") || divisionString.Contains("FOLLOWER"))
-                    r = Role.Follower;
-                else
-                    r = Role.Leader;
-
-                if (division == div && r == role)
-                    return prelims;
+                if (div == division && rl == role)
+                    return sheet;
             }
-            return "";
+            return string.Empty;
         }
         private string GetFinalsDocByDivision(Division division)
         {
             for (int c = 1; c < 30; c++)
             {
-                Division div;
                 var finals = Util.GetSubStringN(
                     s: FinalsSheetDoc,
                     from: "<tr bgcolor=\"#ffae5e\">",
                     to: "</tr></tbody></table><p>",
                     n: c);
 
-                string divisionString = "";
+                string titleString = string.Empty;
 
-                divisionString = Util.GetSubString(finals, "Division", "</td></tr><tr>");
+                titleString = Util.GetSubString(finals, "Division", "</td></tr><tr>");
                 
-
-                if (divisionString.Contains("Masters"))
+                if (titleString.Contains("Masters"))
                     continue;
 
-                if (divisionString.Contains("Newcomer"))
-                    div = Division.Newcomer;
-                else if (divisionString.Contains("Novice"))
-                    div = Division.Novice;
-                else if (divisionString.Contains("Intermediate"))
-                    div = Division.Intermediate;
-                else if (divisionString.Contains("Advanced"))
-                    div = Division.Advanced;
-                else if (divisionString.Contains("All-Star"))
-                    div = Division.AllStar;
-                else if (divisionString.Contains("Allstar"))
-                    div = Division.AllStar;
-                else if (divisionString.Contains("AllStar"))
-                    div = Division.AllStar;
-                else if (divisionString.Contains("All Star"))
-                    div = Division.AllStar;
-                else if (divisionString.Contains("Champion"))
-                    div = Division.Champion;
-                else if (divisionString.Contains("Invitational"))
-                    div = Division.Open;
-                else
-                    div = Division.Open;
+                Division? div;
+
+                div = Util.ContainsDivisionString(titleString);
 
                 if (division == div)
                     return finals;
             }
 
-            return "";
+            return string.Empty;
         }
 
         public override string GetName()

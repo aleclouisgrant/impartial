@@ -178,7 +178,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         private string CreateDeleteWhereQuery<T>(string table, string parameter, T value)
         {
-            return "DELETE FROM " + table + "WHERE " + parameter + " = " + value.ToString() + ";";
+            return "DELETE FROM " + table + " WHERE " + parameter + " = " + value.ToString() + ";";
         }
 
         private async Task SaveDataAsync<T>(string table, T parameters)
@@ -262,7 +262,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         private async Task DeleteDataAsync<T>(string table, string parameter, T value)
         {
-            string command = CreateDeleteWhereQuery<T>(table, parameter, value);
+            string command = CreateDeleteWhereQuery(table, parameter, value);
             await using (var cmd = _dataSource.CreateCommand(command))
             {
                 await cmd.ExecuteNonQueryAsync();
@@ -1179,7 +1179,12 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteCompetitionAsync(Guid id)
         {
-            await DeleteDataAsync(PG_COMPETITIONS_TABLE_NAME, nameof(PgCompetitionModel.id), id);
+            string query = "DELETE FROM " + PG_COMPETITIONS_TABLE_NAME + " WHERE id = \'" + id + "\';";
+            await using (var cmd = _dataSource.CreateCommand(query))
+            {
+                await cmd.ExecuteNonQueryAsync();
+            }
+
             await DeleteHangingCompetitorRegistrations();
         }
         public async Task DeleteAllCompetitionsAsync()

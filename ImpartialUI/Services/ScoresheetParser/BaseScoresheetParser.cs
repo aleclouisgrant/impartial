@@ -42,15 +42,15 @@ namespace ImpartialUI.Services.ScoresheetParser
         public ScoresheetParserBase(string prelimsPath = null, string quartersPath = null, string semisPath = null, string finalsPath = null)
         {
             bool prelimPathFound = !(prelimsPath == null || prelimsPath == string.Empty || !File.Exists(prelimsPath));
-            bool quarterPathFound = !(quartersPath == null || quartersPath == string.Empty || !File.Exists(quartersPath));
+            bool quartersPathFound = !(quartersPath == null || quartersPath == string.Empty || !File.Exists(quartersPath));
             bool semisPathFound = !(semisPath == null || semisPath == string.Empty || !File.Exists(semisPath));
             bool finalsPathFound = !(finalsPath == null || finalsPath == string.Empty || !File.Exists(finalsPath));
 
-            if (!prelimPathFound && !quarterPathFound && !semisPathFound && !finalsPathFound)
+            if (!prelimPathFound && !quartersPathFound && !semisPathFound && !finalsPathFound)
                 throw new FileNotFoundException();
 
             PrelimsSheetDoc = prelimPathFound ? File.ReadAllText(prelimsPath).Replace("\n", "").Replace("\r", "") : null;
-            QuartersSheetDoc = prelimPathFound ? File.ReadAllText(quartersPath).Replace("\n", "").Replace("\r", "") : null;
+            QuartersSheetDoc = quartersPathFound ? File.ReadAllText(quartersPath).Replace("\n", "").Replace("\r", "") : null;
             SemisSheetDoc = semisPathFound ? File.ReadAllText(semisPath).Replace("\n", "").Replace("\r", "") : null;
             FinalsSheetDoc = finalsPathFound ? File.ReadAllText(finalsPath).Replace("\n", "").Replace("\r", "") : null;
         }

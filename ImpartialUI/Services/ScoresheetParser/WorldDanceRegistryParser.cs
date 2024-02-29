@@ -336,37 +336,20 @@ namespace ImpartialUI.Services.ScoresheetParser
 
         private string GetPrelimsDocByDivision(Division division, Role role, string sheet)
         {
-            Division div;
             var doc = Util.GetSubString(
                 s: sheet,
                 from: "<div class=\"pb-4\"><br>",
                 to: "</tbody></table></div>");
 
-            doc = doc.Substring(doc.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length);
+            //doc = doc.Substring(doc.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length);
 
-            var divisionString = Util.GetSubString(doc, "<h3 class=\"text-center\">", "</h3>");
+            var titleString = Util.GetSubString(doc, "Jack &amp; Jill", "</h3>");
 
-            if (divisionString.Contains("Masters"))
+            if (titleString.Contains("Masters"))
                 return string.Empty;
 
-            if (divisionString.Contains("Newcomer"))
-                div = Division.Newcomer;
-            else if (divisionString.Contains("Novice"))
-                div = Division.Novice;
-            else if (divisionString.Contains("Intermediate"))
-                div = Division.Intermediate;
-            else if (divisionString.Contains("Advanced"))
-                div = Division.Advanced;
-            else if (divisionString.Contains("All-Star"))
-                div = Division.AllStar;
-            else if (divisionString.Contains("All Star"))
-                div = Division.AllStar;
-            else if (divisionString.Contains("Champion"))
-                div = Division.Champion;
-            else if (divisionString.Contains("Invitational"))
-                div = Division.Open;
-            else
-                div = Division.Open;
+            Division? div;
+            div = Util.ContainsDivisionString(titleString);
 
             if (division != div)
                 return string.Empty;
@@ -392,42 +375,25 @@ namespace ImpartialUI.Services.ScoresheetParser
         }
         private string GetFinalsDocByDivision(Division division)
         {
-            Division div;
             var finals = Util.GetSubString(
                 s: FinalsSheetDoc,
                 from: "<div class=\"pb-4\"><br>",
                 to: "</tbody></table></div>");
 
-            var divisionString = Util.GetSubString(finals, "<h3 class=\"text-center\">", "</h3>");
+            var titleString = Util.GetSubString(finals, "<h3 class=\"text-center\">", "</h3>");
 
             finals = finals.Substring(finals.IndexOf("</tr></thead><tbody>") + new string("</tr></thead><tbody>").Length);
-
-            if (divisionString.Contains("Newcomer"))
-                div = Division.Newcomer;
-            else if (divisionString.Contains("Novice"))
-                div = Division.Novice;
-            else if (divisionString.Contains("Intermediate"))
-                div = Division.Intermediate;
-            else if (divisionString.Contains("Advanced"))
-                div = Division.Advanced;
-            else if (divisionString.Contains("All-Star"))
-                div = Division.AllStar;
-            else if (divisionString.Contains("All Star"))
-                div = Division.AllStar;
-            else if (divisionString.Contains("Champion"))
-                div = Division.Champion;
-            else if (divisionString.Contains("Invitational"))
-                div = Division.Open;
-            else
-                div = Division.Open;
+            
+            Division? div;
+            div = Util.ContainsDivisionString(titleString);
 
             if (division == div)
                 return finals;
 
-            if (divisionString.Contains("Masters"))
-                return "";
+            if (titleString.Contains("Masters"))
+                return string.Empty;
 
-            return "";
+            return string.Empty;
         }
 
         public override string GetName()

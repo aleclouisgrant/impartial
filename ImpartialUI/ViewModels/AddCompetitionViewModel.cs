@@ -4,6 +4,7 @@ using ImpartialUI.Enums;
 using ImpartialUI.Models;
 using ImpartialUI.Services.ScoresheetParser;
 using Microsoft.Win32;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -301,23 +302,17 @@ namespace ImpartialUI.ViewModels
         private void TestData()
         {
             // EEPro
-            ScoresheetSelector = ScoresheetSelector.EEPro;
-            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
-            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
+            //ScoresheetSelector = ScoresheetSelector.EEPro;
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
 
             // StepRightSolutions
-            //var newDanceConvention = new DanceConvention("Boogie By The Bay", DateTime.Parse("2022-10-08"));
-            //DanceConventions.Add(newDanceConvention);
-            //SelectedDanceConvention = newDanceConvention;
             //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
             //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\prelims.html";
             //SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\semis.html";
             //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\finals.html";
 
             // WorldDanceRegistry
-            //var newDanceConvention = new DanceConvention("Charlotte Westie Fest", DateTime.Parse("2023-02-03"));
-            //DanceConventions.Add(newDanceConvention);
-            //SelectedDanceConvention = newDanceConvention;
             //ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
             //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\prelims.html";
             //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\finals.html";
@@ -438,23 +433,30 @@ namespace ImpartialUI.ViewModels
                 ScoresheetSelector = SelectScoresheetParser(finalsPath);
             }
 
-            switch (ScoresheetSelector)
+            try
             {
-                case ScoresheetSelector.EEPro:
-                    _scoresheetParser = new EEProParser(prelimsPath: prelimsPath, finalsPath: finalsPath);
-                    break;
-                case ScoresheetSelector.DanceConvention:
-                    _scoresheetParser = new DanceConventionParser(prelimsPath: prelimsPath, finalsPath: finalsPath);
-                    break;
-                case ScoresheetSelector.StepRightSolutions:
-                    _scoresheetParser = new StepRightSolutionsParser(prelimsPath: prelimsPath, semisPath: semisPath, finalsPath: finalsPath);
-                    break;
-                case ScoresheetSelector.WorldDanceRegistry:
-                    _scoresheetParser = new WorldDanceRegistryParser(prelimsPath: prelimsPath, semisPath: semisPath, finalsPath: finalsPath);
-                    break;
-                case ScoresheetSelector.Other:
-                default:
-                    return;
+                switch (ScoresheetSelector)
+                {
+                    case ScoresheetSelector.EEPro:
+                        _scoresheetParser = new EEProParser(prelimsPath: prelimsPath, finalsPath: finalsPath);
+                        break;
+                    case ScoresheetSelector.DanceConvention:
+                        _scoresheetParser = new DanceConventionParser(prelimsPath: prelimsPath, finalsPath: finalsPath);
+                        break;
+                    case ScoresheetSelector.StepRightSolutions:
+                        _scoresheetParser = new StepRightSolutionsParser(prelimsPath: prelimsPath, semisPath: semisPath, finalsPath: finalsPath);
+                        break;
+                    case ScoresheetSelector.WorldDanceRegistry:
+                        _scoresheetParser = new WorldDanceRegistryParser(prelimsPath: prelimsPath, semisPath: semisPath, finalsPath: finalsPath);
+                        break;
+                    case ScoresheetSelector.Other:
+                    default:
+                        return;
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                Exception = e;
             }
 
             ICompetition comp;
@@ -483,7 +485,15 @@ namespace ImpartialUI.ViewModels
             }
 
             Trace.WriteLine(Competition.ToLongString());
-            App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+
+            try
+            {
+                App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+            } catch (PostgresException e)
+            {
+                Exception = e;
+                App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
+            }
 
             Clear();
         }
