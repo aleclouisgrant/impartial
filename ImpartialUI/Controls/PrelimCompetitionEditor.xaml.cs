@@ -187,7 +187,7 @@ namespace ImpartialUI.Controls
 
                 if (selectedId != null)
                 {
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.UserId == selectedId); ;
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.UserId == selectedId);
                 }
                 else
                 {
@@ -391,7 +391,7 @@ namespace ImpartialUI.Controls
         {
             for (int j = 0; j < _judgeBoxes.Count(); j++)
             {
-                _scores[placement - 1, j].SetCompetitor(newCompetitor.CompetitorId);
+                _scores[placement - 1, j].Competitor = newCompetitor;
             }
 
             OnPropertyChanged(nameof(PrelimCompetition));
@@ -400,7 +400,7 @@ namespace ImpartialUI.Controls
         {
             for (int i = 0; i < _competitorBoxes.Count(); i++)
             {
-                _scores[i, judgeIndex].SetJudge(newJudge.JudgeId);
+                _scores[i, judgeIndex].Judge = newJudge;
             }
 
             OnPropertyChanged(nameof(PrelimCompetition));

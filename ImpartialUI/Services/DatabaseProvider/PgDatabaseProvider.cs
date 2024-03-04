@@ -1203,7 +1203,7 @@ namespace ImpartialUI.Services.DatabaseProvider
             string query = "DELETE FROM " + PG_COMPETITOR_REGISTRATIONS_TABLE_NAME
                 + " WHERE NOT EXISTS ("
                 + "SELECT FROM " + PG_COMPETITOR_RECORDS_TABLE_NAME
-                + " WHERE competitor_records.competitor_registration.id = competitor_registrations.id"
+                + " WHERE competitor_records.competitor_registration_id = competitor_registrations.id"
                 + ");";
 
             await using (var cmd = _dataSource.CreateCommand(query))

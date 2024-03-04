@@ -366,6 +366,7 @@
                 </ScrollViewer>
             </TabItem>
 
+            <!-- Finals -->
             <TabItem Header="Finals"
                      Visibility="{Binding ShowFinals, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer>

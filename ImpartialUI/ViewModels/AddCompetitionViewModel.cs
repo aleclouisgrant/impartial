@@ -347,8 +347,10 @@ namespace ImpartialUI.ViewModels
                 var newCompetitor = new Competitor(FirstName, LastName, id);
 
                 await App.DatabaseProvider.UpsertCompetitorAsync(newCompetitor);
-                Competitors.Add(newCompetitor);
-                Competitors = Competitors.OrderBy(c => c.FullName).ToList();
+
+                App.CompetitorsDb.Add(newCompetitor);
+                App.CompetitorsDb = App.CompetitorsDb.OrderBy(c => c.FullName).ToList();
+                Competitors = App.CompetitorsDb;
 
                 FirstName = string.Empty;
                 LastName = string.Empty;
@@ -360,8 +362,10 @@ namespace ImpartialUI.ViewModels
             var newJudge = new Judge(JudgeFirstName, JudgeLastName);
             
             await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
-            Judges.Add(newJudge);
-            Judges = Judges.OrderBy(j => j.FullName).ToList();
+            
+            App.JudgesDb.Add(newJudge);
+            App.JudgesDb = App.JudgesDb.OrderBy(j => j.FullName).ToList();
+            Judges = App.JudgesDb;
 
             JudgeFirstName = string.Empty;
             JudgeLastName = string.Empty;
@@ -371,8 +375,8 @@ namespace ImpartialUI.ViewModels
             var newJudge = new Judge(SelectedCompetitor.UserId, Guid.NewGuid(), SelectedCompetitor.FirstName, SelectedCompetitor.LastName);
 
             await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
-            Judges.Add(newJudge);
-            Judges = Judges.OrderBy(j => j.FullName).ToList();
+            App.JudgesDb = App.JudgesDb.OrderBy(j => j.FullName).ToList();
+            Judges = App.JudgesDb;
 
             SelectedCompetitor = null;
         }

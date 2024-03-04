@@ -773,6 +773,8 @@ namespace Impartial
                     return competitors.Where(c => c.FullName == "Dominique Morin")?.FirstOrDefault();
                 case "Lilly Auclair":
                     return competitors.Where(c => c.FullName == "Lily Auclair")?.FirstOrDefault();
+                case "Riley crozier":
+                    return competitors.Where(c => c.FullName == "Riley Crozier")?.FirstOrDefault();
 
                 default:
                     return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();

@@ -127,7 +127,7 @@ namespace ImpartialUI.Controls
 
                 if (selectedId != null)
                 {
-                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.Where(s => s.UserId == selectedId).FirstOrDefault();
+                    searchTextBox.SelectedPerson = searchTextBox.ItemsSource.FirstOrDefault(s => s.UserId == selectedId);
                 }
                 else
                 {

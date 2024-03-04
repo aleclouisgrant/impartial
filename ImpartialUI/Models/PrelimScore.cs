@@ -7,9 +7,6 @@ namespace ImpartialUI.Models
 {
     public class PrelimScore : IPrelimScore
     {
-        private Guid? _judgeId;
-        private Guid? _competitorId;
-
         public Guid Id { get; }
         public IJudge Judge { get; set; }
         public ICompetitor Competitor { get; set; }
@@ -36,14 +33,12 @@ namespace ImpartialUI.Models
 
         public void SetJudge(Guid? id)
         {
-            _judgeId = id;
-            Judge = App.JudgesDb.Where(j => j.JudgeId == _judgeId).FirstOrDefault();
+            Judge = App.JudgesDb.FirstOrDefault(j => j.JudgeId == id);
         }
 
         public void SetCompetitor(Guid? id)
         {
-            _competitorId = id;
-            Competitor = App.CompetitorsDb.Where(c => c.CompetitorId == _competitorId).FirstOrDefault();
+            Competitor = App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == id);
         }
     }
 }
