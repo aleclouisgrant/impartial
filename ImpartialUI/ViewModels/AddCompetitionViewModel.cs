@@ -432,7 +432,7 @@ namespace ImpartialUI.ViewModels
 
             if (ScoresheetSelector == ScoresheetSelector.Auto)
             {
-                if (finalsPath != null || finalsPath != string.Empty)
+                if (!(finalsPath == null || finalsPath == string.Empty))
                 {
                     ScoresheetSelector = SelectScoresheetParser(finalsPath);
                 }
@@ -496,10 +496,15 @@ namespace ImpartialUI.ViewModels
             try
             {
                 await App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
-            } catch (PostgresException e)
+            } 
+            catch (PostgresException e)
             {
+                Clear();
+
                 Exception = e;
                 await App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
+
+                return;
             }
 
             Clear();
@@ -513,7 +518,7 @@ namespace ImpartialUI.ViewModels
                 string sheet = await response.Content.ReadAsStringAsync();
                 string idString = Regex.Match(sheet.Substring(sheet.IndexOf("wscid"), 20), @"\d+").Value;
                 return Int32.TryParse(idString, out int id) ? id : -1;
-            } 
+            }
             catch
             {
                 return -1;

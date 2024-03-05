@@ -244,9 +244,11 @@ namespace Impartial
 
         public static string GetSubString(string s, string from, string to)
         {
+            if (s == null)
+                return "";
+
             if (s.IndexOf(from) == -1)
                 return "";
-                //throw new Exception("String \'" + from + "\' not found in searched string");
 
             int fromIndex = s.IndexOf(from) + from.Length;
             string choppedString = s.Substring(fromIndex, s.Length - fromIndex);
@@ -258,10 +260,7 @@ namespace Impartial
             {
                 sub = s.Substring(fromIndex, toIndex - fromIndex);
             }
-            catch (ArgumentOutOfRangeException)
-            {
-
-            }
+            catch (ArgumentOutOfRangeException) { }
 
             return sub;
         }
@@ -728,11 +727,13 @@ namespace Impartial
                 case "Jess Ann Nail":
                     return competitors.FirstOrDefault(c => c.FullName == "Jes Ann Nail");
                 case "Carlie Obrien":
-                //case "Carlie O'brien":
+                case "Carlie O'brien":
                     return competitors.FirstOrDefault(c => c.FullName == "Carlie O'Brien");
                 case "Katie Smiley":
+                case "Katie Smiley-oyen":
                     return competitors.FirstOrDefault(c => c.FullName == "Katie Smiley-Oyen");
                 case "Fae Xenovia":
+                case "Fae Ashley (Xenovia)":
                     return competitors.FirstOrDefault(c => c.FullName == "Fae Ashley");
                 case "Jung Won Choe":
                 case "Jung Won Cho":
@@ -795,6 +796,17 @@ namespace Impartial
                     return competitors.FirstOrDefault(c => c.FullName == "Madelyn Clark");
                 case "Jason Phillips":
                     return competitors.FirstOrDefault(c => c.FullName == "Jasson Phillips");
+                case "Alyx Mccarthey":
+                case "Alexandra Mccarthey":
+                    return competitors.FirstOrDefault(c => c.FullName == "Alyx McCarthey");
+                case "Cj Wheelock":
+                    return competitors.FirstOrDefault(c => c.FullName == "CJ Wheelock");
+                case "Abigail Schneider":
+                    return competitors.FirstOrDefault(c => c.FullName == "Abi Schneider");
+                case "D'leene Deboer":
+                    return competitors.FirstOrDefault(c => c.FullName == "D'Leene DeBoer");
+                case "Marie Soldevilla":
+                    return competitors.FirstOrDefault(c => c.FullName == "Marie Soldevila");
 
                 default:
                     return competitors.FirstOrDefault(c => c.FullName == firstName + " " + lastName);
@@ -807,47 +819,46 @@ namespace Impartial
             switch ((firstName.Trim() + " " + lastName.Trim()).Trim())
             {
                 case "Sean McKeaver":
-                    return judges.Where(c => c.FullName == "Sean McKeever")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Sean McKeever");
                 case "Tatiana Mollman":
-                    return judges.Where(c => c.FullName == "Tatiana Mollmann")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Tatiana Mollmann");
                 case "Bonnie":
-                    return judges.Where(c => c.FullName == "Bonnie Cannon")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Bonnie Cannon");
                 case "Bryn":
-                    return judges.Where(c => c.FullName == "Bryn Anderson")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Bryn Anderson");
                 case "Jerome":
-                    return judges.Where(c => c.FullName == "Jerome Subey")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Jerome Subey");
                 case "Annmarie":
-                    return judges.Where(c => c.FullName == "Annmarie Marker")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Annmarie Marker");
                 case "PJ":
-                    return judges.Where(c => c.FullName == "PJ Turner")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "PJ Turner");
                 case "Patty":
-                    return judges.Where(c => c.FullName == "Patty Vo")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Patty Vo");
                 case "Sharole Lashe":
                 case "Sharole Lashe Negrete":
-                    return judges.Where(c => c.FullName == "Sharole Negrete")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Sharole Negrete");
                 case "Jessica Mccurdy":
-                    return judges.Where(c => c.FullName == "Jessica McCurdy")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Jessica McCurdy");
                 case "Phillipe Berne":
-                    return judges.Where(c => c.FullName == "Philippe Berne")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Philippe Berne");
                 case "Robin (Pro)":
-                    return judges.Where(c => c.FullName == "Robin Smith")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Robin Smith");
                 case "Tren":
                 case "Trendlyon":
                 case "Trendlyon Veal":
-                    return judges.Where(c => c.FullName == "Tren Veal")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Tren Veal");
                 case "Yvonne Antonnacci":
-                    return judges.Where(c => c.FullName == "Yvonne Antonacci")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Yvonne Antonacci");
                 case "Alyssa Marie Glanville":
-                    return judges.Where(c => c.FullName == "Alyssa Glanville")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "Alyssa Glanville");
                 case "KP":
                 case "Ken Rutland":
-                    return judges.Where(c => c.FullName == "KP Rutland")?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == "KP Rutland");
                 case "Jen Deluca":
-                    return judges.Where(c => c.FullName == "Jen DeLuca")?.FirstOrDefault();
-
+                    return judges.FirstOrDefault(c => c.FullName == "Jen DeLuca");
 
                 default:
-                    return judges.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
+                    return judges.FirstOrDefault(c => c.FullName == firstName + " " + lastName);
             }
         }
     }

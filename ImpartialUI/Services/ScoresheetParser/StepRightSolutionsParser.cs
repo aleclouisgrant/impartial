@@ -63,9 +63,7 @@ namespace ImpartialUI.Services.ScoresheetParser
 
             var prelimsHtml = GetPrelimsDocByDivision(division, role, sheet);
             if (prelimsHtml == string.Empty)
-            {
                 return null;
-            }
 
             var prelimCompetition = new PrelimCompetition(
                 dateTime: DateTime.MinValue,

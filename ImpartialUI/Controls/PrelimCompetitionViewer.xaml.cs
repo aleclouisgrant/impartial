@@ -105,9 +105,11 @@ namespace ImpartialUI.Controls
                     Height = 24
                 };
 
+                var judgeName = judge.FirstName == "Anonymous" ? judge.FirstName : judge.FullName;
+
                 var textBlock = new TextBlock()
                 {
-                    Text = judge.FullName,
+                    Text = judgeName,
                     FontWeight = FontWeights.Bold,
                     FontStyle = FontStyles.Italic,
                     Margin = new Thickness(1)

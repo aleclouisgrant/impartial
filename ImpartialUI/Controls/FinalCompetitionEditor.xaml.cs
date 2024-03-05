@@ -504,6 +504,9 @@ namespace ImpartialUI.Controls
 
         private void UpdateCompetitor(ICompetitor competitor, int placement, Role role)
         {
+            if (FinalCompetition == null)
+                return;
+
             if (placement < 1 || placement > FinalCompetition.Couples.Count)
                 return;
 

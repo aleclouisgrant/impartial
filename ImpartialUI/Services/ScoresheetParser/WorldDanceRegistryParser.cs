@@ -49,22 +49,6 @@ namespace ImpartialUI.Services.ScoresheetParser
             return divisions;
         }
 
-        public override ICompetition GetCompetition(Division division)
-        {
-            var competition = new Competition(danceConventionId: Guid.Empty, name: GetName(), date: DateTime.MinValue, division: division)
-            {
-                FinalCompetition = GetFinalCompetition(division),
-                PairedPrelimCompetitions = new List<IPairedPrelimCompetition>()
-            };
-
-            var prelims = GetPairedPrelimCompetition(division, Round.Prelims);
-
-            if (prelims.LeaderPrelimCompetition != null)
-                competition.PairedPrelimCompetitions.Add(prelims);
-
-            return competition;
-        }
-
         public override IPrelimCompetition GetPrelimCompetition(Division division, Round round, Role role)
         {
             string sheet = "";
