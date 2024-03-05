@@ -561,10 +561,7 @@ namespace Impartial
                 s.Contains("allstar") ||
                 s.Contains("all star") ||
                 s.Contains("All-Star") ||
-                s.Contains("all-star") ||
-                s.Contains("ALS") ||
-                s.Contains("Als") ||
-                s.Contains("als"))
+                s.Contains("all-star"))
                     return Division.AllStar;
                
             if (s.Contains("Champion") ||
@@ -672,112 +669,134 @@ namespace Impartial
                 case "Aidan Keith-hynes":
                 case "Aidan Keith Hynes":
                 case "Aiden Keith Hynes":
-                    return competitors.Where(c => c.FullName == "Aidan Keith-Hynes")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Aidan Keith-Hynes");
                 case "Jt Anderson":
                 case "JT anderson":
                 case "Jt anderson":
-                    return competitors.Where(c => c.FullName == "JT Anderson")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "JT Anderson");
                 case "Dimtri Hector":
-                    return competitors.Where(c => c.FullName == "Dimitri Hector")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Dimitri Hector");
                 case "Conor mcclure":
                 case "Conor Mcclure":
-                    return competitors.Where(c => c.FullName == "Conor McClure")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Conor McClure");
                 case "Aris Demarco":
-                    return competitors.Where(c => c.FullName == "Aris DeMarco")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Aris DeMarco");
                 case "J Khayree Jones":
-                    return competitors.Where(c => c.FullName == "Khayree Jones")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Khayree Jones");
                 case "JennAy Ferreira":
-                    return competitors.Where(c => c.FullName == "Jen Ferreira")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Jen Ferreira");
                 case "Karla Anita Catana":
-                    return competitors.Where(c => c.FullName == "Karla Catana")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Karla Catana");
                 case "Stephanie Risser":
                 case "Stephanie Risser Loveira":
-                    return competitors.Where(c => c.FullName == "Stephanie Loveira")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Stephanie Loveira");
                 case "Samuel Vaden":
-                    return competitors.Where(c => c.FullName == "Sam Vaden")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Sam Vaden");
                 case "Casey Lane Margules":
-                    return competitors.Where(c => c.FullName == "Casey Margules")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Casey Margules");
                 case "Margaret Tuttle":
-                    return competitors.Where(c => c.FullName == "Margie Tuttle")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Margie Tuttle");
                 case "Alexander Glover":
-                    return competitors.Where(c => c.FullName == "Alex Glover")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Alex Glover");
                 case "Frank Moda III":
-                    return competitors.Where(c => c.FullName == "Frank Moda")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Frank Moda");
                 case "Kelly Ponce De Leon":
-                    return competitors.Where(c => c.FullName == "Kelly Ponce de Leon")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Kelly Ponce de Leon");
                 case "Agustin Gutierrez":
-                    return competitors.Where(c => c.FullName == "Augie Leija")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Augie Leija");
                 case "Saya Suzaki":
-                    return competitors.Where(c => c.FullName == "Sayaka Suzaki")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Sayaka Suzaki");
                 case "Brittani Schiro":
-                    return competitors.Where(c => c.FullName == "Brittany Schiro")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Brittany Schiro");
                 case "Xander Stavola":
-                    return competitors.Where(c => c.FullName == "Alexander Stavola")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Alexander Stavola");
                 case "Skyler Pritchard":
-                    return competitors.Where(c => c.FullName == "Skylar Pritchard")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Skylar Pritchard");
                 case "Jade Ruiz":
-                    return competitors.Where(c => c.FullName == "Jade Bryan")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Jade Bryan");
                 case "Julie Edwards-Auclair":
                 case "Julie Edwards Auclair":
-                    return competitors.Where(c => c.FullName == "Julie Auclair")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Julie Auclair");
                 case "Vincent van Mierlo":
-                    return competitors.Where(c => c.FullName == "Vincent Van Mierlo")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Vincent Van Mierlo");
                 case "Kyle Fitzgerald":
-                    return competitors.Where(c => c.FullName == "Kyle FitzGerald")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Kyle FitzGerald");
                 case "Joel Jiminez":
-                    return competitors.Where(c => c.FullName == "Joel Jimenez")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Joel Jimenez");
                 case "Talía Colón":
-                    return competitors.Where(c => c.FullName == "Talia Colon")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Talia Colon");
                 case "Jess Ann Nail":
-                    return competitors.Where(c => c.FullName == "Jes Ann Nail")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Jes Ann Nail");
                 case "Carlie Obrien":
-                    return competitors.Where(c => c.FullName == "Carlie O'Brien")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Carlie O'Brien");
                 case "Katie Smiley":
-                    return competitors.Where(c => c.FullName == "Katie Smiley-Oyen")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Katie Smiley-Oyen");
                 case "Fae Xenovia":
-                    return competitors.Where(c => c.FullName == "Fae Ashley")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Fae Ashley");
                 case "Jung Won Choe":
                 case "Jung Won Cho":
                 case "Jung choe":
-                    return competitors.Where(c => c.FullName == "Jung Choe")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Jung Choe");
                 case "Joanna Mienl":
-                    return competitors.Where(c => c.FullName == "Joanna Meinl")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Joanna Meinl");
                 case "Amber O'connell":
-                    return competitors.Where(c => c.FullName == "Amber O'Connell")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Amber O'Connell");
                 case "Savannah Harris-read":
-                    return competitors.Where(c => c.FullName == "Savannah Harris-Read")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Savannah Harris-Read");
                 case "Branden Stong":
-                    return competitors.Where(c => c.FullName == "Branden Strong")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Branden Strong");
                 case "Ashley Daniels":
-                    return competitors.Where(c => c.FullName == "Ashley Snow")?.FirstOrDefault();
+                case "Ashley Snow (Daniels)":
+                    return competitors.FirstOrDefault(c => c.FullName == "Ashley Snow");
                 case "Jeff Wingo":
-                    return competitors.Where(c => c.FullName == "Jeffrey Wingo")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Jeffrey Wingo");
                 case "Aris ":
-                    return competitors.Where(c => c.FullName == "Aris DeMarco")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Aris DeMarco");
                 case "Estelle Bonaire":
-                    return competitors.Where(c => c.FullName == "Estelle Bonnaire")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Estelle Bonnaire");
                 case "Wee Tze Yi":
-                    return competitors.Where(c => c.FullName == "Tze Yi Wee")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Tze Yi Wee");
                 case "Rob I":
-                    return competitors.Where(c => c.FullName == "Rob Ingenthron")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Rob Ingenthron");
                 case "Ray Byun":
-                    return competitors.Where(c => c.FullName == "Raymond Byun")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Raymond Byun");
                 case "Marie-pascale Cote":
-                    return competitors.Where(c => c.FullName == "Marie-Pascale Cote")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Marie-Pascale Cote");
                 case "Mikaila Finley Pittman":
                 case "Mikaila Finley":
-                    return competitors.Where(c => c.FullName == "Mikaila Pittman")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Mikaila Pittman");
                 case "Lisa M Picard":
-                    return competitors.Where(c => c.FullName == "Lisa Picard")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Lisa Picard");
                 case "Dominique Morin.":
-                    return competitors.Where(c => c.FullName == "Dominique Morin")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Dominique Morin");
                 case "Lilly Auclair":
-                    return competitors.Where(c => c.FullName == "Lily Auclair")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Lily Auclair");
                 case "Riley crozier":
-                    return competitors.Where(c => c.FullName == "Riley Crozier")?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == "Riley Crozier");
+                case "Christine M Medin":
+                    return competitors.FirstOrDefault(c => c.FullName == "Christine Medin");
+                case "tammy duke":
+                    return competitors.FirstOrDefault(c => c.FullName == "Tammy Duke");
+                case "Alexandra BRANCO":
+                    return competitors.FirstOrDefault(c => c.FullName == "Alexandra Branco");
+                case "Mathieu COMPAGNON":
+                    return competitors.FirstOrDefault(c => c.FullName == "Mathieu Compagnon");
+                case "Mélodie Paletta":
+                    return competitors.FirstOrDefault(c => c.FullName == "Melodie Paletta");
+                case "Larissa Frisbee":
+                case "Larissa Thayane (Frisbee)":
+                    return competitors.FirstOrDefault(c => c.FullName == "Larissa Thayane");
+                case "Sebastien Cadet":
+                    return competitors.FirstOrDefault(c => c.FullName == "Sebastian Cadet");
+                case "Agnes Maslanka":
+                    return competitors.FirstOrDefault(c => c.FullName == "Agnieszka Maslanka");
+                case "Madelyn Finley":
+                    return competitors.FirstOrDefault(c => c.FullName == "Madelyn Clark");
+                case "Jason Phillips":
+                    return competitors.FirstOrDefault(c => c.FullName == "Jasson Phillips");
 
                 default:
-                    return competitors.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();
+                    return competitors.FirstOrDefault(c => c.FullName == firstName + " " + lastName);
             }
         }
 
@@ -803,6 +822,7 @@ namespace Impartial
                 case "Patty":
                     return judges.Where(c => c.FullName == "Patty Vo")?.FirstOrDefault();
                 case "Sharole Lashe":
+                case "Sharole Lashe Negrete":
                     return judges.Where(c => c.FullName == "Sharole Negrete")?.FirstOrDefault();
                 case "Jessica Mccurdy":
                     return judges.Where(c => c.FullName == "Jessica McCurdy")?.FirstOrDefault();
@@ -814,6 +834,15 @@ namespace Impartial
                 case "Trendlyon":
                 case "Trendlyon Veal":
                     return judges.Where(c => c.FullName == "Tren Veal")?.FirstOrDefault();
+                case "Yvonne Antonnacci":
+                    return judges.Where(c => c.FullName == "Yvonne Antonacci")?.FirstOrDefault();
+                case "Alyssa Marie Glanville":
+                    return judges.Where(c => c.FullName == "Alyssa Glanville")?.FirstOrDefault();
+                case "KP":
+                case "Ken Rutland":
+                    return judges.Where(c => c.FullName == "KP Rutland")?.FirstOrDefault();
+                case "Jen Deluca":
+                    return judges.Where(c => c.FullName == "Jen DeLuca")?.FirstOrDefault();
 
 
                 default:

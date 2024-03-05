@@ -282,8 +282,8 @@ namespace ImpartialUI.ViewModels
             CancelCommand = new DelegateCommand(Clear);
             RefreshCacheCommand = new DelegateCommand(RefreshCache);
 
-            //_client = new HttpClient();
-            //_client.BaseAddress = new Uri("https://points.worldsdc.com/");
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
             Competition = new Competition()
             { 
@@ -464,6 +464,7 @@ namespace ImpartialUI.ViewModels
             ICompetition comp;
             try
             {
+                //TODO: make this async
                 comp = _scoresheetParser.GetCompetition(Division.AllStar);
             } catch (DivisionNotFoundException e)
             {
@@ -471,11 +472,11 @@ namespace ImpartialUI.ViewModels
                 return;
             }
 
-            Match(comp);
+            await Match(comp);
 
             Competition = comp;
         }
-        private void AddCompetition()
+        private async void AddCompetition()
         {
             // Set date times to match the selected dance convention for now
             Competition.Date = SelectedDanceConvention.Date;
@@ -490,11 +491,11 @@ namespace ImpartialUI.ViewModels
 
             try
             {
-                App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+                await App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
             } catch (PostgresException e)
             {
                 Exception = e;
-                App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
+                await App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
             }
 
             Clear();
@@ -539,17 +540,17 @@ namespace ImpartialUI.ViewModels
         /// Match competitors and judges to their DB counterpart
         /// </summary>
         /// <param name="competition"></param>
-        private void Match(ICompetition competition)
+        private async Task Match(ICompetition competition)
         {
             foreach (var pairedPrelimCompetition in competition.PairedPrelimCompetitions)
             {
                 foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
                 {
-                    MatchCompetitor(competitor);
+                    await MatchCompetitor(competitor);
                 }
                 foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
                 {
-                    MatchCompetitor(competitor);
+                    await MatchCompetitor(competitor);
                 }
 
                 foreach (var judge in pairedPrelimCompetition.LeaderPrelimCompetition.Judges)
@@ -563,15 +564,15 @@ namespace ImpartialUI.ViewModels
             }
             foreach (var couple in competition.FinalCompetition.Couples)
             {
-                MatchCompetitor(couple.Leader);
-                MatchCompetitor(couple.Follower);
+                await MatchCompetitor(couple.Leader);
+                await MatchCompetitor(couple.Follower);
             }
             foreach (var judge in competition.FinalCompetition.Judges)
             {
                 MatchJudge(judge);
             }
         }
-        private void MatchCompetitor(ICompetitor competitor)
+        private async Task MatchCompetitor(ICompetitor competitor)
         {
             var dbCompetitor = Util.FindCompetitorInCache(competitor.FirstName, competitor.LastName, App.CompetitorsDb);
             if (dbCompetitor != null)
@@ -583,6 +584,10 @@ namespace ImpartialUI.ViewModels
                 competitor.LastName = dbCompetitor.LastName;
                 competitor.LeadStats = dbCompetitor.LeadStats;
                 competitor.FollowStats = dbCompetitor.FollowStats;
+            }
+            else
+            {
+                competitor.WsdcId = await GuessWsdcId(competitor.FirstName, competitor.LastName);
             }
         }
         private void MatchJudge(IJudge judge)

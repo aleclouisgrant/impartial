@@ -247,7 +247,10 @@ namespace ImpartialUI.Controls
 
             var competitor = new Competitor(FirstNameTextBox.Text, LastNameTextBox.Text, Int32.Parse(WsdcIdTextBox.Text));
             await App.DatabaseProvider.UpsertCompetitorAsync(competitor);
-            ItemsSource = await App.DatabaseProvider.GetAllCompetitorsAsync();
+
+            App.CompetitorsDb.Add(competitor);
+            App.CompetitorsDb = App.CompetitorsDb.OrderBy(c => c.FullName).ToList();
+            ItemsSource = App.CompetitorsDb;
 
             SearchMode();
             ComboBoxItems.SelectedValue = ItemsSource.Where(u => u.UserId == competitor.UserId).FirstOrDefault();

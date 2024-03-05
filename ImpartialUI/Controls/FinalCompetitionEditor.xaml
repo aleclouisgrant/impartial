@@ -16,7 +16,7 @@
         <Border VerticalAlignment="Top" Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
             <TextBlock Margin="2" VerticalAlignment="Center">
                 <Run Text="Jack &amp; Jill"/>
-                <Run Text="{Binding FinalCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding FinalCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DivisionToStringConverter}}"/>
                 <Run Text="Finals"/>
             </TextBlock>
         </Border>
