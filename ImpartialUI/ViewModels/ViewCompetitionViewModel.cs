@@ -66,6 +66,8 @@ namespace ImpartialUI.ViewModels
             RefreshCompetitionsCommand = new DelegateCommand(RefreshCompetitions);
             SaveCompetitionCommand = new DelegateCommand(SaveCompetition);
             DeleteCompetitionCommand = new DelegateCommand(DeleteCompetition);
+
+            Competitions = App.CompetitionsDb;
         }
 
         private async void RefreshCompetitions()

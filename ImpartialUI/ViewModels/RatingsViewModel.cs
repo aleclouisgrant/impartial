@@ -15,6 +15,12 @@ namespace ImpartialUI.ViewModels
 {
     public class RatingsViewModel : BaseViewModel
     {
+        private HttpClient _client;
+        private List<ICompetition> _competitions;
+
+        private IProgress<double> _plotProgress;
+        private IProgress<double> _crunchProgress;
+
         private List<CompetitorDataModel> _compDm;
         public List<CompetitorDataModel> CompDm
         {
@@ -37,7 +43,6 @@ namespace ImpartialUI.ViewModels
             }
         }
 
-        private IProgress<double> _plotProgress;
         private bool _plotEnabled;
         public bool PlotEnabled
         {
@@ -45,43 +50,6 @@ namespace ImpartialUI.ViewModels
             set
             {
                 _plotEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private HttpClient _client;
-        private List<ICompetition> _competitions = new List<ICompetition>();
-
-        private string _firstName;
-        public string FirstName
-        {
-            get { return _firstName; }
-            set
-            {
-                _firstName = value;
-                OnPropertyChanged();
-            }
-        }
-        private string _lastName;
-        public string LastName
-        {
-            get { return _lastName; }
-            set
-            {
-                _lastName = value;
-                OnPropertyChanged();
-
-                GuessWsdcId();
-            }
-        }
-
-        private string _wsdcId;
-        public string WsdcId
-        {
-            get { return _wsdcId; }
-            set
-            {
-                _wsdcId = value;
                 OnPropertyChanged();
             }
         }
@@ -96,8 +64,6 @@ namespace ImpartialUI.ViewModels
                 OnPropertyChanged();
             }
         }
-
-        private IProgress<double> _crunchProgress;
 
         private bool _crunchEnabled;
         public bool CrunchEnabled
@@ -158,28 +124,19 @@ namespace ImpartialUI.ViewModels
             }
         }
         
-        public ICommand AddCompetitorCommand { get; set; }
-        public ICommand RefreshCompetitorsCommand { get; set; }
         public ICommand ResetRatingsCommand { get; set; }
         public ICommand CrunchRatingsCommand { get; set; }
 
-        private IDatabaseProvider _databaseProvider;
-
         public RatingsViewModel()
         {
-            _databaseProvider = App.DatabaseProvider;
             _client = new HttpClient();
             _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
-            AddCompetitorCommand = new DelegateCommand(AddCompetitor);
-            RefreshCompetitorsCommand = new DelegateCommand(RefreshCompetitors);
             ResetRatingsCommand = new DelegateCommand(ResetRatings);
             CrunchRatingsCommand = new DelegateCommand(new Action(async () =>
             {
                 await Task.Run(CrunchRatings);
             }));
-
-            Competitors = new ObservableCollection<ICompetitor>(App.CompetitorsDb);
 
             _crunchProgress = new Progress<double>(ReportProgress);
             CrunchEnabled = true;
@@ -187,13 +144,8 @@ namespace ImpartialUI.ViewModels
             _plotProgress = new Progress<double>(ReportPlotProgress);
             PlotEnabled = false;
 
-            Initialize();
-        }
-
-        private async void Initialize()
-        {
-            //_competitions = (await _databaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date).ToList();
-            //Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
+            _competitions = App.CompetitionsDb;
+            Competitors = new ObservableCollection<ICompetitor>(App.CompetitorsDb);
         }
 
         private void ReportProgress(double progress)
@@ -226,66 +178,63 @@ namespace ImpartialUI.ViewModels
             //    // prelim rounds
             //    foreach (var pairedPrelimCompetition in competition.PairedPrelimCompetitions)
             //    {
-            //            // update the ratings of all competitors in the scores
-            //            foreach (var score in pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores)
+            //        // update the ratings of all competitors in the scores
+            //        foreach (var score in pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores)
+            //        {
+            //            var compDm = CompDm.FirstOrDefault(c => c.CompetitorId == score.Competitor.CompetitorId);
+            //            if (compDm == null)
             //            {
-            //                var competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
-            //                score.Competitor competitor;
-
-            //                var compDm = CompDm.Where(c => c.CompetitorId == competitor.Id).FirstOrDefault();
-            //                if (compDm == null)
-            //                {
-            //                    compDm = new CompetitorDataModel(competitor);
-            //                    CompDm.Add(compDm);
-            //                }
-
-            //                if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
-            //                    compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.LeadStats.Rating, 0, score.Round, score.RawScore, competition.PrelimLeaders(round).Count));
-            //            }
-            //            foreach (var score in pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores.Where(s => s.Round == round))
-            //            {
-            //                var competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
-            //                score.Competitor = competitor;
-
-            //                var compDm = CompDm.Where(c => c.CompetitorId == competitor.Id).FirstOrDefault();
-            //                if (compDm == null)
-            //                {
-            //                    compDm = new CompetitorDataModel(competitor);
-            //                    CompDm.Add(compDm);
-            //                }
-
-            //                if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
-            //                    compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.FollowStats.Rating, 0, score.Round, score.RawScore, competition.PrelimFollowers(round).Count));
+            //                compDm = new CompetitorDataModel(score.Competitor);
+            //                CompDm.Add(compDm);
             //            }
 
-            //            // calculating the new ratings
-            //            var leaders = EloRatingService.PrelimRatings(pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores.Where(s => s.Round == round).ToList(), Role.Leader, competition.PrelimLeaderJudges(round));
+            //            if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
+            //                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.LeadStats.Rating, 0, score.Round, score.RawScore, competition.PrelimLeaders(round).Count));
+            //        }
+            //        foreach (var score in pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores.Where(s => s.Round == round))
+            //        {
+            //            var competitor = Competitors.Where(c => c.Id == score.Competitor.Id).FirstOrDefault();
+            //            score.Competitor = competitor;
 
-            //            foreach (var leader in leaders)
+            //            var compDm = CompDm.Where(c => c.CompetitorId == competitor.Id).FirstOrDefault();
+            //            if (compDm == null)
             //            {
-            //                var compDmLeader = CompDm.Where(c => c.CompetitorId == leader.Id)?.FirstOrDefault();
-            //                if (compDmLeader != null)
-            //                {
-            //                    compDmLeader.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == round).FirstOrDefault()
-            //                    .RatingAfter = leader.LeadStats.Rating;
-            //                }
-            //                else
-            //                {
-            //                    compDmLeader = new CompetitorDataModel(leader.Id);
-            //                }
+            //                compDm = new CompetitorDataModel(competitor);
+            //                CompDm.Add(compDm);
             //            }
 
-            //            var followers = EloRatingService.PrelimRatings(pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores.Where(s => s.Round == round).ToList(), Role.Follower, competition.PrelimFollowerJudges(round));
+            //            if (!compDm.CompetitionHistory.Exists(c => c.CompetitionName == competition.Name && c.CompetitionDate == competition.Date && c.Round == score.Round))
+            //                compDm.CompetitionHistory.Add(new CompetitionHistory(competition.Name, competition.Date, competitor.FollowStats.Rating, 0, score.Round, score.RawScore, competition.PrelimFollowers(round).Count));
+            //        }
 
-            //            foreach (var follower in followers)
+            //        // calculating the new ratings
+            //        var leaders = EloRatingService.PrelimRatings(pairedPrelimCompetition.LeaderPrelimCompetition.PrelimScores.Where(s => s.Round == round).ToList(), Role.Leader, competition.PrelimLeaderJudges(round));
+
+            //        foreach (var leader in leaders)
+            //        {
+            //            var compDmLeader = CompDm.Where(c => c.CompetitorId == leader.Id)?.FirstOrDefault();
+            //            if (compDmLeader != null)
             //            {
-            //                var compDmFollower = CompDm.Where(c => c.CompetitorId == follower.Id)?.FirstOrDefault();
-            //                if (compDmFollower != null)
-            //                {
-            //                    compDmFollower.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == round).FirstOrDefault()
-            //                    .RatingAfter = follower.FollowStats.Rating;
-            //                }
+            //                compDmLeader.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == round).FirstOrDefault()
+            //                .RatingAfter = leader.LeadStats.Rating;
             //            }
+            //            else
+            //            {
+            //                compDmLeader = new CompetitorDataModel(leader.Id);
+            //            }
+            //        }
+
+            //        var followers = EloRatingService.PrelimRatings(pairedPrelimCompetition.FollowerPrelimCompetition.PrelimScores.Where(s => s.Round == round).ToList(), Role.Follower, competition.PrelimFollowerJudges(round));
+
+            //        foreach (var follower in followers)
+            //        {
+            //            var compDmFollower = CompDm.Where(c => c.CompetitorId == follower.Id)?.FirstOrDefault();
+            //            if (compDmFollower != null)
+            //            {
+            //                compDmFollower.CompetitionHistory.Where(h => h.CompetitionName == competition.Name && h.CompetitionDate == competition.Date && h.Round == round).FirstOrDefault()
+            //                .RatingAfter = follower.FollowStats.Rating;
+            //            }
+            //        }
             //    }
 
             //    // finals
@@ -360,45 +309,12 @@ namespace ImpartialUI.ViewModels
             //PlotEnabled = true;
         }
 
-        private async void AddCompetitor()
-        {
-            if (int.TryParse(WsdcId, out int id))
-            {
-                var newCompetitor = new Competitor(FirstName, LastName, int.Parse(WsdcId));
-
-                await _databaseProvider.UpsertCompetitorAsync(newCompetitor);
-
-                FirstName = string.Empty;
-                LastName = string.Empty;
-                WsdcId = string.Empty;
-            }
-
-            Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
-        }
-
-        private async void RefreshCompetitors()
-        {
-            Competitors = new ObservableCollection<ICompetitor>(await _databaseProvider.GetAllCompetitorsAsync());
-        }
-
         private async void ResetRatings()
         {
             foreach (ICompetitor competitor in Competitors)
             {
                 competitor.LeadStats.Rating = 1000;
                 competitor.FollowStats.Rating = 1000;
-            }
-        }
-
-        private async void GuessWsdcId()
-        {
-            var response = await _client.PostAsync("/lookup/find?q=" + FirstName + "%20" + LastName, null);
-            string sheet = await response.Content.ReadAsStringAsync();
-            string idString = Regex.Match(sheet.Substring(sheet.IndexOf("wscid"), 20), @"\d+").Value;
-
-            if (Int32.TryParse(idString, out int id))
-            {
-                WsdcId = id.ToString();
             }
         }
 
