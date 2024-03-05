@@ -432,7 +432,10 @@ namespace ImpartialUI.ViewModels
 
             if (ScoresheetSelector == ScoresheetSelector.Auto)
             {
-                ScoresheetSelector = SelectScoresheetParser(finalsPath);
+                if (finalsPath != null || finalsPath != string.Empty)
+                {
+                    ScoresheetSelector = SelectScoresheetParser(finalsPath);
+                }
             }
 
             try
@@ -453,6 +456,7 @@ namespace ImpartialUI.ViewModels
                         break;
                     case ScoresheetSelector.Other:
                     default:
+                        Exception = new Exception("Auto scoresheet selector could not determine which parser to use.");
                         return;
                 }
             }

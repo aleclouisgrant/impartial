@@ -70,7 +70,7 @@ namespace ImpartialUI.ViewModels
 
         private async void RefreshCompetitions()
         {
-            Competitions = (await App.DatabaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date).ToList();
+            Competitions = (await App.DatabaseProvider.GetAllCompetitionsAsync()).OrderBy(c => c.Date).ThenBy(c => c.Name).ToList();
         }
         private async void DeleteCompetition()
         {

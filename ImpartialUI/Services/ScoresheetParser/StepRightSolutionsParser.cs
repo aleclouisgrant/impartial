@@ -297,6 +297,9 @@ namespace ImpartialUI.Services.ScoresheetParser
 
         private string GetPrelimsDocByDivision(Division division, Role role, string doc)
         {
+            if (doc == null || doc == string.Empty)
+                return string.Empty;
+
             var titleString = Util.GetSubString(
                 s: doc,
                 from: "<h3>",

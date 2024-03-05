@@ -728,6 +728,7 @@ namespace Impartial
                 case "Jess Ann Nail":
                     return competitors.FirstOrDefault(c => c.FullName == "Jes Ann Nail");
                 case "Carlie Obrien":
+                //case "Carlie O'brien":
                     return competitors.FirstOrDefault(c => c.FullName == "Carlie O'Brien");
                 case "Katie Smiley":
                     return competitors.FirstOrDefault(c => c.FullName == "Katie Smiley-Oyen");

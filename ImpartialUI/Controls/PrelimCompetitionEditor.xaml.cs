@@ -261,7 +261,7 @@ namespace ImpartialUI.Controls
 
             competitorSearchBox.SelectionChanged += (o, e) =>
             {
-                if (e.AddedItems.Count > 0 && e.RemovedItems.Count <= 0)
+                if (e.AddedItems.Count > 0 && e.RemovedItems.Count <= 1)
                 {
                     UpdateCompetitorInScores(e.Placement, (ICompetitor)e.AddedItems[0]);
                 }
