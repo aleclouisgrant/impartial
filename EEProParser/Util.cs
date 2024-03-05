@@ -810,6 +810,11 @@ namespace Impartial
                     return judges.Where(c => c.FullName == "Philippe Berne")?.FirstOrDefault();
                 case "Robin (Pro)":
                     return judges.Where(c => c.FullName == "Robin Smith")?.FirstOrDefault();
+                case "Tren":
+                case "Trendlyon":
+                case "Trendlyon Veal":
+                    return judges.Where(c => c.FullName == "Tren Veal")?.FirstOrDefault();
+
 
                 default:
                     return judges.Where(c => c.FullName == firstName + " " + lastName)?.FirstOrDefault();

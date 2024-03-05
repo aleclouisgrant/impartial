@@ -357,29 +357,27 @@ namespace ImpartialUI.ViewModels
                 WsdcId = string.Empty;
             }
         }
-        private async void AddJudge()
+        private void AddJudge()
         {
-            var newJudge = new Judge(JudgeFirstName, JudgeLastName);
-            
-            await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
-            
-            App.JudgesDb.Add(newJudge);
-            App.JudgesDb = App.JudgesDb.OrderBy(j => j.FullName).ToList();
-            Judges = App.JudgesDb;
-
+            AddJudgeToDb(new Judge(JudgeFirstName, JudgeLastName));
             JudgeFirstName = string.Empty;
             JudgeLastName = string.Empty;
         }
-        private async void AddJudgeProfile()
+        private void AddJudgeProfile()
         {
-            var newJudge = new Judge(SelectedCompetitor.UserId, Guid.NewGuid(), SelectedCompetitor.FirstName, SelectedCompetitor.LastName);
-
-            await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
-            App.JudgesDb = App.JudgesDb.OrderBy(j => j.FullName).ToList();
-            Judges = App.JudgesDb;
-
+            AddJudgeToDb(new Judge(SelectedCompetitor.UserId, Guid.NewGuid(), SelectedCompetitor.FirstName, SelectedCompetitor.LastName));
             SelectedCompetitor = null;
         }
+
+        private async void AddJudgeToDb(IJudge newJudge)
+        {
+            await App.DatabaseProvider.UpsertJudgeAsync(newJudge);
+
+            App.JudgesDb.Add(newJudge);
+            App.JudgesDb = App.JudgesDb.OrderBy(j => j.FullName).ToList();
+            Judges = App.JudgesDb;
+        }
+
         private async void AddDanceConvention()
         {
             var newDanceConvention = new DanceConvention(NewDanceConventionName, NewDanceConventionDate);
