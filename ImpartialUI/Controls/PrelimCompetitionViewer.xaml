@@ -18,9 +18,7 @@
                 <Run Text="Jack &amp; Jill - "/>
                 <Run Text="{Binding PrelimCompetition.Role, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Run Text="{Binding RoundString, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Run Text="("/>
-                <Run Text="{Binding Count, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Run Text=")"/>
+                <Run x:Name="CountText"/>
             </TextBlock>
         </Border>
 

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace ImpartialUI.Controls
 {
@@ -46,11 +45,13 @@ namespace ImpartialUI.Controls
             control.ScoreGrid.ColumnDefinitions.Clear();
 
             #region Header
+            /// Promoted, Count, Bib, Competitor, [Judges], Sum
+            
             control.ScoreGrid.RowDefinitions.Add(new RowDefinition());
             control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Promoted
             control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Count
             control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Bib
-            control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition()); // competitor
+            control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition()); // Competitor
 
             var headerBorder = new Border()
             {
@@ -60,8 +61,6 @@ namespace ImpartialUI.Controls
             Grid.SetRow(headerBorder, 0);
             Grid.SetColumn(headerBorder, 0);
             Grid.SetColumnSpan(headerBorder, 100);
-
-            /// Promoted, Count, Bib, Competitor, [Judges], Sum
 
             var promotedTextBlock = new TextBlock()
             {
@@ -238,12 +237,12 @@ namespace ImpartialUI.Controls
             }
             #endregion
 
-            control.OnPropertyChanged(nameof(control.Count));
             control.OnPropertyChanged(nameof(control.RoundString));
+            control.CountText.Text = "(" + control.CountString + ")";
         }
         #endregion
 
-        public string Count => PrelimCompetition.Competitors.Count().ToString();
+        public string CountString => PrelimCompetition.Competitors.Count().ToString();
         public string RoundString => PrelimCompetition.Round.ToString();
 
         public PrelimCompetitionViewer()
