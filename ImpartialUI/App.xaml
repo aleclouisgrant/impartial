@@ -5,6 +5,16 @@
              StartupUri="MainWindow.xaml"
              xmlns:converters="clr-namespace:ImpartialUI.Converters">
     <Application.Resources>
-        <converters:DivisionToStringConverter x:Key="DivisionToStringConverter"/>
+        <ResourceDictionary>
+        
+            <!-- Converters -->
+            <converters:DivisionToStringConverter x:Key="DivisionToStringConverter"/>
+
+            <!-- Styles -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver;
-using Npgsql;
+﻿using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

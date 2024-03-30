@@ -12,16 +12,15 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
-            <TextBlock Margin="2">
-                <Run Text="Jack &amp; Jill"/>
+        <Border Grid.Row="0" Background="Transparent">
+            <TextBlock Margin="2 0 0 -2" FontWeight="Bold" Foreground="{StaticResource Gray2}" FontSize="20">
                 <Run Text="{Binding PrelimCompetition.Division, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DivisionToStringConverter}}"/>
-                <Run Text="{Binding RoundString, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Run Text=" ("/>
+                <Run Text="Jack &amp; Jill - "/>
                 <Run Text="{Binding PrelimCompetition.Role, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding RoundString, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Run Text="("/>
                 <Run Text="{Binding Count, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Run Text="))"/>
+                <Run Text=")"/>
             </TextBlock>
         </Border>
 
@@ -35,17 +34,22 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="Gray" Margin="1">
-                <TextBlock
-                    Text="Count"
-                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
-            </Border>
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Style="{StaticResource ScoreViewerHeaderBorderStyle}"/>
 
-            <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray" Margin="1">
-                <TextBlock
-                    Text="Competitor" 
-                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
-            </Border>
+            <TextBlock
+                Grid.Row="0" Grid.Column="0"
+                Text="Bib"
+                FontWeight="Bold"
+                VerticalAlignment="Center"
+                Padding="5"/>
+
+            <TextBlock
+                Grid.Row="0" Grid.Column="1"
+                Text="Competitor"
+                FontWeight="Bold"
+                VerticalAlignment="Center"
+                Padding="5"/>
+
         </Grid>
     </Grid>
 </UserControl>

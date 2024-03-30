@@ -9,9 +9,6 @@ using System.Windows.Media;
 
 namespace ImpartialUI.Controls
 {
-    /// <summary>
-    /// Interaction logic for ScoreViewer.xaml
-    /// </summary>
     public partial class ScoreViewer : UserControl
     {
         public static readonly DependencyProperty ScoresProperty = DependencyProperty.Register(
@@ -200,7 +197,6 @@ namespace ImpartialUI.Controls
                 Grid.SetRow(border, 1);
             }
         }
-
 
         public ScoreViewer()
         {

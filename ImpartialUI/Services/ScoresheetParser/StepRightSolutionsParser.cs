@@ -5,7 +5,6 @@ using ImpartialUI.Models;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace ImpartialUI.Services.ScoresheetParser

@@ -1,0 +1,89 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:ImpartialUI.Controls">
+
+    <!-- Colors -->
+    <SolidColorBrush Color="#D9D9D9" x:Key="Gray1"/>
+    <SolidColorBrush Color="#565656" x:Key="Gray2"/>
+
+    <SolidColorBrush Color="#6ABF73" x:Key="CallbackYesColor"/>
+    <SolidColorBrush Color="#FFD600" x:Key="CallbackAlt1Color"/>
+    <SolidColorBrush Color="#FFE767" x:Key="CallbackAlt2Color"/>
+    <SolidColorBrush Color="#FEF395" x:Key="CallbackAlt3Color"/>
+    <SolidColorBrush Color="#CFCDCD" x:Key="CallbackNoColor"/>
+    
+    <!-- Fonts -->
+    <FontFamily x:Key="Inter">pack://application:,,,/Assets/Fonts/Inter/#Inter</FontFamily>
+    
+    <!-- Default Styles -->
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="FontFamily" Value="{StaticResource Inter}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+    
+    <!-- Score Viewer Styles -->
+    <Style TargetType="{x:Type Border}" x:Key="ScoreViewerHeaderBorderStyle">
+        <Setter Property="Background" Value="{StaticResource Gray1}"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Height" Value="43"/>
+    </Style>
+    
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerHeaderTextStyle">
+        <Setter Property="FontFamily" Value="{StaticResource Inter}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="5"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerCountTextStyleNonFinalist" BasedOn="{StaticResource ScoreViewerHeaderTextStyle}">
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerCountTextStyleFinalist" BasedOn="{StaticResource ScoreViewerCountTextStyleNonFinalist}">
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerTextStyleNonFinalist" BasedOn="{StaticResource ScoreViewerHeaderTextStyle}">
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource Gray2}"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerTextStyleFinalist" BasedOn="{StaticResource ScoreViewerTextStyleNonFinalist}">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerBibTextStyleNonFinalist" BasedOn="{StaticResource ScoreViewerTextStyleNonFinalist}">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerBibTextStyleFinalist" BasedOn="{StaticResource ScoreViewerBibTextStyleNonFinalist}">
+    </Style>
+
+    <Style TargetType="{x:Type Border}" x:Key="CallbackScoreViewerBorderStyle">
+        <Setter Property="Width" Value="35"/>
+        <Setter Property="Height" Value="23"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" x:Key="CallbackScoreViewerTextStyle">
+        <Setter Property="FontFamily" Value="{StaticResource Inter}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+
+</ResourceDictionary>

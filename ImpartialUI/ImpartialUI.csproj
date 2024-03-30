@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.24.0" />
     <PackageReference Include="ScottPlot" Version="4.1.60" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.60" />
   </ItemGroup>
@@ -61,6 +61,10 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\Fonts\Inter\" />
   </ItemGroup>
 
 </Project>
