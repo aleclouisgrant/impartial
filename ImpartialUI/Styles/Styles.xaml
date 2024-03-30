@@ -27,44 +27,52 @@
         <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="Height" Value="43"/>
     </Style>
-    
-    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerHeaderTextStyle">
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerTextStyle">
         <Setter Property="FontFamily" Value="{StaticResource Inter}"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="Black"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="TextAlignment" Value="Left"/>
-        <Setter Property="Padding" Value="5"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
     </Style>
 
+    <!-- Header Styles -->
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerHeaderTextStyle" BasedOn="{StaticResource ScoreViewerTextStyle}">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="5 0"/>
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerJudgeHeaderTextStyle" BasedOn="{StaticResource ScoreViewerHeaderTextStyle}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Prelims Viewer -->
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerCountTextStyleNonFinalist" BasedOn="{StaticResource ScoreViewerHeaderTextStyle}">
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
     </Style>
-
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerCountTextStyleFinalist" BasedOn="{StaticResource ScoreViewerCountTextStyleNonFinalist}">
         <Setter Property="FontWeight" Value="Bold"/>
     </Style>
-
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerTextStyleNonFinalist" BasedOn="{StaticResource ScoreViewerHeaderTextStyle}">
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="{StaticResource Gray2}"/>
     </Style>
-
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerTextStyleFinalist" BasedOn="{StaticResource ScoreViewerTextStyleNonFinalist}">
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="Black"/>
     </Style>
-
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerBibTextStyleNonFinalist" BasedOn="{StaticResource ScoreViewerTextStyleNonFinalist}">
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
     </Style>
-
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerBibTextStyleFinalist" BasedOn="{StaticResource ScoreViewerBibTextStyleNonFinalist}">
     </Style>
 
@@ -85,5 +93,21 @@
         <Setter Property="TextAlignment" Value="Center"/>
     </Style>
 
+    <!-- Finals Viewer -->
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerPlacementTextStyle" BasedOn="{StaticResource ScoreViewerTextStyle}">
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerBibTextStyle" BasedOn="{StaticResource ScoreViewerTextStyle}">
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource Gray2}"/>
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerCompetitorNamesTextStyle" BasedOn="{StaticResource ScoreViewerTextStyle}">
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource Gray2}"/>
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerScoresTextStyle" BasedOn="{StaticResource ScoreViewerTextStyle}">
+    </Style>
 
 </ResourceDictionary>

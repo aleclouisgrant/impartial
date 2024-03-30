@@ -109,17 +109,49 @@ namespace ImpartialUI.Controls
             {
                 control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
-                var judgeName = judge.FirstName == "Anonymous" ? judge.FirstName : judge.FullName;
-
-                var judgeTextBlock = new TextBlock()
+                if (judge.FirstName == "Anonymous" || judge.LastName == string.Empty)
                 {
-                    Text = judgeName,
-                    Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
-                };
+                    var judgeTextBlock = new TextBlock()
+                    {
+                        Text = judge.FirstName,
+                        Style = Application.Current.Resources["ScoreViewerJudgeHeaderTextStyle"] as Style
+                    };
 
-                control.ScoreGrid.Children.Add(judgeTextBlock);
-                Grid.SetRow(judgeTextBlock, 0);
-                Grid.SetColumn(judgeTextBlock, control.ScoreGrid.Children.Count - 2);
+                    control.ScoreGrid.Children.Add(judgeTextBlock);
+                    Grid.SetRow(judgeTextBlock, 0);
+                    Grid.SetColumn(judgeTextBlock, control.ScoreGrid.Children.Count - 2);
+                }
+                else
+                {
+                    int margin = -2;
+
+                    var judgeNameStackPanel = new StackPanel()
+                    {
+                        Orientation = Orientation.Vertical,
+                        VerticalAlignment = VerticalAlignment.Center,
+                    };
+
+                    var judgeFirstNameTextBlock = new TextBlock()
+                    {
+                        Text = judge.FirstName,
+                        Style = Application.Current.Resources["ScoreViewerJudgeHeaderTextStyle"] as Style,
+                        Margin = new Thickness(0, 0, 0, margin)
+                    };
+
+                    var judgeLastNameTextBlock = new TextBlock()
+                    {
+                        Text = judge.LastName,
+                        Style = Application.Current.Resources["ScoreViewerJudgeHeaderTextStyle"] as Style,
+                        Margin = new Thickness(0, margin, 0, 0)
+                    };
+
+                    judgeNameStackPanel.Children.Add(judgeFirstNameTextBlock);
+                    judgeNameStackPanel.Children.Add(judgeLastNameTextBlock);
+
+                    control.ScoreGrid.Children.Add(judgeNameStackPanel);
+                    Grid.SetRow(judgeNameStackPanel, 0);
+                    Grid.SetColumn(judgeNameStackPanel, control.ScoreGrid.Children.Count - 2);
+                }
             }
 
             // for total score
@@ -135,7 +167,7 @@ namespace ImpartialUI.Controls
             Grid.SetColumn(scoreTextBlock, control.ScoreGrid.Children.Count - 1);
 
             #endregion
-            #region CompetitorData
+            #region JudgeScores
             var competitorNodes = new LinkedList<PrelimCompetitorScores>();
 
             foreach (var competitor in competition?.Competitors)
@@ -236,24 +268,12 @@ namespace ImpartialUI.Controls
                 row++;
             }
             #endregion
-
-            control.OnPropertyChanged(nameof(control.RoundString));
-            control.CountText.Text = "(" + control.CountString + ")";
         }
         #endregion
-
-        public string CountString => PrelimCompetition.Competitors.Count().ToString();
-        public string RoundString => PrelimCompetition.Round.ToString();
 
         public PrelimCompetitionViewer()
         {
             InitializeComponent();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
-        public void OnPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

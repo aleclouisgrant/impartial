@@ -6,39 +6,21 @@
              xmlns:local="clr-namespace:ImpartialUI.Controls"
              xmlns:m="clr-namespace:Impartial;assembly=Impartial"
              mc:Ignorable="d">
+    <Grid VerticalAlignment="Top" x:Name="ScoreGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
 
-    <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
-            <TextBlock x:Name="TitleTextBlock" Margin="2"/>
-        </Border>
-
-        <Grid VerticalAlignment="Top" Grid.Row="1" x:Name="ScoreGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="Gray" Margin="1">
-                <TextBlock
-                    Text="Place"
-                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
-            </Border>
-
-            <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray" Margin="1">
-                <TextBlock
-                    Text="Competitor" 
-                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
-            </Border>
-
-        </Grid>
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Style="{StaticResource ScoreViewerHeaderBorderStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Place" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="Bib" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="Competitors" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
     </Grid>
 </UserControl>
