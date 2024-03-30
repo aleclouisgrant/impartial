@@ -6,7 +6,6 @@
              xmlns:converters="clr-namespace:ImpartialUI.Converters">
     <Application.Resources>
         <ResourceDictionary>
-        
             <!-- Converters -->
             <converters:DivisionToStringConverter x:Key="DivisionToStringConverter"/>
 
@@ -14,7 +13,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

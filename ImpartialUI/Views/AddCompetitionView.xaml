@@ -104,10 +104,12 @@
                                     Maximum="100"
                                     BorderBrush="Transparent"
                                     BorderThickness="0"
+                                    Background="Transparent"
+                                    VerticalAlignment="Center"
                                     Value="{Binding ParseProgressPercentage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                             <Grid>
-                                <TextBlock HorizontalAlignment="Center" Text="Open Scoresheet"/>
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Open Scoresheet"/>
                             </Grid>
                         </Grid>
                     </Button.Content>
@@ -135,6 +137,7 @@
                         </StackPanel>
 
                         <DatePicker
+                            Height="20"
                             Margin="2"
                             SelectedDate="{Binding NewDanceConventionDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
@@ -146,6 +149,7 @@
                         FontWeight="Bold"
                         Command="{Binding AddDanceConventionCommand}"
                         IsDefault="True"
+                        Style="{StaticResource ServerActionButtonStyle}"
                         Margin="10 10 5 10"/>
                 </StackPanel>
                 
@@ -174,13 +178,13 @@
                         FontWeight="Bold"
                         Command="{Binding AddCompetitorCommand}"
                         IsDefault="True"
+                        Style="{StaticResource ServerActionButtonStyle}"
                         Margin="10 10 5 10"/>
 
                     <StackPanel Orientation="Horizontal">
                         <c:SearchTextBox Width="150" ItemsSource="{Binding Competitors, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" SelectedPerson="{Binding SelectedCompetitor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Button Content="Add Judge Profile" FontWeight="Bold" Command="{Binding AddJudgeProfileCommand}" Padding="5 2"/>
+                        <Button Height="20" Content="Add Judge Profile" FontWeight="Bold" Command="{Binding AddJudgeProfileCommand}" Padding="10 2" Style="{StaticResource ServerActionButtonStyle}"/>
                     </StackPanel>
-
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Grid.Column="1" Margin="5 20">
@@ -203,7 +207,8 @@
                         FontWeight="Bold"
                         Command="{Binding AddJudgeCommand}"
                         IsDefault="True"
-                        Margin="20"/>
+                        Margin="20"
+                        Style="{StaticResource ServerActionButtonStyle}"/>
                 </StackPanel>
             </Grid>
         </Grid>
@@ -399,6 +404,7 @@
                 FontWeight="Bold"
                 Command="{Binding AddCompetitionCommand}"
                 IsDefault="True"
+                Style="{StaticResource ServerActionButtonStyle}"
                 Margin="20"/>
             
             <Button 

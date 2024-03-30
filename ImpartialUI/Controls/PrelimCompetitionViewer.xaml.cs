@@ -225,7 +225,7 @@ namespace ImpartialUI.Controls
 
                 var competitorBibTextBlock = new TextBlock()
                 {
-                    Text = "",
+                    Text = "000",
                     Style = promoted ? Application.Current.Resources["ScoreViewerBibTextStyleFinalist"] as Style : Application.Current.Resources["ScoreViewerBibTextStyleNonFinalist"] as Style
                 };
                 control.ScoreGrid.Children.Add(competitorBibTextBlock);

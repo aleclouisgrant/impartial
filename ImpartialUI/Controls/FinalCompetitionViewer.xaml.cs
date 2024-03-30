@@ -17,6 +17,16 @@ namespace ImpartialUI.Controls
         private static readonly int SCORE_COLUMN_START = 3;
 
         #region DependencyProperties
+        public static readonly DependencyProperty ShowJudgeAccuracyProperty = DependencyProperty.Register(
+            nameof(ShowJudgeAccuracy),
+            typeof(bool),
+            typeof(FinalCompetitionViewer),
+            new FrameworkPropertyMetadata(false, OnFinalCompetitionPropertyChanged));
+        public bool ShowJudgeAccuracy
+        {
+            get { return (bool)GetValue(ShowJudgeAccuracyProperty); }
+            set { SetValue(ShowJudgeAccuracyProperty, value); }
+        }
 
         public static readonly DependencyProperty FinalCompetitionProperty = DependencyProperty.Register(
             nameof(FinalCompetition),
@@ -159,7 +169,7 @@ namespace ImpartialUI.Controls
                 // bib numbers
                 var bibNumbersTextBlock = new TextBlock()
                 {
-                    Text = " / ",
+                    Text = "000 / 000",
                     Style = Application.Current.Resources["ScoreViewerBibTextStyle"] as Style
                 };
                 control.ScoreGrid.Children.Add(bibNumbersTextBlock);
@@ -170,9 +180,7 @@ namespace ImpartialUI.Controls
                 var namesTextBlock = new TextBlock()
                 {
                     Text = couple.Leader.FullName + " and " + couple.Follower.FullName,
-                    Style = Application.Current.Resources["ScoreViewerCompetitorNamesTextStyle"] as Style,
-                    TextAlignment = TextAlignment.Left,
-                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Style = Application.Current.Resources["ScoreViewerCompetitorNamesTextStyle"] as Style
                 };
                 control.ScoreGrid.Children.Add(namesTextBlock);
                 Grid.SetRow(namesTextBlock, couple.Placement);
@@ -185,21 +193,15 @@ namespace ImpartialUI.Controls
 
                     var scoreTextBlock = new TextBlock()
                     {
+                        Text = score.Score.ToString(),
                         Style = Application.Current.Resources["ScoreViewerScoresTextStyle"] as Style
                     };
 
-                    if (score.Score == score.Score){
-                        scoreTextBlock.Text = score.Score.ToString();
-                    }
-                    else
+                    if (control.ShowJudgeAccuracy && score.Score != score.Placement)
                     {
                         scoreTextBlock.Inlines.Add(new Run()
                         {
-                            Text = score.Score.ToString()
-                        });
-                        scoreTextBlock.Inlines.Add(new Run()
-                        {
-                            Text = " (" + (-1 * Math.Abs(score.Score - score.Score)).ToString() + ")",
+                            Text = " (" + (-1 * Math.Abs(score.Score - score.Placement)).ToString() + ")",
                             Foreground = Brushes.Red
                         });
                     }

@@ -24,18 +24,25 @@
                       SelectionChanged="CompetitionComboBox_SelectionChanged"
                       ItemsSource="{Binding Competitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedItem="{Binding SelectedCompetition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button x:Name="RefreshButton" Content="Refresh" Command="{Binding RefreshCompetitionsCommand}" Width="70" Height="30"/>
-            <Button x:Name="SaveButton" Content="Save" Command="{Binding SaveCompetitionCommand}" Click="SaveButton_Click" Width="70" Height="30" Visibility="Collapsed"/>
-            <Button x:Name="EditButton" Content="Edit" IsEnabled="False" Click="EditCompetitionButton_Click" Width="70" Height="30" Margin="5 0 0 0"/>
-            <Button x:Name="DeleteButton" Content="Delete" Command="{Binding DeleteCompetitionCommand}" Width="70" Height="30" Margin="5 0 0 0"/>
+            <Button x:Name="RefreshButton" Content="Refresh" Command="{Binding RefreshCompetitionsCommand}" Width="70"/>
+            <Button x:Name="SaveButton" Content="Save" Command="{Binding SaveCompetitionCommand}" Click="SaveButton_Click" Width="70" Visibility="Collapsed"/>
+            <Button x:Name="EditButton" Content="Edit" IsEnabled="False" Click="EditCompetitionButton_Click" Width="70" Margin="5 0 0 0"/>
+            <Button x:Name="DeleteButton" Content="Delete" Command="{Binding DeleteCompetitionCommand}" Width="70" Margin="5 0 0 0" Style="{StaticResource ServerActionButtonStyle}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" x:Name="CompetitionViewerGrid">
-            <ScrollViewer >
+            <ScrollViewer>
                 <StackPanel Orientation="Vertical">
-                    <Grid Visibility="{Binding ShowFinals, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel Orientation="Vertical" Visibility="{Binding ShowFinals, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Style="{StaticResource ScoreViewerTitleStyle}">
+                                <Run Text="{Binding FinalCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DivisionToStringConverter}}"/>
+                                <Run Text="Jack &amp; Jill - Finals"/>
+                                <Run Text="{Binding SelectedCompetition.LeaderTier, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=(Leader {0}}"/>
+                                <Run Text=","/>
+                                <Run Text="{Binding SelectedCompetition.FollowerTier, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=Follower {0})}"/>
+                        </TextBlock>
                         <c:FinalCompetitionViewer FinalCompetition="{Binding FinalCompetition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    </Grid>
+                    </StackPanel>
 
                     <Grid x:Name="SemisViewerGrid" Margin="0 10 0 0" Visibility="{Binding ShowSemis, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid.ColumnDefinitions>
@@ -44,8 +51,23 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimCompetitionViewer Grid.Column="0" PrelimCompetition="{Binding LeaderSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimCompetitionViewer Grid.Column="2" PrelimCompetition="{Binding FollowerSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <StackPanel Grid.Column="0" Orientation="Vertical">
+                            <TextBlock Style="{StaticResource ScoreViewerTitleStyle}">
+                                <Run Text="{Binding LeaderSemis.Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding LeaderSemis.Round, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding LeaderSemis.Competitors.Count, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=({0})}"/>
+                            </TextBlock>
+                            <c:PrelimCompetitionViewer PrelimCompetition="{Binding LeaderSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Orientation="Vertical">
+                            <TextBlock Style="{StaticResource ScoreViewerTitleStyle}">
+                                <Run Text="{Binding FollowerSemis.Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding FollowerSemis.Round, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding FollowerSemis.Competitors.Count, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=({0})}"/>
+                            </TextBlock>
+                            <c:PrelimCompetitionViewer PrelimCompetition="{Binding FollowerSemis, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
                     </Grid>
 
                     <Grid x:Name="PrelimsViewerGrid" Margin="0 10 0 0" Visibility="{Binding ShowPrelims, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -55,8 +77,23 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <c:PrelimCompetitionViewer Grid.Column="0" PrelimCompetition="{Binding LeaderPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <c:PrelimCompetitionViewer Grid.Column="2" PrelimCompetition="{Binding FollowerPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <StackPanel Grid.Column="0" Orientation="Vertical">
+                            <TextBlock Style="{StaticResource ScoreViewerTitleStyle}">
+                                <Run Text="{Binding LeaderPrelims.Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding LeaderPrelims.Round, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding LeaderPrelims.Competitors.Count, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=({0})}"/>
+                            </TextBlock>
+                            <c:PrelimCompetitionViewer PrelimCompetition="{Binding LeaderPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Style="{StaticResource ScoreViewerTitleStyle}">
+                                <Run Text="{Binding FollowerPrelims.Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding FollowerPrelims.Round, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="{Binding FollowerPrelims.Competitors.Count, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=({0})}"/>
+                            </TextBlock>
+                            <c:PrelimCompetitionViewer PrelimCompetition="{Binding FollowerPrelims, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>
