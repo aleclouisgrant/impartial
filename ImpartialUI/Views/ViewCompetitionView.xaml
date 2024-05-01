@@ -31,10 +31,12 @@
         </StackPanel>
 
         <Grid Grid.Row="1" x:Name="CompetitionViewerGrid">
-            <ScrollViewer>
-                <StackPanel Orientation="Vertical">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Vertical" Margin="20">
                     <StackPanel Orientation="Vertical" Visibility="{Binding ShowFinals, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Style="{StaticResource ScoreViewerTitleStyle}">
+                                <Run Text="{Binding SelectedCompetition.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Run Text="-"/>
                                 <Run Text="{Binding FinalCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DivisionToStringConverter}}"/>
                                 <Run Text="Jack &amp; Jill - Finals"/>
                                 <Run Text="{Binding SelectedCompetition.LeaderTier, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=(Leader {0}}"/>
@@ -47,7 +49,7 @@
                     <Grid x:Name="SemisViewerGrid" Margin="0 10 0 0" Visibility="{Binding ShowSemis, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="60"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
@@ -73,7 +75,7 @@
                     <Grid x:Name="PrelimsViewerGrid" Margin="0 10 0 0" Visibility="{Binding ShowPrelims, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="60"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
@@ -107,7 +109,7 @@
                     <Grid x:Name="SemisEditorGrid" Margin="0 10 0 0" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="60"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
@@ -118,7 +120,7 @@
                     <Grid x:Name="PrelimsEditorGrid" Margin="0 10 0 0" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="60"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 

@@ -1,6 +1,7 @@
 ﻿using Impartial;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ImpartialUI.Models
 {
@@ -52,6 +53,28 @@ namespace ImpartialUI.Models
             DanceConventionId = danceConventionId;
             Name = name;
             Date = date;
+        }
+
+        public bool TryAddPairedPrelimCompetition(Round round)
+        {
+            if (PairedPrelimCompetitions.Any(ppc => ppc.Round == round))
+                return false;
+
+            PairedPrelimCompetitions.Add(new PairedPrelimCompetition(
+                round: round,
+                leaderPrelimCompetition: new PrelimCompetition {
+                    Round = round,
+                    Division = Division,
+                    Role = Role.Leader
+                },
+                followerPrelimCompetition: new PrelimCompetition
+                {
+                    Round = round,
+                    Division = Division,
+                    Role = Role.Follower
+                }));
+
+            return true;
         }
 
         public override string ToString()

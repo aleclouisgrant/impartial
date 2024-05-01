@@ -94,6 +94,7 @@
         <Setter Property="Background" Value="{StaticResource Gray1}"/>
         <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="Height" Value="43"/>
+        <Setter Property="Margin" Value="-20 0"/>
     </Style>
 
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerTextStyle">
@@ -124,7 +125,7 @@
         <Setter Property="Padding" Value="5 0"/>
     </Style>
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerJudgeHeaderTextStyle" BasedOn="{StaticResource ScoreViewerHeaderTextStyle}">
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
     </Style>
@@ -189,6 +190,23 @@
         <Setter Property="TextAlignment" Value="Left"/>
     </Style>
     <Style TargetType="{x:Type TextBlock}" x:Key="ScoreViewerScoresTextStyle" BasedOn="{StaticResource ScoreViewerTextStyle}">
+    </Style>
+
+    <Style TargetType="{x:Type Border}" x:Key="ScoreViewerFinalsJudgeBorderStyle">
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="5 0"/>
+        <Setter Property="Margin" Value="0 6 0 -10"/>
+        <Setter Property="Panel.ZIndex" Value="1"/>
+        <Setter Property="MinWidth" Value="80"/>
+    </Style>
+    <Style TargetType="{x:Type Border}" x:Key="ScoreViewerFinalsCompetitorBorderStyle">
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Gray1}"/>
+        <Setter Property="BorderThickness" Value="1 0 1 1"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Margin" Value="0 0 -10 0"/>
     </Style>
 
 </ResourceDictionary>

@@ -151,7 +151,7 @@ namespace ImpartialUI.Controls
         private Border _addRowBorder;
         private Button _addColumnButton;
 
-        private IPrelimScore[,] _scores;
+        private IPrelimScore[,] _scores = new IPrelimScore[0,0];
 
         public PrelimCompetitionEditor()
         {
@@ -464,7 +464,7 @@ namespace ImpartialUI.Controls
             {
                 var newPrelimScore = new PrelimScore(
                     judgeId: Guid.Empty,
-                    competitorId: ((ICompetitor)_competitorBoxes.ElementAt(competitorIndex).SelectedPerson).CompetitorId,
+                    competitorId: ((ICompetitor)_competitorBoxes.ElementAt(competitorIndex).SelectedPerson)?.CompetitorId ?? Guid.Empty,
                     callbackScore: CallbackScore.Unscored);
 
                 scores[competitorIndex, scores.GetLength(1) - 1] = newPrelimScore;
@@ -514,7 +514,7 @@ namespace ImpartialUI.Controls
 
         private void Clear()
         {
-            _scores = new PrelimScore[0, 0];
+            _scores = new IPrelimScore[0, 0];
 
             _judgeBoxes.Clear();
             _competitorBoxes.Clear();

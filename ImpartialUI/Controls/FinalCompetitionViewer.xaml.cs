@@ -60,7 +60,7 @@ namespace ImpartialUI.Controls
             control.ScoreGrid.Children.Add(headerBorder);
             Grid.SetRow(headerBorder, 0);
             Grid.SetColumn(headerBorder, 0);
-            Grid.SetColumnSpan(headerBorder, 100);
+            Grid.SetColumnSpan(headerBorder, int.MaxValue);
 
             var placeTextBlock = new TextBlock()
             {
@@ -97,8 +97,9 @@ namespace ImpartialUI.Controls
             var couples = finalCompetition.Couples;
 
             // judge names
-            foreach (var judge in judges)
+            for (int judgeIndex = 0; judgeIndex < judges.Count(); judgeIndex++)
             {
+                var judge = judges.ElementAt(judgeIndex);
                 judge.Scores = finalCompetition.FinalScores.Where(s => s.Judge.JudgeId == judge.JudgeId).ToList();
 
                 control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
@@ -113,7 +114,7 @@ namespace ImpartialUI.Controls
 
                     control.ScoreGrid.Children.Add(judgeTextBlock);
                     Grid.SetRow(judgeTextBlock, 0);
-                    Grid.SetColumn(judgeTextBlock, control.ScoreGrid.Children.Count - 2);
+                    Grid.SetColumn(judgeTextBlock, SCORE_COLUMN_START + judgeIndex);
                 }
                 else
                 {
@@ -144,8 +145,17 @@ namespace ImpartialUI.Controls
 
                     control.ScoreGrid.Children.Add(judgeNameStackPanel);
                     Grid.SetRow(judgeNameStackPanel, 0);
-                    Grid.SetColumn(judgeNameStackPanel, control.ScoreGrid.Children.Count - 2);
+                    Grid.SetColumn(judgeNameStackPanel, SCORE_COLUMN_START + judgeIndex);
                 }
+
+                var judgeBorder = new Border()
+                {
+                    Style = Application.Current.Resources["ScoreViewerFinalsJudgeBorderStyle"] as Style,
+                };
+                control.ScoreGrid.Children.Add(judgeBorder);
+                Grid.SetRow(judgeBorder, 0);
+                Grid.SetRowSpan(judgeBorder, int.MaxValue);
+                Grid.SetColumn(judgeBorder, SCORE_COLUMN_START + judgeIndex);
             }
 
             #endregion
@@ -210,6 +220,15 @@ namespace ImpartialUI.Controls
                     Grid.SetRow(scoreTextBlock, couple.Placement);
                     Grid.SetColumn(scoreTextBlock, SCORE_COLUMN_START + i);
                 }
+
+                var competitorBorder = new Border()
+                {
+                    Style = Application.Current.Resources["ScoreViewerFinalsCompetitorBorderStyle"] as Style
+                };
+                control.ScoreGrid.Children.Add(competitorBorder);
+                Grid.SetRow(competitorBorder, couple.Placement);
+                Grid.SetColumn(competitorBorder, 0);
+                Grid.SetColumnSpan(competitorBorder, int.MaxValue);
             }
             #endregion
         }

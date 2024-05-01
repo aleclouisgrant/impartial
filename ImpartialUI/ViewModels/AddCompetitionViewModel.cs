@@ -162,6 +162,37 @@ namespace ImpartialUI.ViewModels
             }
         }
 
+        private bool _createBlankScoresheetWithPrelims;
+        public bool CreateBlankScoresheetWithPrelims
+        {
+            get { return _createBlankScoresheetWithPrelims; }
+            set
+            {
+                _createBlankScoresheetWithPrelims = value;
+                OnPropertyChanged();
+            }
+        }
+        private bool _createBlankScoresheetWithSemis;
+        public bool CreateBlankScoresheetWithSemis
+        {
+            get { return _createBlankScoresheetWithSemis; }
+            set
+            {
+                _createBlankScoresheetWithSemis = value;
+                OnPropertyChanged();
+            }
+        }
+        private bool _createBlankScoresheetWithFinals;
+        public bool CreateBlankScoresheetWithFinals
+        {
+            get { return _createBlankScoresheetWithFinals; }
+            set
+            {
+                _createBlankScoresheetWithFinals = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICompetitor _selectedCompetitor;
         public ICompetitor SelectedCompetitor
         {
@@ -262,6 +293,7 @@ namespace ImpartialUI.ViewModels
         public ICommand AddDanceConventionCommand { get; set; }
         public ICommand AddCompetitionCommand { get; set; }
         public ICommand ParseScoreSheetsCommand { get; set; }
+        public ICommand CreateBlankSheetCommand { get; set; }
         public ICommand CancelCommand { get; set; }
         public ICommand SelectPrelimsPathCommand { get; set; }
         public ICommand SelectSemisPathCommand { get; set; }
@@ -279,16 +311,14 @@ namespace ImpartialUI.ViewModels
             SelectSemisPathCommand = new DelegateCommand(SelectSemisPath);
             SelectFinalsPathCommand = new DelegateCommand(SelectFinalsPath);
             ParseScoreSheetsCommand = new DelegateCommand(ParseScoreSheets);
+            CreateBlankSheetCommand = new DelegateCommand(CreateBlankSheet);
             CancelCommand = new DelegateCommand(Clear);
             RefreshCacheCommand = new DelegateCommand(RefreshCache);
 
             _client = new HttpClient();
             _client.BaseAddress = new Uri("https://points.worldsdc.com/");
 
-            Competition = new Competition()
-            { 
-                Division = Division.AllStar 
-            };
+            Competition = new Competition() { Division = Division.AllStar };
             ScoresheetSelector = ScoresheetSelector.Auto;
             NewDanceConventionDate = DateTime.Now;
 
@@ -335,6 +365,11 @@ namespace ImpartialUI.ViewModels
             PrelimsPath = string.Empty;
             SemisPath = string.Empty;
             FinalsPath = string.Empty;
+
+            CreateBlankScoresheetWithPrelims = false;
+            CreateBlankScoresheetWithSemis = false;
+            CreateBlankScoresheetWithFinals = false;
+
             ScoresheetSelector = ScoresheetSelector.Auto;
 
             ClearException();
@@ -426,6 +461,25 @@ namespace ImpartialUI.ViewModels
             FinalsPath = openFileDialog.FileName;
         }
 
+        private void CreateBlankSheet()
+        {
+            if (!(CreateBlankScoresheetWithPrelims || CreateBlankScoresheetWithSemis || CreateBlankScoresheetWithFinals))
+                return;
+
+            var comp = new Competition { Division = Division.AllStar };
+            if (SelectedDanceConvention != null)
+                comp.DanceConventionId = SelectedDanceConvention.Id;
+
+            if (CreateBlankScoresheetWithPrelims)
+                comp.TryAddPairedPrelimCompetition(Round.Prelims);
+            if (CreateBlankScoresheetWithSemis)
+                comp.TryAddPairedPrelimCompetition(Round.Semifinals);
+            if (CreateBlankScoresheetWithFinals)
+                comp.FinalCompetition = new FinalCompetition();
+
+            Competition = comp;
+        }
+
         private async void ParseScoreSheets()
         {
             ClearException();
@@ -493,19 +547,21 @@ namespace ImpartialUI.ViewModels
 
             Trace.WriteLine(Competition.ToLongString());
 
+#if DEBUG
             try
             {
-                await App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+                //await App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
             } 
             catch (PostgresException e)
             {
                 Clear();
 
                 Exception = e;
-                await App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
+                //await App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
 
                 return;
             }
+#endif
 
             Clear();
         }

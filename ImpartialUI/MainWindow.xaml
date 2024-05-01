@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         
         <TabControl Grid.Row="0" Margin="0 20 0 0" BorderThickness="0 2 0 0">
-            <TabItem Header="Ratings">
+            <TabItem Header="Ratings" Visibility="Collapsed">
                 <v:RatingsView DataContext="{Binding RatingsViewModel, Mode=OneWay}"/>
             </TabItem>
             <TabItem Header="Add Competition" IsSelected="True">

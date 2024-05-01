@@ -64,7 +64,7 @@ namespace ImpartialUI.Controls
 
             var promotedTextBlock = new TextBlock()
             {
-                Text = "Promoted",
+                Text = "",
                 Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
             };
             control.ScoreGrid.Children.Add(promotedTextBlock);
@@ -207,6 +207,7 @@ namespace ImpartialUI.Controls
 
                 var promotedButton = new PromotedButton()
                 {
+                    Margin = new Thickness(20, 0, 0, 0),
                     CallbackScore = promoted ? Impartial.Enums.CallbackScore.Yes : Impartial.Enums.CallbackScore.No,
                     Editable = false
                 };
