@@ -2,9 +2,7 @@
 using ImpartialUI.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -46,7 +44,6 @@ namespace ImpartialUI.Controls
 
             #region Header
             /// Promoted, Count, Bib, Competitor, [Judges], Sum
-            
             control.ScoreGrid.RowDefinitions.Add(new RowDefinition());
             control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Promoted
             control.ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Count

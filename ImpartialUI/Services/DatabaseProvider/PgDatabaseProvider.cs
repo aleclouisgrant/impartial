@@ -8,7 +8,6 @@ using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using Impartial.Enums;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
@@ -650,6 +649,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                                 id = Guid.NewGuid(),
                                 competitor_profile_id = competitor.CompetitorId,
                                 dance_convention_id = danceConventionId,
+                                //TODO
+                                bib_number = "0"
                             });
                         }
 
@@ -937,6 +938,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                         promotedCompetitors: null,
                         alternate1: App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == alternate1Id),
                         alternate2: App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == alternate2Id),
+                        competitorRegistrations: null,
                         id: prelimCompetitionId));
                 }
             }

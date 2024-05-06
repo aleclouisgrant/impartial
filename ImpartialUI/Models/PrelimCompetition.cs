@@ -1,5 +1,4 @@
 ﻿using Impartial;
-using MongoDB.Driver.Core.Operations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +21,8 @@ namespace ImpartialUI.Models
 
         public List<ICompetitor> PromotedCompetitors { get; set; } = new();
 
+        public List<ICompetitorRegistration> CompetitorRegistrations { get; set; } = new();
+
         public ICompetitor Alternate1 { get; set; }
         public ICompetitor Alternate2 { get; set; }
 
@@ -39,6 +40,7 @@ namespace ImpartialUI.Models
             IEnumerable<ICompetitor> promotedCompetitors,
             ICompetitor alternate1,
             ICompetitor alternate2,
+            IEnumerable<ICompetitorRegistration> competitorRegistrations,
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
@@ -54,6 +56,7 @@ namespace ImpartialUI.Models
             PrelimScores = prelimScores?.ToList();
 
             PromotedCompetitors = promotedCompetitors?.ToList();
+            CompetitorRegistrations = competitorRegistrations?.ToList();
         }
 
         public string ToLongString()

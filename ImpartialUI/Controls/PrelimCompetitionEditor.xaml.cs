@@ -9,11 +9,18 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ImpartialUI.Controls
 {
     public partial class PrelimCompetitionEditor : UserControl
     {
+        private static readonly int PROMOTED_COLUMN = 0;
+        private static readonly int COUNT_COLUMN = 1;
+        private static readonly int BIB_COLUMN = 2;
+        private static readonly int COMPETITOR_COLUMN = 3;
+        private static readonly int SCORE_COLUMN_START = 4;
+
         private class PrelimCompetitorScores
         {
             public ICompetitor Competitor { get; set; }
@@ -213,51 +220,54 @@ namespace ImpartialUI.Controls
                 competitorPrelimScores = new();
             }
 
-            bool finaled = false;
-            if (competitorPrelimScores.Count > 0)
-            {
-                finaled = PrelimCompetition.PromotedCompetitors.Contains(competitor);
-            }
+            var row = ScoreGrid.RowDefinitions.Count - 2;
 
-            var countBorder = new Border()
+            bool promoted = competitorPrelimScores.Count > 0 ? PrelimCompetition.PromotedCompetitors.Contains(competitor) : false;
+            var promotedButton = new PromotedButton()
             {
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(1),
-                Height = 24
+                Margin = new Thickness(20, 0, 0, 0),
+                CallbackScore = promoted ? Impartial.Enums.CallbackScore.Yes : Impartial.Enums.CallbackScore.No
             };
+            ScoreGrid.Children.Add(promotedButton);
+            Grid.SetRow(promotedButton, row);
+            Grid.SetColumn(promotedButton, PROMOTED_COLUMN);
 
-            var countTextBlock = new TextBlock()
+            var competitorCountTextBlock = new TextBlock()
             {
                 Text = (ScoreGrid.RowDefinitions.Count - 2).ToString(),
-                Margin = new Thickness(1)
+                Style = Application.Current.Resources["ScoreViewerCountTextStyleNonFinalist"] as Style
             };
+            ScoreGrid.Children.Add(competitorCountTextBlock);
+            Grid.SetRow(competitorCountTextBlock, row);
+            Grid.SetColumn(competitorCountTextBlock, COUNT_COLUMN);
 
-            if (finaled)
-                countTextBlock.FontWeight = FontWeights.Bold;
-
-            countBorder.Child = countTextBlock;
-
-            ScoreGrid.Children.Add(countBorder);
-            Grid.SetColumn(countBorder, 0);
-            Grid.SetRow(countBorder, ScoreGrid.RowDefinitions.Count - 2);
-
-            // names
-            var competitorBorder = new Border()
+            var competitorBibTextBox = new TextBox()
             {
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(1),
-                Height = 24
+                Text = "",
+                Style = Application.Current.Resources["ScoreViewerBibTextBoxStyleNonFinalist"] as Style
+            };
+            ScoreGrid.Children.Add(competitorBibTextBox);
+            Grid.SetRow(competitorBibTextBox, row);
+            Grid.SetColumn(competitorBibTextBox, BIB_COLUMN);
+
+            // TODO: pass bib number into competitor registrations
+            competitorBibTextBox.TextChanged += (o, e) =>
+            {
+                var bibNumber = competitorBibTextBox.Text;
             };
 
             var competitorSearchBox = new SearchTextBox()
             {
-                Margin = new Thickness(1),
                 ItemsSource = Competitors,
                 SelectedPerson = null,
-                Placement = _competitorBoxes.Count() + 1
+                Placement = _competitorBoxes.Count() + 1,
+                Style = Application.Current.Resources["ScoreViewerSearchTextBox"] as Style
             };
+            ScoreGrid.Children.Add(competitorSearchBox);
+            Grid.SetRow(competitorSearchBox, row);
+            Grid.SetColumn(competitorSearchBox, COMPETITOR_COLUMN);
+
+            _competitorBoxes.Add(competitorSearchBox);
 
             competitorSearchBox.SelectionChanged += (o, e) =>
             {
@@ -289,35 +299,30 @@ namespace ImpartialUI.Controls
                 }
             }
 
-            _competitorBoxes.Add(competitorSearchBox);
-            competitorBorder.Child = competitorSearchBox;
-
-            ScoreGrid.Children.Add(competitorBorder);
-            Grid.SetColumn(competitorBorder, 1);
-            Grid.SetRow(competitorBorder, ScoreGrid.RowDefinitions.Count - 2);
-
             // scores
-            for (int i = 2; i < _judgeBoxes.Count() + 2; i++)
+            for (int scoreColumn = SCORE_COLUMN_START; scoreColumn < _judgeBoxes.Count() + 2; scoreColumn++)
             {
                 IPrelimScore prelimScore;
 
-                if (competitorPrelimScores != null && competitorPrelimScores?.Count > i - 2)
+                if (competitorPrelimScores != null && competitorPrelimScores?.Count > scoreColumn - 2)
                 {
-                    prelimScore = competitorPrelimScores[i - 2];
+                    prelimScore = competitorPrelimScores[scoreColumn - SCORE_COLUMN_START];
                 }
                 else
                 {
-                    int judgeIndex = i - 2;
+                    int judgeIndex = scoreColumn - SCORE_COLUMN_START;
                     int competitorIndex = _competitorBoxes.Count() - 1;
 
                     prelimScore = _scores[competitorIndex, judgeIndex];
                 }
-                
-                Border scoreBorder = MakeScoreBorder(prelimScore);
 
-                ScoreGrid.Children.Add(scoreBorder);
-                Grid.SetColumn(scoreBorder, i);
-                Grid.SetRow(scoreBorder, ScoreGrid.RowDefinitions.Count() - 2);
+                var callbackScoreViewer = new CallbackScoreViewer()
+                {
+                    CallbackScore = prelimScore.CallbackScore,
+                };
+                ScoreGrid.Children.Add(callbackScoreViewer);
+                Grid.SetRow(callbackScoreViewer, row);
+                Grid.SetColumn(callbackScoreViewer, scoreColumn);
             }
 
             Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);
@@ -327,14 +332,6 @@ namespace ImpartialUI.Controls
         private void AddJudge(IJudge judge = null)
         {
             ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-
-            Border judgeBorder = new Border()
-            {
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(1),
-                Height = 24
-            };
 
             SearchTextBox judgeSearchBox = new SearchTextBox()
             {
@@ -362,25 +359,36 @@ namespace ImpartialUI.Controls
                 }
             }
 
-            judgeBorder.Child = judgeSearchBox;
-
-            ScoreGrid.Children.Add(judgeBorder);
-            Grid.SetColumn(judgeBorder, ScoreGrid.ColumnDefinitions.Count() - 2);
+            ScoreGrid.Children.Add(judgeSearchBox);
+            Grid.SetColumn(judgeSearchBox, ScoreGrid.ColumnDefinitions.Count() - 2);
 
             for (int i = 1; i < ScoreGrid.RowDefinitions.Count - 1; i++)
             {
-                ICompetitor competitor = (ICompetitor)_competitorBoxes.Where(c => c.Placement == i).FirstOrDefault().SelectedPerson;
-
                 int competitorIndex = i - 1;
                 int judgeIndex = _judgeBoxes.Count() - 1;
 
                 IPrelimScore prelimScore = _scores[competitorIndex, judgeIndex];
 
-                Border scoreBorder = MakeScoreBorder(prelimScore);
+                ComboBox scoreComboBox = new ComboBox()
+                {
+                    Margin = new Thickness(1),
+                    ItemsSource = Enum.GetValues(typeof(CallbackScore)),
+                    SelectedValue = prelimScore.CallbackScore
+                };
 
-                ScoreGrid.Children.Add(scoreBorder);
-                Grid.SetRow(scoreBorder, i);
-                Grid.SetColumn(scoreBorder, ScoreGrid.ColumnDefinitions.Count() - 2);
+                scoreComboBox.SelectionChanged += (s, e) =>
+                {
+                    int competitorIndex = Grid.GetRow((ComboBox)s) - 1;
+                    int judgeIndex = Grid.GetColumn((ComboBox)s) - 2;
+
+                    var val = (CallbackScore)((ComboBox)s).SelectedValue;
+
+                    UpdateScore(competitorIndex, judgeIndex, val);
+                };
+
+                ScoreGrid.Children.Add(scoreComboBox);
+                Grid.SetRow(scoreComboBox, i);
+                Grid.SetColumn(scoreComboBox, ScoreGrid.ColumnDefinitions.Count() - 2);
             }
 
             Grid.SetColumn(_addColumnButton, ScoreGrid.ColumnDefinitions.Count() - 1);
@@ -477,41 +485,6 @@ namespace ImpartialUI.Controls
             OnPropertyChanged(nameof(PrelimCompetition));
         }
 
-        private Border MakeScoreBorder(IPrelimScore score)
-        {
-            Border scoreBorder = new Border()
-            {
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(1),
-                Height = 24
-            };
-
-            ComboBox scoreComboBox = new ComboBox()
-            {
-                Margin = new Thickness(1),
-                ItemsSource = Enum.GetValues(typeof(CallbackScore)),
-                SelectedValue = score.CallbackScore
-            };
-
-            scoreComboBox.SelectionChanged += (s, e) =>
-            {
-                int competitorIndex = Grid.GetRow(((ComboBox)s).Parent as Border) - 1;
-                int judgeIndex = Grid.GetColumn(((ComboBox)s).Parent as Border) - 2;
-
-                var val = (CallbackScore)((ComboBox)s).SelectedValue;
-
-                UpdateScore(competitorIndex, judgeIndex, val);
-            };
-
-            if (PrelimCompetition.PromotedCompetitors.Contains(score.Competitor))
-                scoreComboBox.FontWeight = FontWeights.Bold;
-
-            scoreBorder.Child = scoreComboBox;
-
-            return scoreBorder;
-        }
-
         private void Clear()
         {
             _scores = new IPrelimScore[0, 0];
@@ -526,51 +499,57 @@ namespace ImpartialUI.Controls
             ScoreGrid.RowDefinitions.Add(new RowDefinition());
             ScoreGrid.RowDefinitions.Add(new RowDefinition());
 
-            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            /// Promoted, Count, Bib, Competitor, [Judges], Add Judge Button
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Promoted
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Count
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Bib
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition()); // Competitor
+            ScoreGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto }); // Add Judge Button
 
-            var placeBorder = new Border()
+            var headerBorder = new Border()
             {
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(1),
-                Height = 24
+                Style = Application.Current.Resources["ScoreViewerHeaderBorderStyle"] as Style
             };
+            ScoreGrid.Children.Add(headerBorder);
+            Grid.SetRow(headerBorder, 0);
+            Grid.SetColumn(headerBorder, 0);
+            Grid.SetColumnSpan(headerBorder, 100);
 
-            var placeTextBlock = new TextBlock()
+            var promotedTextBlock = new TextBlock()
+            {
+                Text = "Promoted",
+                Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
+            };
+            ScoreGrid.Children.Add(promotedTextBlock);
+            Grid.SetRow(promotedTextBlock, 0);
+            Grid.SetColumn(promotedTextBlock, PROMOTED_COLUMN);
+
+            var countTextBlock = new TextBlock()
             {
                 Text = "Count",
-                FontWeight = FontWeights.Bold,
-                FontStyle = FontStyles.Italic,
-                Margin = new Thickness(1)
+                Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
             };
-            placeBorder.Child = placeTextBlock;
+            ScoreGrid.Children.Add(countTextBlock);
+            Grid.SetRow(countTextBlock, 0);
+            Grid.SetColumn(countTextBlock, COUNT_COLUMN);
 
-            ScoreGrid.Children.Add(placeBorder);
-            Grid.SetRow(placeBorder, 0);
-            Grid.SetColumn(placeBorder, 0);
-
-            var competitorBorder = new Border()
+            var bibTextBlock = new TextBlock()
             {
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(1),
-                Height = 24
+                Text = "Bib",
+                Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
             };
+            ScoreGrid.Children.Add(bibTextBlock);
+            Grid.SetRow(bibTextBlock, 0);
+            Grid.SetColumn(bibTextBlock, BIB_COLUMN);
 
             var competitorTextBlock = new TextBlock()
             {
                 Text = "Competitor",
-                FontWeight = FontWeights.Bold,
-                FontStyle = FontStyles.Italic,
-                Margin = new Thickness(1)
+                Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
             };
-            competitorBorder.Child = competitorTextBlock;
-
-            ScoreGrid.Children.Add(competitorBorder);
-            Grid.SetRow(competitorBorder, 0);
-            Grid.SetColumn(competitorBorder, 1);
+            ScoreGrid.Children.Add(competitorTextBlock);
+            Grid.SetRow(competitorTextBlock, 0);
+            Grid.SetColumn(competitorTextBlock, COMPETITOR_COLUMN);
 
             var addColumnButton = new Button()
             {
@@ -583,13 +562,15 @@ namespace ImpartialUI.Controls
 
             ScoreGrid.Children.Add(addColumnButton);
             Grid.SetRow(addColumnButton, 0);
-            Grid.SetColumn(addColumnButton, 2);
+            Grid.SetColumn(addColumnButton, SCORE_COLUMN_START);
 
             var addRowBorder = new Border()
             {
                 BorderThickness = new Thickness(0),
                 BorderBrush = Brushes.Gray,
-                Margin = new Thickness(1)
+                Margin = new Thickness(1),
+                Width = 30,
+                HorizontalAlignment = HorizontalAlignment.Left
             };
 
             var addRowButton = new Button()

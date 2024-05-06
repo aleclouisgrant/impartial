@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ImpartialUI.Controls"
              mc:Ignorable="d"
              x:Name="self">
-    <Grid VerticalAlignment="Top" x:Name="ScoreGrid">
+    <Grid VerticalAlignment="Top" x:Name="ScoreGrid" Margin="20 0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>

@@ -6,57 +6,33 @@
              xmlns:local="clr-namespace:ImpartialUI.Controls"
              mc:Ignorable="d"
              x:Name="self">
-    <Grid Background="White">
+    <Grid VerticalAlignment="Top" x:Name="ScoreGrid" Margin="20 0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="Orange" BorderBrush="Black" BorderThickness="2">
-            <TextBlock Margin="2">
-                <Run Text="Jack &amp; Jill"/>
-                <Run Text="{Binding PrelimCompetition.Division, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DivisionToStringConverter}}"/>
-                <Run Text="Prelims ("/>
-                <Run Text="{Binding Role, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Run Text="("/>
-                <Run Text="{Binding CountString, ElementName=self, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Run Text="))"/>
-            </TextBlock>
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Style="{StaticResource ScoreViewerHeaderBorderStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Promoted" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Bib" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="Count" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="Competitor" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+
+        <Border Grid.Row="1" HorizontalAlignment="Left" Width="30" Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Margin="1" x:Name="AddRowBorder">
+            <Button Content="+" Click="AddRow_Click"/>
         </Border>
 
-        <Grid VerticalAlignment="Top" Grid.Row="1" x:Name="ScoreGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="Gray" Margin="1">
-                <TextBlock
-                    Text="Count"
-                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
-            </Border>
-
-            <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="Gray" Margin="1">
-                <TextBlock
-                    Text="Competitor" 
-                    FontWeight="Bold" FontStyle="Italic" Margin="1"/>
-            </Border>
-
-            <Border Grid.Row="1" Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Margin="1" x:Name="AddRowBorder">
-                <Button 
-                    Content="+"
-                    Click="AddRow_Click"/>
-            </Border>
-
-            <Border Grid.Row="0" Grid.Column="2">
-                <Button HorizontalAlignment="Left" Content="+" Width="20" Margin="1" Click="AddColumn_Click"/>
-            </Border>
-        </Grid>
+        <Border Grid.Row="0" Grid.Column="4">
+            <Button HorizontalAlignment="Left" Content="+" Width="20" Margin="1" Click="AddColumn_Click"/>
+        </Border>
     </Grid>
+
 </UserControl>
