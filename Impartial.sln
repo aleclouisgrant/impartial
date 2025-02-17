@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImpartialUI", "ImpartialUI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impartial", "EEProParser\Impartial.csproj", "{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImpartialApi", "ImpartialApi\ImpartialApi.csproj", "{4E2ADF16-2550-4537-B9F7-B33AFF99AA7F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2A7570E-E26E-47D4-B2FB-2E9A3325A07E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E2ADF16-2550-4537-B9F7-B33AFF99AA7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E2ADF16-2550-4537-B9F7-B33AFF99AA7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E2ADF16-2550-4537-B9F7-B33AFF99AA7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E2ADF16-2550-4537-B9F7-B33AFF99AA7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
