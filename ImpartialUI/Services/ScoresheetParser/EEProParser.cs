@@ -94,7 +94,6 @@ namespace ImpartialUI.Services.ScoresheetParser
                 role: role,
                 prelimScores: new List<IPrelimScore>(),
                 promotedCompetitors: new List<ICompetitor>(),
-                competitorRegistrations: new List<ICompetitorRegistration>(),
                 alternate1: null,
                 alternate2: null);
 
@@ -111,6 +110,8 @@ namespace ImpartialUI.Services.ScoresheetParser
                 var nodeCollection = node.SelectNodes("td");
 
                 bool finaled = nodeCollection[5 + judges.Count].InnerText == "X" && nodeCollection[6 + judges.Count].InnerText == "";
+                string bibNumber = nodeCollection[2 + judges.Count].InnerText;
+
                 string name = nodeCollection[1].InnerText;
                 int pos = name.IndexOf(' ');
 
@@ -128,6 +129,7 @@ namespace ImpartialUI.Services.ScoresheetParser
                 }
 
                 var competitor = new Competitor(firstName, lastName);
+                var registration = new CompetitorRegistration(competitor, bibNumber);
 
                 CallbackScore callbackScore;
                 int offset = 2;
@@ -137,7 +139,7 @@ namespace ImpartialUI.Services.ScoresheetParser
 
                     var prelimScore = new PrelimScore(
                         judge: judges[i - offset],
-                        competitor: competitor,
+                        competitorRegistration: registration,
                         callbackScore: callbackScore);
 
                     prelimCompetition.PrelimScores.Add(prelimScore);

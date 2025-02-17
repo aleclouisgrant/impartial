@@ -168,7 +168,7 @@ namespace ImpartialUI.Controls
 
                 // placement
                 var placementTextBlock = new TextBlock()
-                                {
+                {
                     Text = couple.Placement.ToString(),
                     Style = Application.Current.Resources["ScoreViewerPlacementTextStyle"] as Style,
                 };
@@ -177,9 +177,11 @@ namespace ImpartialUI.Controls
                 Grid.SetColumn(placementTextBlock, PLACEMENT_COLUMN);
 
                 // bib numbers
+                var leaderBibNumber = couple.LeaderRegistration?.BibNumber ?? "000";
+                var followerBibNumber = couple.FollowerRegistration?.BibNumber ?? "000";
                 var bibNumbersTextBlock = new TextBlock()
                 {
-                    Text = "000 / 000",
+                    Text = leaderBibNumber + " / " + followerBibNumber,
                     Style = Application.Current.Resources["ScoreViewerBibTextStyle"] as Style
                 };
                 control.ScoreGrid.Children.Add(bibNumbersTextBlock);

@@ -87,7 +87,7 @@ namespace ImpartialUI.Models
             {
                 if (!couples.Any(c => c.Placement == score.Placement))
                 {
-                    var couple = new Couple(score.Leader, score.Follower, score.Placement);
+                    var couple = new Couple(score.LeaderRegistration, score.FollowerRegistration, score.Placement);
                     couples.Add(couple);
                     couple.Scores.Add(score);
                 }

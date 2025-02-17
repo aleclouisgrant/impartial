@@ -8,6 +8,8 @@ namespace Impartial
         public IJudge Judge { get; set; }
         public ICompetitor Leader { get; set; }
         public ICompetitor Follower { get; set; }
+        public ICompetitorRegistration LeaderRegistration { get; set; }
+        public ICompetitorRegistration FollowerRegistration { get; set; }
 
         public int Score { get; set; }
         public int Placement { get; set; }

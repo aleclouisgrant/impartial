@@ -78,7 +78,6 @@ namespace ImpartialUI.Services.ScoresheetParser
                 role: role,
                 prelimScores: new List<IPrelimScore>(),
                 promotedCompetitors: new List<ICompetitor>(),
-                competitorRegistrations: new List<ICompetitorRegistration>(),
                 alternate1: null,
                 alternate2: null);
 

@@ -304,17 +304,6 @@ namespace Impartial
             return -1;
         }
 
-        public static Role StringToRole(string role)
-        {
-            switch (role)
-            {
-                case "Follower":
-                    return Role.Follower;
-                default:
-                case "Leader":
-                    return Role.Leader;
-            }
-        }
         public static CallbackScore StringToCallbackScore(string score)
         {
             switch (score)
@@ -384,7 +373,7 @@ namespace Impartial
                     return CallbackScore.Unscored;
             }
         }
-        public static Division GetDivisionFromString(string s)
+        public static Division StringToDivision(string s)
         {
             switch (s)
             {
@@ -436,7 +425,7 @@ namespace Impartial
                     return Division.Open;
             }
         }
-        public static Role GetRoleFromString(string s)
+        public static Role StringToRole(string s)
         {
             switch (s)
             {
@@ -496,7 +485,7 @@ namespace Impartial
         }
         public static string DivisionToString(Division division)
         {
-            switch(division)
+            switch (division)
             {
                 case Division.Newcomer:
                     return "Newcomer";
@@ -513,6 +502,27 @@ namespace Impartial
                 default:
                 case Division.Open:
                     return "Open";
+            }
+        }
+        public static string TierToString(Tier tier)
+        {
+            switch (tier) 
+            {
+                case Tier.Tier1:
+                    return "Tier 1";
+                case Tier.Tier2:
+                    return "Tier 2";
+                case Tier.Tier3:
+                    return "Tier 3";
+                case Tier.Tier4:
+                    return "Tier 4";
+                case Tier.Tier5:
+                    return "Tier 5";
+                case Tier.Tier6:
+                    return "Tier 6";
+                default:
+                case Tier.NoTier:
+                    return "No Tier";
             }
         }
         

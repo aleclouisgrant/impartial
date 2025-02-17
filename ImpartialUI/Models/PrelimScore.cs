@@ -9,15 +9,44 @@ namespace ImpartialUI.Models
     {
         public Guid Id { get; }
         public IJudge Judge { get; set; }
-        public ICompetitor Competitor { get; set; }
+        public ICompetitorRegistration CompetitorRegistration { get; set; }
+
+        private ICompetitor _competitor;
+        public ICompetitor Competitor
+        {
+            get
+            {
+                return CompetitorRegistration == null ? _competitor : CompetitorRegistration.Competitor;
+            }
+            set
+            {
+                if (CompetitorRegistration == null)
+                {
+                    _competitor = value;
+                }
+                else
+                {
+                    CompetitorRegistration.Competitor = value;
+                }
+            }
+        }
         public CallbackScore CallbackScore { get; set; }
+
+        public PrelimScore(IJudge judge, ICompetitorRegistration competitorRegistration, CallbackScore callbackScore, Guid? id = null)
+        {
+            Id = id ?? Guid.NewGuid();
+
+            Judge = judge;
+            CompetitorRegistration = competitorRegistration;
+            CallbackScore = callbackScore;
+        }
 
         public PrelimScore(Guid? judgeId, Guid? competitorId, CallbackScore callbackScore, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
 
-            SetJudge(judgeId);
-            SetCompetitor(competitorId);
+            TrySetJudge(judgeId);
+            TrySetCompetitor(competitorId);
 
             CallbackScore = callbackScore;
         }
@@ -34,11 +63,37 @@ namespace ImpartialUI.Models
         public void SetJudge(Guid? id)
         {
             Judge = App.JudgesDb.FirstOrDefault(j => j.JudgeId == id);
+
+            if (Judge == null)
+                throw new Exception("Judge ID not found in Judges DB");
         }
 
         public void SetCompetitor(Guid? id)
         {
             Competitor = App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == id);
+
+            if (Competitor == null)
+                throw new Exception("Competitor ID not found in Competitors DB");
+        }
+
+        public bool TrySetJudge(Guid? id)
+        {
+            Judge = App.JudgesDb.FirstOrDefault(j => j.JudgeId == id);
+
+            if (Judge == null)
+                return false;
+            else 
+                return true;
+        }
+
+        public bool TrySetCompetitor(Guid? id)
+        {
+            Competitor = App.CompetitorsDb.FirstOrDefault(j => j.CompetitorId == id);
+
+            if (Competitor == null)
+                return false;
+            else
+                return true;
         }
     }
 }

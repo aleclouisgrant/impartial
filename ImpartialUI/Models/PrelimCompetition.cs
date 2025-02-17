@@ -21,7 +21,7 @@ namespace ImpartialUI.Models
 
         public List<ICompetitor> PromotedCompetitors { get; set; } = new();
 
-        public List<ICompetitorRegistration> CompetitorRegistrations { get; set; } = new();
+        public IEnumerable<ICompetitorRegistration> CompetitorRegistrations => GetCompetitorRegistrations();
 
         public ICompetitor Alternate1 { get; set; }
         public ICompetitor Alternate2 { get; set; }
@@ -40,7 +40,6 @@ namespace ImpartialUI.Models
             IEnumerable<ICompetitor> promotedCompetitors,
             ICompetitor alternate1,
             ICompetitor alternate2,
-            IEnumerable<ICompetitorRegistration> competitorRegistrations,
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
@@ -56,7 +55,6 @@ namespace ImpartialUI.Models
             PrelimScores = prelimScores?.ToList();
 
             PromotedCompetitors = promotedCompetitors?.ToList();
-            CompetitorRegistrations = competitorRegistrations?.ToList();
         }
 
         public string ToLongString()
@@ -156,9 +154,27 @@ namespace ImpartialUI.Models
             return judges;
         }
 
+        private IEnumerable<ICompetitorRegistration> GetCompetitorRegistrations()
+        {
+            var competitorRegistrations = new List<ICompetitorRegistration>();
+
+            foreach (var prelimScore in PrelimScores)
+            {
+                if (prelimScore.CompetitorRegistration != null && !competitorRegistrations.Contains(prelimScore.CompetitorRegistration))
+                {
+                    competitorRegistrations.Add(prelimScore.CompetitorRegistration);
+                }
+            }
+
+            return competitorRegistrations;
+        }
+
         public void Clear()
         {
             PrelimScores.Clear();
+            PromotedCompetitors.Clear();
+            Alternate1 = null;
+            Alternate2 = null;
         }
     }
 }

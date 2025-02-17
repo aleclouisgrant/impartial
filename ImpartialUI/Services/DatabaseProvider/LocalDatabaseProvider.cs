@@ -194,48 +194,49 @@ namespace ImpartialUI.Services.DatabaseProvider
             IJudge greg = new Judge("Greg", "Rollinscott");
             IJudge victoria = new Judge("Victoria", "Henk");
 
-            ICompetitor brandon = new Competitor("Brandon", "Rasmussen");
-            ICompetitor melodie = new Competitor("Melodie", "Paletta");
-            ICompetitor neil = new Competitor("Neil", "Joshi");
-            ICompetitor kristen = new Competitor("Kristen", "Wallace");
-            ICompetitor lucky = new Competitor("Lucky", "Sipin");
-            ICompetitor dimitri = new Competitor("Dimitri", "Hector");
-            ICompetitor maxwell = new Competitor("Maxwell", "Thew");
-            ICompetitor shanna = new Competitor("Shanna", "Porcari");
-            ICompetitor oscar = new Competitor("Oscar", "Hampton");
-            ICompetitor saya = new Competitor("Sayaka", "Suzaki");
-            ICompetitor joshu = new Competitor("Joshu", "Creel");
-            ICompetitor jen = new Competitor("Jen", "Ferreira");
-            ICompetitor edem = new Competitor("Edem", "Attikese");
-            ICompetitor jia = new Competitor("Jia", "Lu");
-            ICompetitor kyle = new Competitor("Kyle", "FitzGerald");
-            ICompetitor rachel = new Competitor("Rachel", "Shook");
-            ICompetitor sam = new Competitor("Sam", "Vaden");
-            ICompetitor elli = new Competitor("Elli", "Warner");
-            ICompetitor kaiano = new Competitor("Kaiano", "Levine");
-            ICompetitor liz = new Competitor("Liz", "Ravdin");
-            ICompetitor alec = new Competitor("Alec", "Grant");
-            ICompetitor olivia = new Competitor("Olivia", "Burnsed");
-            ICompetitor david = new Competitor("David", "Carrington");
-            ICompetitor jesann = new Competitor("Jes Ann", "Nail");
+            ICompetitorRegistration brandon  = new CompetitorRegistration(new Competitor("Brandon", "Rasmussen"), "320");
+            ICompetitorRegistration melodie = new CompetitorRegistration(new Competitor("Melodie", "Paletta"), "367");
+            ICompetitorRegistration neil = new CompetitorRegistration(new Competitor("Neil", "Joshi"), "131");
+            ICompetitorRegistration kristen = new CompetitorRegistration(new Competitor("Kristen", "Wallace"), "396");
+            ICompetitorRegistration lucky = new CompetitorRegistration(new Competitor("Lucky", "Sipin"), "159");
+            ICompetitorRegistration dimitri = new CompetitorRegistration(new Competitor("Dimitri", "Hector"), "197");
+            ICompetitorRegistration maxwell = new CompetitorRegistration(new Competitor("Maxwell", "Thew"), "275");
+            ICompetitorRegistration shanna = new CompetitorRegistration(new Competitor("Shanna", "Porcari"), "179");
+            ICompetitorRegistration oscar = new CompetitorRegistration(new Competitor("Oscar", "Hampton"), "370");
+            ICompetitorRegistration saya = new CompetitorRegistration(new Competitor("Sayaka", "Suzaki"), "102");
+            ICompetitorRegistration joshu = new CompetitorRegistration(new Competitor("Joshu", "Creel"), "316");
+            ICompetitorRegistration jen = new CompetitorRegistration(new Competitor("Jen", "Ferreira"), "447");
+            ICompetitorRegistration edem = new CompetitorRegistration(new Competitor("Edem", "Attikese"), "105");
+            ICompetitorRegistration jia = new CompetitorRegistration(new Competitor("Jia", "Lu"), "364");
+            ICompetitorRegistration kyle = new CompetitorRegistration(new Competitor("Kyle", "FitzGerald"), "103");
+            ICompetitorRegistration rachel = new CompetitorRegistration(new Competitor("Rachel", "Shook"), "428");
+            ICompetitorRegistration sam = new CompetitorRegistration(new Competitor("Sam", "Vaden"), "336");
+            ICompetitorRegistration elli = new CompetitorRegistration(new Competitor("Elli", "Warner"), "330");
+            ICompetitorRegistration kaiano = new CompetitorRegistration(new Competitor("Kaiano", "Levine"), "107");
+            ICompetitorRegistration liz = new CompetitorRegistration(new Competitor("Liz", "Ravdin"), "312");
+            ICompetitorRegistration alec = new CompetitorRegistration(new Competitor("Alec", "Grant"), "390");
+            ICompetitorRegistration olivia = new CompetitorRegistration(new Competitor("Olivia", "Burnsed"), "287");
+            ICompetitorRegistration david = new CompetitorRegistration(new Competitor("David", "Carrington"), "303");
+            ICompetitorRegistration jesann = new CompetitorRegistration(new Competitor("Jes Ann", "Nail"), "375");
 
-            ICompetitor roberto = new Competitor("Roberto", "Corporan");
-            ICompetitor glen = new Competitor("Glen", "Acheampong");
-            ICompetitor chris = new Competitor("Chris", "Lo");
-            ICompetitor simon = new Competitor("Simon", "Girard");
-            ICompetitor kevin = new Competitor("Kevin", "Balcom");
-            ICompetitor vincent = new Competitor("Vincent", "Van Mierlo");
-            ICompetitor alex = new Competitor("Alex", "Glover");
-            ICompetitor matt = new Competitor("Matt", "Davis");
-            ICompetitor frank = new Competitor("Frank", "Moda");
-            ICompetitor christopher = new Competitor("Christopher", "Muise");
+            ICompetitorRegistration roberto = new CompetitorRegistration(new Competitor("Roberto", "Corporan"), "115");
+            ICompetitorRegistration glen = new CompetitorRegistration(new Competitor("Glen", "Acheampong"), "383");
+            ICompetitorRegistration chris = new CompetitorRegistration(new Competitor("Chris", "Lo"), "171");
+            ICompetitorRegistration simon = new CompetitorRegistration(new Competitor("Simon", "Girard"), "323");
+            ICompetitorRegistration kevin = new CompetitorRegistration(new Competitor("Kevin", "Balcom"), "416");
+            ICompetitorRegistration vincent = new CompetitorRegistration(new Competitor("Vincent", "Van Mierlo"), "112");
+            ICompetitorRegistration alex = new CompetitorRegistration(new Competitor("Alex", "Glover"), "258");
+            ICompetitorRegistration matt = new CompetitorRegistration(new Competitor("Matt", "Davis"), "121");
+            ICompetitorRegistration frank = new CompetitorRegistration(new Competitor("Frank", "Moda"), "296");
+            ICompetitorRegistration christopher = new CompetitorRegistration(new Competitor("Christopher", "Muise"), "368");
 
-            ICompetitor alyx = new Competitor("Alyx", "McCarthey");
-            ICompetitor jacqueline = new Competitor("Jacqueline", "Lo");
-            ICompetitor maya = new Competitor("Maya", "Tydykov");
-            ICompetitor kendra = new Competitor("Kendra", "Zara");
-            ICompetitor isabelle = new Competitor("Isabelle", "Roy");
-            ICompetitor brianna = new Competitor("Brianna", "Miller");
+            ICompetitorRegistration alyx = new CompetitorRegistration(new Competitor("Alyx", "McCarthey"), "329");
+            ICompetitorRegistration jacqueline = new CompetitorRegistration(new Competitor("Jacqueline", "Lo"), "168");
+            ICompetitorRegistration maya = new CompetitorRegistration(new Competitor("Maya", "Tydykov"), "415");
+            ICompetitorRegistration kendra = new CompetitorRegistration(new Competitor("Kendra", "Zara"), "385");
+            ICompetitorRegistration isabelle = new CompetitorRegistration(new Competitor("Isabelle", "Roy"), "348");
+            ICompetitorRegistration brianna = new CompetitorRegistration(new Competitor("Brianna", "Miller"), "283");
+
 
             competition.FinalCompetition = new FinalCompetition(
                 dateTime: competition.Date, 
@@ -307,22 +308,40 @@ namespace ImpartialUI.Services.DatabaseProvider
             competition.FinalCompetition.FinalScores.Add(new FinalScore(lemery, alec, olivia, 8, 11));
             competition.FinalCompetition.FinalScores.Add(new FinalScore(lemery, david, jesann, 11, 12));
 
-            var leaderPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Leader, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>(), competitorRegistrations: new List<ICompetitorRegistration>(), alternate1: maxwell, alternate2: lucky);
-            var followerPrelimComp = new PrelimCompetition(dateTime: competition.Date, division: competition.Division, round: Round.Prelims, role: Role.Follower, prelimScores: new List<IPrelimScore>(), promotedCompetitors: new List<ICompetitor>(), competitorRegistrations: new List<ICompetitorRegistration>(), alternate1: alyx, alternate2: jacqueline);
+            var leaderPrelimComp = new PrelimCompetition(
+                dateTime: competition.Date, 
+                division: competition.Division,
+                round: Round.Prelims, 
+                role: Role.Leader, 
+                prelimScores: new List<IPrelimScore>(), 
+                promotedCompetitors: new List<ICompetitor>(), 
+                alternate1: maxwell.Competitor, 
+                alternate2: lucky.Competitor);
+
+            var followerPrelimComp = new PrelimCompetition(
+                dateTime: competition.Date, 
+                division: competition.Division, 
+                round: Round.Prelims, 
+                role: Role.Follower, 
+                prelimScores: new List<IPrelimScore>(), 
+                promotedCompetitors: new List<ICompetitor>(), 
+                alternate1: alyx.Competitor, 
+                alternate2: jacqueline.Competitor);
+
             competition.PairedPrelimCompetitions.Add(new PairedPrelimCompetition(Round.Prelims, leaderPrelimComp, followerPrelimComp));
 
-            followerPrelimComp.PromotedCompetitors.Add(saya);
-            followerPrelimComp.PromotedCompetitors.Add(shanna);
-            followerPrelimComp.PromotedCompetitors.Add(olivia);
-            followerPrelimComp.PromotedCompetitors.Add(liz);
-            followerPrelimComp.PromotedCompetitors.Add(elli);
-            followerPrelimComp.PromotedCompetitors.Add(jia);
-            followerPrelimComp.PromotedCompetitors.Add(melodie);
-            followerPrelimComp.PromotedCompetitors.Add(kristen);
-            followerPrelimComp.PromotedCompetitors.Add(rachel);
-            followerPrelimComp.PromotedCompetitors.Add(jen);
-            followerPrelimComp.PromotedCompetitors.Add(jesann);
-            followerPrelimComp.PromotedCompetitors.Add(dimitri);
+            followerPrelimComp.PromotedCompetitors.Add(saya.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(shanna.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(olivia.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(liz.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(elli.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(jia.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(melodie.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(kristen.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(rachel.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(jen.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(jesann.Competitor);
+            followerPrelimComp.PromotedCompetitors.Add(dimitri.Competitor);
 
             followerPrelimComp.PrelimScores.Add(new PrelimScore(bryn, saya, Impartial.Enums.CallbackScore.Yes));
             followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, saya, Impartial.Enums.CallbackScore.Yes));
@@ -396,18 +415,18 @@ namespace ImpartialUI.Services.DatabaseProvider
             followerPrelimComp.PrelimScores.Add(new PrelimScore(greg, brianna, Impartial.Enums.CallbackScore.No));
             followerPrelimComp.PrelimScores.Add(new PrelimScore(victoria, brianna, Impartial.Enums.CallbackScore.No));
 
-            leaderPrelimComp.PromotedCompetitors.Add(kyle);
-            leaderPrelimComp.PromotedCompetitors.Add(kaiano);
-            leaderPrelimComp.PromotedCompetitors.Add(roberto);
-            leaderPrelimComp.PromotedCompetitors.Add(neil);
-            leaderPrelimComp.PromotedCompetitors.Add(david);
-            leaderPrelimComp.PromotedCompetitors.Add(brandon);
-            leaderPrelimComp.PromotedCompetitors.Add(glen);
-            leaderPrelimComp.PromotedCompetitors.Add(sam);
-            leaderPrelimComp.PromotedCompetitors.Add(alec);
-            leaderPrelimComp.PromotedCompetitors.Add(edem);
-            leaderPrelimComp.PromotedCompetitors.Add(joshu);
-            leaderPrelimComp.PromotedCompetitors.Add(oscar);
+            leaderPrelimComp.PromotedCompetitors.Add(kyle.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(kaiano.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(roberto.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(neil.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(david.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(brandon.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(glen.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(sam.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(alec.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(edem.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(joshu.Competitor);
+            leaderPrelimComp.PromotedCompetitors.Add(oscar.Competitor);
 
             leaderPrelimComp.PrelimScores.Add(new PrelimScore(arjay, kyle, Impartial.Enums.CallbackScore.Yes));
             leaderPrelimComp.PrelimScores.Add(new PrelimScore(john, kyle, Impartial.Enums.CallbackScore.Yes));
@@ -509,30 +528,30 @@ namespace ImpartialUI.Services.DatabaseProvider
             _judges.Add(victoria);
             _judges.Add(greg);
 
-            _competitors.Add(brandon);
-            _competitors.Add(melodie);
-            _competitors.Add(neil);
-            _competitors.Add(kristen);
-            _competitors.Add(lucky);
-            _competitors.Add(dimitri);
-            _competitors.Add(maxwell);
-            _competitors.Add(shanna);
-            _competitors.Add(oscar);
-            _competitors.Add(saya);
-            _competitors.Add(joshu);
-            _competitors.Add(jen);
-            _competitors.Add(edem);
-            _competitors.Add(jia);
-            _competitors.Add(kyle);
-            _competitors.Add(rachel);
-            _competitors.Add(sam);
-            _competitors.Add(elli);
-            _competitors.Add(kaiano);
-            _competitors.Add(liz);
-            _competitors.Add(alec);
-            _competitors.Add(olivia);
-            _competitors.Add(david);
-            _competitors.Add(jesann);
+            _competitors.Add(brandon.Competitor);
+            _competitors.Add(melodie.Competitor);
+            _competitors.Add(neil.Competitor);
+            _competitors.Add(kristen.Competitor);
+            _competitors.Add(lucky.Competitor);
+            _competitors.Add(dimitri.Competitor);
+            _competitors.Add(maxwell.Competitor);
+            _competitors.Add(shanna.Competitor);
+            _competitors.Add(oscar.Competitor);
+            _competitors.Add(saya.Competitor);
+            _competitors.Add(joshu.Competitor);
+            _competitors.Add(jen.Competitor);
+            _competitors.Add(edem.Competitor);
+            _competitors.Add(jia.Competitor);
+            _competitors.Add(kyle.Competitor);
+            _competitors.Add(rachel.Competitor);
+            _competitors.Add(sam.Competitor);
+            _competitors.Add(elli.Competitor);
+            _competitors.Add(kaiano.Competitor);
+            _competitors.Add(liz.Competitor);
+            _competitors.Add(alec.Competitor);
+            _competitors.Add(olivia.Competitor);
+            _competitors.Add(david.Competitor);
+            _competitors.Add(jesann.Competitor);
         }
     }
 }

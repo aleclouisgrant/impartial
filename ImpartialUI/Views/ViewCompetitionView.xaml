@@ -26,22 +26,21 @@
                       SelectedItem="{Binding SelectedCompetition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button x:Name="RefreshButton" Content="Refresh" Command="{Binding RefreshCompetitionsCommand}" Width="70"/>
             <Button x:Name="SaveButton" Content="Save" Command="{Binding SaveCompetitionCommand}" Click="SaveButton_Click" Width="70" Visibility="Collapsed"/>
-            <Button x:Name="EditButton" Content="Edit" IsEnabled="False" Click="EditCompetitionButton_Click" Width="70" Margin="5 0 0 0"/>
+            <Button x:Name="EditButton" Content="Edit" Click="EditCompetitionButton_Click" Width="70" Margin="5 0 0 0" Visibility="Collapsed"/>
             <Button x:Name="DeleteButton" Content="Delete" Command="{Binding DeleteCompetitionCommand}" Width="70" Margin="5 0 0 0" Style="{StaticResource ServerActionButtonStyle}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" x:Name="CompetitionViewerGrid">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Orientation="Vertical" Margin="20">
-                    <StackPanel Orientation="Vertical" Visibility="{Binding ShowFinals, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel Orientation="Vertical" Visibility="{Binding ShowFinals, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0 0 0 28">
                         <TextBlock Style="{StaticResource ScoreViewerTitleStyle}">
                                 <Run Text="{Binding SelectedCompetition.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <Run Text="-"/>
                                 <Run Text="{Binding FinalCompetition.Division, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DivisionToStringConverter}}"/>
                                 <Run Text="Jack &amp; Jill - Finals"/>
-                                <Run Text="{Binding SelectedCompetition.LeaderTier, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=(Leader {0}}"/>
-                                <Run Text=","/>
-                                <Run Text="{Binding SelectedCompetition.FollowerTier, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat=Follower {0})}"/>
+                                <Run Text="{Binding SelectedCompetition.LeaderTier, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TierToStringConverter}, StringFormat='(Leader {0},'}"/>
+                                <Run Text="{Binding SelectedCompetition.FollowerTier, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TierToStringConverter}, StringFormat='Follower {0})'}"/>
                         </TextBlock>
                         <c:FinalCompetitionViewer FinalCompetition="{Binding FinalCompetition, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>

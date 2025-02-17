@@ -22,8 +22,8 @@
 
         <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Style="{StaticResource ScoreViewerHeaderBorderStyle}"/>
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Promoted" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="Bib" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="Count" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Count" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="Bib" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
         <TextBlock Grid.Row="0" Grid.Column="3" Text="Competitor" Style="{StaticResource ScoreViewerHeaderTextStyle}"/>
 
         <Border Grid.Row="1" HorizontalAlignment="Left" Width="30" Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Margin="1" x:Name="AddRowBorder">

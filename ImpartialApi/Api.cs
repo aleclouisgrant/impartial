@@ -22,11 +22,11 @@ namespace ImpartialApi
             }
         }
 
-        private static async Task<IResult> GetCompetitorById(int id, IDatabaseProvider db)
+        private static async Task<IResult> GetCompetitorById(Guid id, IDatabaseProvider db)
         {
             try
             {
-                return Results.Ok(await db.GetAllCompetitorsAsync());
+                return Results.Ok(await db.GetCompetitorAsync(id: id));
             }
             catch (Exception ex)
             {

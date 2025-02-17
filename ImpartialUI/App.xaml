@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <!-- Converters -->
             <converters:DivisionToStringConverter x:Key="DivisionToStringConverter"/>
+            <converters:TierToStringConverter x:Key="TierToStringConverter"/>
 
             <!-- Styles -->
             <ResourceDictionary.MergedDictionaries>

@@ -590,6 +590,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                                 id = Guid.NewGuid(),
                                 competitor_profile_id = competitor.CompetitorId,
                                 dance_convention_id = danceConventionId,
+                                bib_number = pairedPrelimCompetition.LeaderPrelimCompetition.CompetitorRegistrations.FirstOrDefault(c => c.Competitor == competitor)?.BibNumber
                             });
                         }
 
@@ -649,8 +650,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                                 id = Guid.NewGuid(),
                                 competitor_profile_id = competitor.CompetitorId,
                                 dance_convention_id = danceConventionId,
-                                //TODO
-                                bib_number = "0"
+                                bib_number = pairedPrelimCompetition.FollowerPrelimCompetition.CompetitorRegistrations.FirstOrDefault(c => c.Competitor == competitor)?.BibNumber
                             });
                         }
 
@@ -784,6 +784,8 @@ namespace ImpartialUI.Services.DatabaseProvider
                             id = Guid.NewGuid(),
                             competitor_profile_id = couple.Follower.CompetitorId,
                             dance_convention_id = danceConventionId,
+                            // TODO
+                            //bib_number = 
                         });
                     }
 
@@ -884,7 +886,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                     DateTime date = reader.GetDateTime(2);
                     string divisionString = reader.GetString(3);
     
-                    Division division = Util.GetDivisionFromString(divisionString);
+                    Division division = Util.StringToDivision(divisionString);
 
                     competition = new Competition(danceConventionId, danceConventionName, date, division, id);
                 }
@@ -926,7 +928,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                         alternate2Id = null;
                     }
 
-                    Role role = Util.GetRoleFromString(prelimCompetitionRoleString);
+                    Role role = Util.StringToRole(prelimCompetitionRoleString);
                     Round round = Util.GetRoundFromString(prelimCompetitionRoundString);
 
                     prelimCompetitions.Add(new PrelimCompetition(
@@ -938,7 +940,6 @@ namespace ImpartialUI.Services.DatabaseProvider
                         promotedCompetitors: null,
                         alternate1: App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == alternate1Id),
                         alternate2: App.CompetitorsDb.FirstOrDefault(c => c.CompetitorId == alternate2Id),
-                        competitorRegistrations: null,
                         id: prelimCompetitionId));
                 }
             }
@@ -1103,7 +1104,6 @@ namespace ImpartialUI.Services.DatabaseProvider
                         Guid? judgeId = null;
                         Guid? leaderId = null;
                         Guid? followerId = null;
-
 
                         try
                         {

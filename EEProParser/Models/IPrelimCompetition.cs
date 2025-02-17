@@ -1,5 +1,4 @@
-﻿using Impartial.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Impartial
@@ -17,10 +16,9 @@ namespace Impartial
 
         public List<ICompetitor> Competitors { get; }
         public List<IJudge> Judges { get; }
+        public IEnumerable<ICompetitorRegistration> CompetitorRegistrations { get; }
 
         public List<ICompetitor> PromotedCompetitors { get; set; }
-
-        public List<ICompetitorRegistration> CompetitorRegistrations { get; set; }
 
         public ICompetitor Alternate1 { get; set; }
         public ICompetitor Alternate2 { get; set; }

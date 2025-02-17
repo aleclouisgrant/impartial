@@ -34,8 +34,8 @@
             </TabItem>
         </TabControl>
 
-        <Grid Grid.Row="1" Background="Gray">
-            <TextBlock Foreground="Red" VerticalAlignment="Center" Margin="30 0" Visibility="Visible">
+        <Grid Grid.Row="1" Background="LightGray">
+            <TextBlock Foreground="DarkRed" VerticalAlignment="Center" Margin="30 0" Visibility="Visible">
                 <Run Text="{Binding Exception, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ExceptionToMessageConverter}}"/>
             </TextBlock>
         </Grid>

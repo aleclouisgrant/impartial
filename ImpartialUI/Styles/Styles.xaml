@@ -93,7 +93,7 @@
     <Style TargetType="{x:Type Border}" x:Key="ScoreViewerHeaderBorderStyle">
         <Setter Property="Background" Value="{StaticResource Gray1}"/>
         <Setter Property="CornerRadius" Value="10"/>
-        <Setter Property="Height" Value="43"/>
+        <Setter Property="Height" Value="38"/>
         <Setter Property="Margin" Value="-20 0"/>
     </Style>
 

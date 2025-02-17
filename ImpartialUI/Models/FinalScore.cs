@@ -8,8 +8,50 @@ namespace ImpartialUI.Models
     {
         public Guid Id { get; set; }
         public IJudge Judge { get; set; }
-        public ICompetitor Leader { get; set; }
-        public ICompetitor Follower { get; set; }
+
+
+        public ICompetitorRegistration LeaderRegistration { get; set; }
+        public ICompetitorRegistration FollowerRegistration { get; set; }
+
+        private ICompetitor _leader;
+        public ICompetitor Leader
+        {
+            get
+            {
+                return LeaderRegistration == null ? _leader : LeaderRegistration.Competitor;
+            }
+            set
+            {
+                if (LeaderRegistration == null)
+                {
+                    _leader = value;
+                }
+                else
+                {
+                    LeaderRegistration.Competitor = value;
+                }
+            }
+        }
+
+        private ICompetitor _follower;
+        public ICompetitor Follower
+        {
+            get
+            {
+                return FollowerRegistration == null ? _follower : FollowerRegistration.Competitor;
+            }
+            set
+            {
+                if (FollowerRegistration == null)
+                {
+                    _follower = value;
+                }
+                else
+                {
+                    FollowerRegistration.Competitor = value;
+                }
+            }
+        }
 
         public int Score { get; set; }
         public int Placement { get; set; }
@@ -34,6 +76,15 @@ namespace ImpartialUI.Models
             SetJudge(judgeId);
             SetLeader(leaderId);
             SetFollower(followerId);
+        }
+
+        public FinalScore(IJudge judge, ICompetitorRegistration leader, ICompetitorRegistration follower, int score, int placement, Guid? id = null)
+        {
+            Id = id ?? Guid.NewGuid();
+
+            Judge = judge; 
+            LeaderRegistration = leader; FollowerRegistration = follower;
+            Score = score; Placement = placement;
         }
 
         public void SetJudge(Guid? id)

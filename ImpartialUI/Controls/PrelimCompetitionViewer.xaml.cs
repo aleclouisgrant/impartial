@@ -18,6 +18,17 @@ namespace ImpartialUI.Controls
 
         private class PrelimCompetitorScores
         {
+            public string BibNumberString { get; set; }
+            public int BibNumberValue
+            {
+                get
+                {
+                    if (Int32.TryParse(BibNumberString, out int n))
+                        return n;
+
+                    return -1;
+                }
+            }
             public ICompetitor Competitor { get; set; }
             public List<IPrelimScore> PrelimScores { get; set; } = new List<IPrelimScore>();
             public double TotalScore { get; set; }
@@ -171,15 +182,18 @@ namespace ImpartialUI.Controls
             {
                 var prelimScores = competition.PrelimScores.Where(s => s.Competitor.FullName == competitor.FullName).ToList();
 
+                string bibNumberString = competition.CompetitorRegistrations.FirstOrDefault(c => c.Competitor == competitor)?.BibNumber ?? "0";
+
                 competitorNodes.AddLast(new PrelimCompetitorScores
                 {
+                    BibNumberString = bibNumberString,
                     Competitor = competitor,
                     PrelimScores = prelimScores,
                     TotalScore = prelimScores.Sum(s => Util.GetCallbackScoreValue(s.CallbackScore))
                 });
             }
 
-            competitorNodes = new(competitorNodes.OrderByDescending(s => s.TotalScore));
+            competitorNodes = new(competitorNodes.OrderByDescending(s => s.TotalScore).ThenBy(s => s.BibNumberValue));
 
             int row = 1;
             int count = 1;
@@ -187,7 +201,7 @@ namespace ImpartialUI.Controls
             for (var competitorNode = competitorNodes.First; competitorNode != null; competitorNode = competitorNode.Next)
             {
                 control.ScoreGrid.RowDefinitions.Add(new RowDefinition());
-                bool promoted = control.PrelimCompetition.PromotedCompetitors.Contains(competitorNode.Value.Competitor);
+                bool promoted = competition.PromotedCompetitors.Contains(competitorNode.Value.Competitor);
 
                 if (competitorNode.Previous != null)
                 {
@@ -208,6 +222,16 @@ namespace ImpartialUI.Controls
                     CallbackScore = promoted ? Impartial.Enums.CallbackScore.Yes : Impartial.Enums.CallbackScore.No,
                     Editable = false
                 };
+
+                if (competitorNode.Value.Competitor == competition.Alternate1)
+                {
+                    promotedButton.CallbackScore = Impartial.Enums.CallbackScore.Alt1;
+                }
+                if (competitorNode.Value.Competitor == competition.Alternate2)
+                {
+                    promotedButton.CallbackScore = Impartial.Enums.CallbackScore.Alt2;
+                }
+
                 control.ScoreGrid.Children.Add(promotedButton);
                 Grid.SetRow(promotedButton, row);
                 Grid.SetColumn(promotedButton, PROMOTED_COLUMN);
@@ -223,7 +247,7 @@ namespace ImpartialUI.Controls
 
                 var competitorBibTextBlock = new TextBlock()
                 {
-                    Text = "000",
+                    Text = competitorNode.Value.BibNumberString,
                     Style = promoted ? Application.Current.Resources["ScoreViewerBibTextStyleFinalist"] as Style : Application.Current.Resources["ScoreViewerBibTextStyleNonFinalist"] as Style
                 };
                 control.ScoreGrid.Children.Add(competitorBibTextBlock);

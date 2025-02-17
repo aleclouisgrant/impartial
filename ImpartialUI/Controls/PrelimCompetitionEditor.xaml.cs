@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace ImpartialUI.Controls
 {
@@ -23,6 +22,17 @@ namespace ImpartialUI.Controls
 
         private class PrelimCompetitorScores
         {
+            public string BibNumberString { get; set; }
+            public int BibNumberValue
+            {
+                get
+                {
+                    if (Int32.TryParse(BibNumberString, out int n))
+                        return n;
+
+                    return -1;
+                }
+            }
             public ICompetitor Competitor { get; set; }
             public List<IPrelimScore> PrelimScores { get; set; } = new List<IPrelimScore>();
             public double TotalScore { get; set; }
@@ -159,6 +169,7 @@ namespace ImpartialUI.Controls
         private Button _addColumnButton;
 
         private IPrelimScore[,] _scores = new IPrelimScore[0,0];
+        private string[] _bibNumbers = new string[0];
 
         public PrelimCompetitionEditor()
         {
@@ -289,7 +300,10 @@ namespace ImpartialUI.Controls
                     {
                         foreach (var prelimScore in competitorPrelimScores)
                         {
-                            prelimScore.SetCompetitor(newCompetitor.CompetitorId);
+                            if (!prelimScore.TrySetCompetitor(newCompetitor.CompetitorId))
+                            {
+                                // competitor id wasn't found in competitor database
+                            }
                         }
                     }
                 }
@@ -423,6 +437,9 @@ namespace ImpartialUI.Controls
         private void AddBlankCompetitorToScores()
         {
             IPrelimScore[,] scores = new PrelimScore[_scores.GetLength(0) + 1, _scores.GetLength(1)];
+            string[] bibNumbers = new string[_scores.GetLength(0) + 1];
+
+            var registrations = new List<ICompetitorRegistration>();
 
             // transfer prelim scores from current array
             for (int competitorIndex = 0; competitorIndex < _scores.GetLength(0); competitorIndex++)
@@ -431,7 +448,15 @@ namespace ImpartialUI.Controls
                 {
                     scores[competitorIndex, judgeIndex] = _scores[competitorIndex, judgeIndex];
                 }
+
+                // add corresponding bib number
+                bibNumbers[competitorIndex] = _bibNumbers[competitorIndex];
+
+                registrations.Add(new CompetitorRegistration(scores[competitorIndex, 0].Competitor, bibNumbers[competitorIndex]));
             }
+
+            // add additional bib number to end of array
+            bibNumbers[bibNumbers.Length - 1] = "";
 
             List<IPrelimScore> newScores = new();
 
@@ -448,8 +473,12 @@ namespace ImpartialUI.Controls
             }
 
             PrelimCompetition.PrelimScores.AddRange(newScores);
+            // TODO
+            //PrelimCompetition.CompetitorRegistrations = registrations;
 
             _scores = scores;
+            _bibNumbers = bibNumbers;
+
             OnPropertyChanged(nameof(PrelimCompetition));
         }
         private void AddBlankJudgeToScores()
@@ -488,6 +517,7 @@ namespace ImpartialUI.Controls
         private void Clear()
         {
             _scores = new IPrelimScore[0, 0];
+            _bibNumbers = new string[0];
 
             _judgeBoxes.Clear();
             _competitorBoxes.Clear();
@@ -517,7 +547,7 @@ namespace ImpartialUI.Controls
 
             var promotedTextBlock = new TextBlock()
             {
-                Text = "Promoted",
+                Text = "",
                 Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
             };
             ScoreGrid.Children.Add(promotedTextBlock);
@@ -526,7 +556,7 @@ namespace ImpartialUI.Controls
 
             var countTextBlock = new TextBlock()
             {
-                Text = "Count",
+                Text = "",
                 Style = Application.Current.Resources["ScoreViewerHeaderTextStyle"] as Style
             };
             ScoreGrid.Children.Add(countTextBlock);
