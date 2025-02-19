@@ -237,7 +237,7 @@ namespace ImpartialUI.Controls
             var promotedButton = new PromotedButton()
             {
                 Margin = new Thickness(20, 0, 0, 0),
-                CallbackScore = promoted ? Impartial.Enums.CallbackScore.Yes : Impartial.Enums.CallbackScore.No
+                CallbackScore = promoted ? CallbackScore.Yes : CallbackScore.No
             };
             ScoreGrid.Children.Add(promotedButton);
             Grid.SetRow(promotedButton, row);

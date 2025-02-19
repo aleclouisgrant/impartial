@@ -2,18 +2,21 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Exceptions\**" />
+    <EmbeddedResource Remove="Exceptions\**" />
+    <None Remove="Exceptions\**" />
+    <Page Remove="Exceptions\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.24.0" />
     <PackageReference Include="ScottPlot" Version="4.1.60" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.60" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\EEProParser\Impartial.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,6 +68,10 @@
 
   <ItemGroup>
     <Folder Include="Assets\Fonts\Inter\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Impartial\Impartial.csproj" />
   </ItemGroup>
 
 </Project>
