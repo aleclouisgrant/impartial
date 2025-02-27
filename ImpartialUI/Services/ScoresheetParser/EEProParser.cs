@@ -307,6 +307,9 @@ namespace ImpartialUI.Services.ScoresheetParser
 
         private string GetPrelimsDocByDivision(Division division, Role role, Round round)
         {
+            if (PrelimsSheetDoc == null)
+                return string.Empty;
+
             for (int c = 1; c < 30; c++)
             {
                 var sheet = Util.GetSubStringN(
@@ -318,8 +321,6 @@ namespace ImpartialUI.Services.ScoresheetParser
                 string titleString = string.Empty;
 
                 titleString = Util.GetSubString(sheet, "Jack &amp; Jill", "</td></tr><tr>");
-
-                Trace.WriteLine("TITLE: " + titleString);
 
                 if (titleString == string.Empty)
                     return string.Empty;
@@ -352,10 +353,14 @@ namespace ImpartialUI.Services.ScoresheetParser
                 if (div == division && rl == role)
                     return sheet;
             }
+
             return string.Empty;
         }
         private string GetFinalsDocByDivision(Division division)
         {
+            if (FinalsSheetDoc == null)
+                return string.Empty;
+
             for (int c = 1; c < 30; c++)
             {
                 var finals = Util.GetSubStringN(

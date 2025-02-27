@@ -314,11 +314,11 @@ namespace ImpartialUI.Controls
             }
 
             // scores
-            for (int scoreColumn = SCORE_COLUMN_START; scoreColumn < _judgeBoxes.Count() + 2; scoreColumn++)
+            for (int scoreColumn = SCORE_COLUMN_START; scoreColumn < _judgeBoxes.Count() + SCORE_COLUMN_START; scoreColumn++)
             {
                 IPrelimScore prelimScore;
 
-                if (competitorPrelimScores != null && competitorPrelimScores?.Count > scoreColumn - 2)
+                if (competitorPrelimScores != null && competitorPrelimScores?.Count > scoreColumn - SCORE_COLUMN_START)
                 {
                     prelimScore = competitorPrelimScores[scoreColumn - SCORE_COLUMN_START];
                 }
@@ -330,13 +330,26 @@ namespace ImpartialUI.Controls
                     prelimScore = _scores[competitorIndex, judgeIndex];
                 }
 
-                var callbackScoreViewer = new CallbackScoreViewer()
+                ComboBox scoreComboBox = new ComboBox()
                 {
-                    CallbackScore = prelimScore.CallbackScore,
+                    Margin = new Thickness(1),
+                    ItemsSource = Enum.GetValues(typeof(CallbackScore)),
+                    SelectedValue = prelimScore.CallbackScore
                 };
-                ScoreGrid.Children.Add(callbackScoreViewer);
-                Grid.SetRow(callbackScoreViewer, row);
-                Grid.SetColumn(callbackScoreViewer, scoreColumn);
+
+                scoreComboBox.SelectionChanged += (s, e) =>
+                {
+                    int competitorIndex = Grid.GetRow((ComboBox)s) - 1;
+                    int judgeIndex = Grid.GetColumn((ComboBox)s) - SCORE_COLUMN_START;
+
+                    var val = (CallbackScore)((ComboBox)s).SelectedValue;
+
+                    UpdateScore(competitorIndex, judgeIndex, val);
+                };
+
+                ScoreGrid.Children.Add(scoreComboBox);
+                Grid.SetRow(scoreComboBox, row);
+                Grid.SetColumn(scoreComboBox, scoreColumn);
             }
 
             Grid.SetRow(_addRowBorder, ScoreGrid.RowDefinitions.Count() - 1);

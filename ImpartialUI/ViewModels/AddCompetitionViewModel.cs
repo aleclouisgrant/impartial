@@ -299,6 +299,7 @@ namespace ImpartialUI.ViewModels
         public ICommand SelectSemisPathCommand { get; set; }
         public ICommand SelectFinalsPathCommand { get; set; }
         public ICommand RefreshCacheCommand { get; set; }
+        public ICommand RefreshConventionsCommand { get; set; }
 
         public AddCompetitionViewModel()
         {
@@ -314,6 +315,7 @@ namespace ImpartialUI.ViewModels
             CreateBlankSheetCommand = new DelegateCommand(CreateBlankSheet);
             CancelCommand = new DelegateCommand(Clear);
             RefreshCacheCommand = new DelegateCommand(RefreshCache);
+            RefreshConventionsCommand = new DelegateCommand(RefreshConventions);
 
             _client = new HttpClient();
             _client.BaseAddress = new Uri("https://points.worldsdc.com/");
@@ -356,6 +358,11 @@ namespace ImpartialUI.ViewModels
 
             Competitors = App.CompetitorsDb;
             Judges = App.JudgesDb;
+        }
+
+        private async void RefreshConventions()
+        {
+            DanceConventions = (await App.DatabaseProvider.GetAllDanceConventionsAsync()).OrderBy(c => c.Date).ToList();
         }
 
         private void Clear()
@@ -490,6 +497,19 @@ namespace ImpartialUI.ViewModels
                 {
                     ScoresheetSelector = SelectScoresheetParser(finalsPath);
                 }
+                else if (!(prelimsPath == null || prelimsPath == string.Empty))
+                {
+                    ScoresheetSelector = SelectScoresheetParser(prelimsPath);
+                }
+                else if (!(semisPath == null || semisPath == string.Empty))
+                {
+                    ScoresheetSelector = SelectScoresheetParser(semisPath);
+                }
+                else
+                {
+                    Exception = new Exception("No paths to scoresheets were valid.");
+                    return;
+                }
             }
 
             try
@@ -533,16 +553,24 @@ namespace ImpartialUI.ViewModels
             await Match(comp);
 
             Competition = comp;
+
+            Trace.Write(Competition.ToLongString());
         }
         private async void AddCompetition()
         {
-            // Set date times to match the selected dance convention for now
+            // Set date times to match the selected dance convention
             Competition.Date = SelectedDanceConvention.Date;
-            Competition.FinalCompetition.DateTime = SelectedDanceConvention.Date;
+
+            if (Competition.FinalCompetition != null)
+                Competition.FinalCompetition.DateTime = SelectedDanceConvention.Date;
+            
             foreach (var competition in Competition.PairedPrelimCompetitions)
             {
-                competition.LeaderPrelimCompetition.DateTime = SelectedDanceConvention.Date;
-                competition.FollowerPrelimCompetition.DateTime = SelectedDanceConvention.Date;
+                if (competition.LeaderPrelimCompetition != null)
+                    competition.LeaderPrelimCompetition.DateTime = SelectedDanceConvention.Date;
+                
+                if (competition.FollowerPrelimCompetition != null)
+                    competition.FollowerPrelimCompetition.DateTime = SelectedDanceConvention.Date;
             }
 
             Trace.WriteLine(Competition.ToLongString());
@@ -627,14 +655,18 @@ namespace ImpartialUI.ViewModels
                     MatchJudge(judge);
                 }
             }
-            foreach (var couple in competition.FinalCompetition.Couples)
+
+            if (competition.FinalCompetition != null)
             {
-                await MatchCompetitor(couple.Leader);
-                await MatchCompetitor(couple.Follower);
-            }
-            foreach (var judge in competition.FinalCompetition.Judges)
-            {
-                MatchJudge(judge);
+                foreach (var couple in competition.FinalCompetition.Couples)
+                {
+                    await MatchCompetitor(couple.Leader);
+                    await MatchCompetitor(couple.Follower);
+                }
+                foreach (var judge in competition.FinalCompetition.Judges)
+                {
+                    MatchJudge(judge);
+                }
             }
         }
         private async Task MatchCompetitor(ICompetitor competitor)
@@ -652,7 +684,9 @@ namespace ImpartialUI.ViewModels
             }
             else
             {
+#if !DEBUG
                 competitor.WsdcId = await GuessWsdcId(competitor.FirstName, competitor.LastName);
+#endif
             }
         }
         private void MatchJudge(IJudge judge)

@@ -259,10 +259,15 @@
                           Height="20"
                           HorizontalAlignment="Left"/>
                 <Button 
+                        Content="Refresh"
+                        Width="100" Height="20"
+                        Command="{Binding RefreshConventionsCommand}"
+                        Margin="10 10 5 10"/>
+                <Button 
                         Content="Cancel"
                         Width="100" Height="20"
                         Command="{Binding CancelCommand}"
-                        Margin="10"/>
+                        Margin="5 10 10 10"/>
             </StackPanel>
 
             <!-- Competition Tabs -->
