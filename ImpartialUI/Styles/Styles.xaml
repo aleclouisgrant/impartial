@@ -89,6 +89,28 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type Button}" x:Key="CircleButtonStyle">
+        <Setter Property="Foreground" Value="{StaticResource ServerActionColor}"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="border" CornerRadius="10" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding Foreground}" BorderThickness="2" Width="20" Height="20">
+                        <ContentPresenter x:Name="content" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        </ContentPresenter>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="BorderThickness" Value="0"/>
+                            <Setter TargetName="border" Property="Background" Value="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Setter TargetName="content" Property="TextElement.Foreground" Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <!-- Score Viewer Styles -->
     <Style TargetType="{x:Type Border}" x:Key="ScoreViewerHeaderBorderStyle">
         <Setter Property="Background" Value="{StaticResource Gray1}"/>
@@ -157,7 +179,7 @@
 
     <Style TargetType="{x:Type Border}" x:Key="CallbackScoreViewerBorderStyle">
         <Setter Property="Width" Value="35"/>
-        <Setter Property="Height" Value="23"/>
+        <Setter Property="Height" Value="22"/>
         <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -166,7 +188,7 @@
     <Style TargetType="{x:Type TextBlock}" x:Key="CallbackScoreViewerTextStyle">
         <Setter Property="FontFamily" Value="{StaticResource Inter}"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -212,21 +234,42 @@
     <!-- Prelims Editor -->
     <Style TargetType="{x:Type TextBox}" x:Key="ScoreViewerTextBoxStyleNonFinalist">
         <Setter Property="FontFamily" Value="{StaticResource Inter}"/>
-        <Setter Property="Foreground" Value="Black"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Left"/>
         <Setter Property="Margin" Value="5 2"/>
         <Setter Property="FontWeight" Value="Medium"/>
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="Foreground" Value="{StaticResource Gray2}"/>
+        <Setter Property="Background" Value="{StaticResource Gray1}"/>
+        <Setter Property="Height" Value="22"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border CornerRadius="10" Background="{TemplateBinding Background}" Padding="8 0" Height="{TemplateBinding Height}">
+                        <TextBox
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            TextAlignment="{TemplateBinding TextAlignment}"
+                            Foreground="{TemplateBinding Foreground}"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            FontSize="{TemplateBinding FontSize}"
+                            Text="{TemplateBinding Text}"
+                            Height="{TemplateBinding Height}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     <Style TargetType="{x:Type TextBox}" x:Key="ScoreViewerTextBoxStyleFinalist" BasedOn="{StaticResource ScoreViewerTextBoxStyleNonFinalist}">
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="Black"/>
     </Style>
     <Style TargetType="{x:Type TextBox}" x:Key="ScoreViewerBibTextBoxStyleNonFinalist" BasedOn="{StaticResource ScoreViewerTextBoxStyleNonFinalist}">
-        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="Width" Value="70"/>
     </Style>
@@ -235,6 +278,29 @@
 
     <Style TargetType="{x:Type controls:SearchTextBox}" x:Key="ScoreViewerSearchTextBox">
         <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}" x:Key="ScoreViewerTextBoxStyleAddNewCompetitor" BasedOn="{StaticResource ScoreViewerTextBoxStyleNonFinalist}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border CornerRadius="10" Background="{TemplateBinding Background}" BorderBrush="{StaticResource ServerActionColor}" BorderThickness="2" Padding="8 0" Height="20">
+                        <TextBox
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            TextAlignment="{TemplateBinding TextAlignment}"
+                            Foreground="{TemplateBinding Foreground}"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            FontSize="{TemplateBinding FontSize}"
+                            Text="{TemplateBinding Text}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>
