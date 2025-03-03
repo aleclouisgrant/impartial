@@ -1,4 +1,5 @@
 ﻿using Impartial;
+using Impartial.Enums;
 using ImpartialUI.Models;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ namespace ImpartialUI.Controls
             public ICompetitor Competitor { get; set; }
             public List<IPrelimScore> PrelimScores { get; set; } = new List<IPrelimScore>();
             public double TotalScore { get; set; }
+            public CallbackScore Callback { get; set; } = CallbackScore.Unscored;
         }
 
         #region DependencyProperties
@@ -184,16 +186,30 @@ namespace ImpartialUI.Controls
 
                 string bibNumberString = competition.CompetitorRegistrations.FirstOrDefault(c => c.Competitor == competitor)?.BibNumber ?? "0";
 
+                var callback = competition.PromotedCompetitors.Contains(competitor) ? CallbackScore.Yes : CallbackScore.No;
+                if (callback == CallbackScore.No)
+                {
+                    if (competition.Alternate1 == competitor)
+                    {
+                        callback = CallbackScore.Alt1;
+                    }
+                    else if (competition.Alternate2 == competitor)
+                    {
+                        callback = CallbackScore.Alt2; 
+                    }
+                }
+
                 competitorNodes.AddLast(new PrelimCompetitorScores
                 {
                     BibNumberString = bibNumberString,
                     Competitor = competitor,
                     PrelimScores = prelimScores,
-                    TotalScore = prelimScores.Sum(s => Util.GetCallbackScoreValue(s.CallbackScore))
+                    TotalScore = prelimScores.Sum(s => Util.GetCallbackScoreValue(s.CallbackScore)),
+                    Callback = callback
                 });
             }
 
-            competitorNodes = new(competitorNodes.OrderByDescending(s => s.TotalScore).ThenBy(s => s.BibNumberValue));
+            competitorNodes = new(competitorNodes.OrderByDescending(s => s.TotalScore).ThenByDescending(s => s.Callback).ThenBy(s => s.BibNumberValue));
 
             int row = 1;
             int count = 1;

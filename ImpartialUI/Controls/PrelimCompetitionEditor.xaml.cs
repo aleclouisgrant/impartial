@@ -67,6 +67,7 @@ namespace ImpartialUI.Controls
                 competitorScoresList.Add(new PrelimCompetitorScores 
                     {
                         Competitor = competitor,
+                        BibNumberString = prelimScores[0].CompetitorRegistration.BibNumber,
                         PrelimScores = prelimScores,
                         TotalScore = prelimScores.Sum(c => Util.GetCallbackScoreValue(c.CallbackScore))
                     });
@@ -93,9 +94,22 @@ namespace ImpartialUI.Controls
                 control.AddJudge(judge);
             }
 
-            foreach (var competitor in competitorScoresList)
+            foreach (var competitorScores in competitorScoresList)
             {
-                control.AddCompetitor(competitor.Competitor, competitor.PrelimScores);
+                var callback = competition.PromotedCompetitors.Contains(competitorScores.Competitor) ? CallbackScore.Yes : CallbackScore.No;
+                if (callback == CallbackScore.No)
+                {
+                    if (competition.Alternate1 == competitorScores.Competitor)
+                    {
+                        callback = CallbackScore.Alt1;
+                    }
+                    else if (competition.Alternate2 == competitorScores.Competitor)
+                    {
+                        callback = CallbackScore.Alt2;
+                    }
+                }
+
+                control.AddCompetitor(competitorScores.Competitor, competitorScores.BibNumberString, competitorScores.PrelimScores, callback);
             }
         }
 
@@ -169,7 +183,7 @@ namespace ImpartialUI.Controls
         private Button _addColumnButton;
 
         private IPrelimScore[,] _scores = new IPrelimScore[0,0];
-        private string[] _bibNumbers = new string[0];
+        private string[] _bibNumbers = Array.Empty<string>();
 
         public PrelimCompetitionEditor()
         {
@@ -214,7 +228,7 @@ namespace ImpartialUI.Controls
             }
         }
 
-        private void AddCompetitor(ICompetitor competitor = null, List<IPrelimScore> competitorPrelimScores = null)
+        private void AddCompetitor(ICompetitor competitor = null, string bibNumberString = "", List<IPrelimScore> competitorPrelimScores = null, CallbackScore callbackScore = CallbackScore.Unscored)
         {
             ScoreGrid.RowDefinitions.Add(new RowDefinition());
 
@@ -232,13 +246,14 @@ namespace ImpartialUI.Controls
             }
 
             var row = ScoreGrid.RowDefinitions.Count - 2;
-
-            bool promoted = competitorPrelimScores.Count > 0 ? PrelimCompetition.PromotedCompetitors.Contains(competitor) : false;
+            
             var promotedButton = new PromotedButton()
             {
                 Margin = new Thickness(20, 0, 0, 0),
-                CallbackScore = promoted ? CallbackScore.Yes : CallbackScore.No
+                CallbackScore = callbackScore,
+                Editable = false
             };
+
             ScoreGrid.Children.Add(promotedButton);
             Grid.SetRow(promotedButton, row);
             Grid.SetColumn(promotedButton, PROMOTED_COLUMN);
@@ -254,7 +269,7 @@ namespace ImpartialUI.Controls
 
             var competitorBibTextBox = new TextBox()
             {
-                Text = "",
+                Text = bibNumberString,
                 Style = Application.Current.Resources["ScoreViewerBibTextBoxStyleNonFinalist"] as Style
             };
             ScoreGrid.Children.Add(competitorBibTextBox);

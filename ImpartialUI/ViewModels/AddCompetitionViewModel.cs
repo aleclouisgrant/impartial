@@ -575,21 +575,19 @@ namespace ImpartialUI.ViewModels
 
             Trace.WriteLine(Competition.ToLongString());
 
-#if DEBUG
             try
             {
-                //await App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
+                await App.DatabaseProvider.UpsertCompetitionAsync(Competition, SelectedDanceConvention.Id);
             } 
             catch (PostgresException e)
             {
                 Clear();
 
                 Exception = e;
-                //await App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
+                await App.DatabaseProvider.DeleteCompetitionAsync(Competition.Id);
 
                 return;
             }
-#endif
 
             Clear();
         }

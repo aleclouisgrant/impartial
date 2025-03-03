@@ -95,8 +95,8 @@ namespace ImpartialUI.Models
             foreach (var competitor in Competitors)
             {
                 List<IPrelimScore> scores = PrelimScores.Where(s => s.Competitor == competitor).ToList();
-
-                str += Environment.NewLine + competitor.FullName + ": ";
+                
+                str += Environment.NewLine + scores[0]?.CompetitorRegistration.BibNumber + " " + competitor.FullName + ": ";
                 foreach (var score in scores)
                 {
                     switch (score.CallbackScore)

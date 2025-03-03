@@ -7,6 +7,7 @@ using HtmlAgilityPack;
 using Impartial;
 using Impartial.Enums;
 using ImpartialUI.Models;
+using MongoDB.Driver.Core.WireProtocol;
 
 namespace ImpartialUI.Services.ScoresheetParser
 {
@@ -105,14 +106,26 @@ namespace ImpartialUI.Services.ScoresheetParser
             if (nodes != null)
                 nodes.RemoveAt(0);
 
+            //count, competitor name, judge scores, bib, counts, sum, promote, alt
+            //int COUNT_COLUMN = 0;
+            int COMPETITOR_COLUMN = 1;
+            int SCORES_START_COLUMN = 2;
+            int BIB_COLUMN = SCORES_START_COLUMN + judges.Count;
+            int COUNTS_COLUMN = SCORES_START_COLUMN + judges.Count + 1;
+            int SUM_COLUMN = SCORES_START_COLUMN + judges.Count + 2;
+            int PROMOTE_COLUMN = SCORES_START_COLUMN + judges.Count + 3;
+            int ALT_COLUMN = SCORES_START_COLUMN + judges.Count + 4;
+
             foreach (var node in nodes)
             {
                 var nodeCollection = node.SelectNodes("td");
 
-                bool finaled = nodeCollection[5 + judges.Count].InnerText == "X" && nodeCollection[6 + judges.Count].InnerText == "";
-                string bibNumber = nodeCollection[2 + judges.Count].InnerText;
+                bool finaled = nodeCollection[PROMOTE_COLUMN].InnerText == "X" && nodeCollection[ALT_COLUMN].InnerText == "";
+                bool alternate1 = nodeCollection[PROMOTE_COLUMN].InnerText == "X" && nodeCollection[ALT_COLUMN].InnerText == "ALT1";
+                bool alternate2 = nodeCollection[PROMOTE_COLUMN].InnerText == "X" && nodeCollection[ALT_COLUMN].InnerText == "ALT2";
+                string bibNumber = nodeCollection[BIB_COLUMN].InnerText;
 
-                string name = nodeCollection[1].InnerText;
+                string name = nodeCollection[COMPETITOR_COLUMN].InnerText;
                 int pos = name.IndexOf(' ');
 
                 string firstName = "";
@@ -132,13 +145,12 @@ namespace ImpartialUI.Services.ScoresheetParser
                 var registration = new CompetitorRegistration(competitor, bibNumber);
 
                 CallbackScore callbackScore;
-                int offset = 2;
-                for (int i = offset; i < judges.Count + offset; i++)
+                for (int i = SCORES_START_COLUMN; i < judges.Count + SCORES_START_COLUMN; i++)
                 {
                     callbackScore = Util.StringToCallbackScore(nodeCollection[i].InnerText);
 
                     var prelimScore = new PrelimScore(
-                        judge: judges[i - offset],
+                        judge: judges[i - SCORES_START_COLUMN],
                         competitorRegistration: registration,
                         callbackScore: callbackScore);
 
@@ -148,6 +160,15 @@ namespace ImpartialUI.Services.ScoresheetParser
                 if (finaled)
                 {
                     prelimCompetition.PromotedCompetitors.Add(competitor);
+                }
+
+                if (alternate1)
+                {
+                    prelimCompetition.Alternate1 = competitor;
+                }
+                if (alternate2)
+                {
+                    prelimCompetition.Alternate2 = competitor;
                 }
             }
 
