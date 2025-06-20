@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Impartial.Enums;
-using System.Linq;
+﻿using Impartial.Enums;
 
 namespace Impartial
 {
@@ -223,7 +220,7 @@ namespace Impartial
         }
         public static IUser GetClosestPersonByFirstName(string input, IEnumerable<IUser> list)
         {
-            int leastDistance = 10000;
+            int leastDistance = int.MaxValue;
             IUser match = null;
 
             foreach (IUser p in list)
@@ -817,6 +814,8 @@ namespace Impartial
                     return competitors.FirstOrDefault(c => c.FullName == "D'Leene DeBoer");
                 case "Marie Soldevilla":
                     return competitors.FirstOrDefault(c => c.FullName == "Marie Soldevila");
+                case "Nicholas BOURGEAIS":
+                    return competitors.FirstOrDefault(c => c.FullName == "Nicholas Bourgeais");
 
                 default:
                     return competitors.FirstOrDefault(c => c.FullName == firstName + " " + lastName);

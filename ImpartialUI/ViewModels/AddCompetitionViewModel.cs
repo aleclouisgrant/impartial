@@ -334,20 +334,20 @@ namespace ImpartialUI.ViewModels
         private void TestData()
         {
             // EEPro
-            //ScoresheetSelector = ScoresheetSelector.EEPro;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-03-04 madjam\finals.html";
+            ScoresheetSelector = ScoresheetSelector.EEPro;
+            PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023\2023-11-24 us open\prelims.html";
+            FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023\2023-11-24 us open\finals.html";
 
             // StepRightSolutions
             //ScoresheetSelector = ScoresheetSelector.StepRightSolutions;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\prelims.html";
-            //SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\semis.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022-10-08 boogie by the bay\finals.html";
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022\2022-10-08 boogie by the bay\prelims.html";
+            //SemisPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022\2022-10-08 boogie by the bay\semis.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2022\2022-10-08 boogie by the bay\finals.html";
 
             // WorldDanceRegistry
             //ScoresheetSelector = ScoresheetSelector.WorldDanceRegistry;
-            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\prelims.html";
-            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023-02-03 charlotte\finals.html";
+            //PrelimsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023\2023-02-03 charlotte\prelims.html";
+            //FinalsPath = @"C:\Users\Alec\source\Impartial\ImpartialUI\Scoresheets\2023\2023-02-03 charlotte\finals.html";
         }
 
         private async void RefreshCache()
@@ -537,6 +537,7 @@ namespace ImpartialUI.ViewModels
             catch (FileNotFoundException e)
             {
                 Exception = e;
+                return;
             }
 
             ICompetition comp;
@@ -544,7 +545,8 @@ namespace ImpartialUI.ViewModels
             {
                 //TODO: make this async
                 comp = _scoresheetParser.GetCompetition(Division.AllStar);
-            } catch (DivisionNotFoundException e)
+            } 
+            catch (DivisionNotFoundException e)
             {
                 Exception = e;
                 return;

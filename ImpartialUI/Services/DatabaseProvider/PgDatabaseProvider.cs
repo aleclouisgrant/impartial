@@ -8,25 +8,13 @@ using Impartial;
 using ImpartialUI.Models;
 using ImpartialUI.Models.PgModels;
 using Impartial.Enums;
+using Impartial.PgTableSchema;
+using System.Net.Security;
 
 namespace ImpartialUI.Services.DatabaseProvider
 {
     public class PgDatabaseProvider : IDatabaseProvider, IDisposable
     {
-        const string PG_USERS_TABLE_NAME = "users";
-        const string PG_COMPETITOR_PROFILES_TABLE_NAME = "competitor_profiles";
-        const string PG_COMPETITOR_REGISTRATIONS_TABLE_NAME = "competitor_registrations";
-        const string PG_COMPETITOR_RECORDS_TABLE_NAME = "competitor_records";
-        const string PG_JUDGE_PROFILES_TABLE_NAME = "judge_profiles";
-        const string PG_DANCE_CONVENTIONS_TABLE_NAME = "dance_conventions";
-        const string PG_COMPETITIONS_TABLE_NAME = "competitions";
-        const string PG_PRELIM_COMPETITIONS_TABLE_NAME = "prelim_competitions";
-        const string PG_FINAL_COMPETITIONS_TABLE_NAME = "final_competitions";
-        const string PG_PRELIM_SCORES_TABLE_NAME = "prelim_scores";
-        const string PG_FINAL_SCORES_TABLE_NAME = "final_scores";
-        const string PG_PROMOTED_COMPETITORS_TABLE_NAME = "promoted_competitors";
-        const string PG_PLACEMENTS_TABLE_NAME = "placements";
-
         string _connectionString;
         private NpgsqlDataSource _dataSource;
 
@@ -288,15 +276,15 @@ namespace ImpartialUI.Services.DatabaseProvider
             await using var connection = await _dataSource.OpenConnectionAsync();
             await using var transaction = await connection.BeginTransactionAsync();
 
-            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, nameof(PgUserModel.id));
-            await UpsertDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME, competitorProfileModel, nameof(PgCompetitorProfileModel.user_id));
+            await UpsertDataAsync(PgUsersTableSchema.TableName, userModel, nameof(PgUserModel.id));
+            await UpsertDataAsync(PgCompetitorProfilesTableSchema.TableName, competitorProfileModel, nameof(PgCompetitorProfileModel.user_id));
 
             await transaction.CommitAsync();
         }
         public async Task<ICompetitor?> GetCompetitorAsync(Guid id)
         {
             string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
-                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
+                + " FROM " + PgUsersTableSchema.TableName + " INNER JOIN " + PgCompetitorProfilesTableSchema.TableName + " ON users.id = competitor_profiles.user_id"
                 + " WHERE competitor_profiles.id = " + id;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -321,7 +309,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<ICompetitor?> GetCompetitorAsync(string firstName, string lastName)
         {
             string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id competitor_profiles.leader_rating competitor_profiles.follower_rating"
-               + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id"
+               + " FROM " + PgUsersTableSchema.TableName + " INNER JOIN " + PgCompetitorProfilesTableSchema.TableName + " ON users.id = competitor_profiles.user_id"
                + " WHERE users.first_name = " + firstName + " AND users.last_name = " + lastName;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -346,7 +334,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<IEnumerable<ICompetitor>> GetAllCompetitorsAsync()
         {
             string query = "SELECT users.id, competitor_profiles.id, users.first_name, users.last_name, competitor_profiles.wsdc_id, competitor_profiles.leader_rating, competitor_profiles.follower_rating"
-            + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_COMPETITOR_PROFILES_TABLE_NAME + " ON users.id = competitor_profiles.user_id";
+            + " FROM " + PgUsersTableSchema.TableName + " INNER JOIN " + PgCompetitorProfilesTableSchema.TableName + " ON users.id = competitor_profiles.user_id";
             var results = new List<ICompetitor>();
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -370,11 +358,11 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteCompetitorAsync(Guid id)
         {
-            await DeleteDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME, nameof(PgCompetitorProfileModel.id), id);
+            await DeleteDataAsync(PgCompetitorProfilesTableSchema.TableName, nameof(PgCompetitorProfileModel.id), id);
         }
         public async Task DeleteAllCompetitorsAsync()
         {
-            await DeleteAllDataAsync(PG_COMPETITOR_PROFILES_TABLE_NAME);
+            await DeleteAllDataAsync(PgCompetitorProfilesTableSchema.TableName);
         }
 
         public async Task UpsertJudgeAsync(IJudge judge)
@@ -395,15 +383,15 @@ namespace ImpartialUI.Services.DatabaseProvider
             await using var connection = await _dataSource.OpenConnectionAsync();
             await using var transaction = await connection.BeginTransactionAsync();
 
-            await UpsertDataAsync(PG_USERS_TABLE_NAME, userModel, nameof(PgUserModel.id));
-            await UpsertDataAsync(PG_JUDGE_PROFILES_TABLE_NAME, judgeModel, nameof(PgJudgeProfileModel.user_id));
+            await UpsertDataAsync(PgUsersTableSchema.TableName, userModel, nameof(PgUserModel.id));
+            await UpsertDataAsync(PgJudgeProfilesTableSchema.TableName, judgeModel, nameof(PgJudgeProfileModel.user_id));
 
             await transaction.CommitAsync();
         }
         public async Task<IJudge?> GetJudgeAsync(Guid id)
         {
             string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
-                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
+                + " FROM " + PgUsersTableSchema.TableName + " INNER JOIN " + PgJudgeProfilesTableSchema.TableName + " ON users.id = judge_profiles.user_id"
                 + " WHERE judge_profiles.id = " + id;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -425,7 +413,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<IJudge?> GetJudgeAsync(string firstName, string lastName)
         {
             string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
-                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id"
+                + " FROM " + PgUsersTableSchema.TableName + " INNER JOIN " + PgJudgeProfilesTableSchema.TableName + " ON users.id = judge_profiles.user_id"
                + " WHERE users.first_name = " + firstName + " AND users.last_name = " + lastName;
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -447,7 +435,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         public async Task<IEnumerable<IJudge>> GetAllJudgesAsync()
         {
             string query = "SELECT users.id, judge_profiles.id, users.first_name, users.last_name"
-                + " FROM " + PG_USERS_TABLE_NAME + " INNER JOIN " + PG_JUDGE_PROFILES_TABLE_NAME + " ON users.id = judge_profiles.user_id";
+                + " FROM " + PgUsersTableSchema.TableName + " INNER JOIN " + PgJudgeProfilesTableSchema.TableName + " ON users.id = judge_profiles.user_id";
 
             var results = new List<IJudge>();
 
@@ -469,11 +457,11 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteJudgeAsync(Guid id)
         {
-            await DeleteDataAsync(PG_JUDGE_PROFILES_TABLE_NAME, nameof(PgJudgeProfileModel.id), id);
+            await DeleteDataAsync(PgJudgeProfilesTableSchema.TableName, nameof(PgJudgeProfileModel.id), id);
         }
         public async Task DeleteAllJudgesAsync()
         {
-            await DeleteAllDataAsync(PG_JUDGE_PROFILES_TABLE_NAME);
+            await DeleteAllDataAsync(PgJudgeProfilesTableSchema.TableName);
         }
 
         public async Task UpsertDanceConventionAsync(IDanceConvention convention)
@@ -485,7 +473,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 date = convention.Date,
             };
 
-            await UpsertDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, pgDanceConventionModel, nameof(PgDanceConventionModel.id));
+            await UpsertDataAsync(PgDanceConventionsTableSchema.TableName, pgDanceConventionModel, nameof(PgDanceConventionModel.id));
         }
         public async Task<IDanceConvention?> GetDanceConventionAsync(Guid id)
         {
@@ -530,11 +518,11 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteDanceConventionAsync(Guid id)
         {
-            await DeleteDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME, nameof(PgDanceConventionModel.id), id);
+            await DeleteDataAsync(PgDanceConventionsTableSchema.TableName, nameof(PgDanceConventionModel.id), id);
         }
         public async Task DeleteAllDanceConventionsAsync()
         {
-            await DeleteAllDataAsync(PG_DANCE_CONVENTIONS_TABLE_NAME);
+            await DeleteAllDataAsync(PgDanceConventionsTableSchema.TableName);
         }
 
         public async Task UpsertCompetitionAsync(ICompetition competition, Guid danceConventionId)
@@ -551,7 +539,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                 follower_tier = competition.FollowerTier
             };
 
-            await SaveDataAsync(PG_COMPETITIONS_TABLE_NAME, pgCompetitionModel);
+            await SaveDataAsync(PgCompetitionsTableSchema.TableName, pgCompetitionModel);
 
             var uploadedCompetitorRegistrations = new List<PgCompetitorRegistrationModel>();
             var uploadedCompetitorRecords = new List<PgCompetitorRecordModel>();
@@ -583,7 +571,8 @@ namespace ImpartialUI.Services.DatabaseProvider
 
                     foreach (var competitor in pairedPrelimCompetition.LeaderPrelimCompetition.Competitors)
                     {
-                        if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
+                        if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId)
+                            && !uploadedCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
                         {
                             prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
                             {
@@ -594,15 +583,31 @@ namespace ImpartialUI.Services.DatabaseProvider
                             });
                         }
 
-                        if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                            && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                            && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Leader.CompetitorId == competitor.CompetitorId))
+                        bool pendingRegistration = prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId);
+                        bool recordAlreadyUploaded = pendingRegistration ?
+                            uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == prelimCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == competitor.CompetitorId)?.id)
+                            : uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == uploadedCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == competitor.CompetitorId)?.id);
+                        bool alreadyInRecords = prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId);
+                        bool willBeUploadedDuringFinals = (bool)competition.FinalCompetition?.Couples.Any(c => c.Leader.CompetitorId == competitor.CompetitorId);
+
+                        if (!(recordAlreadyUploaded || alreadyInRecords || willBeUploadedDuringFinals))
                         {
-                            prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                            if (pendingRegistration)
                             {
-                                competition_id = competition.Id,
-                                competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
-                            });
+                                prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                                {
+                                    competition_id = competition.Id,
+                                    competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                                });
+                            }
+                            else
+                            {
+                                prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                                {
+                                    competition_id = competition.Id,
+                                    competitor_registration_id = uploadedCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                                });
+                            }
                         }
                     }
 
@@ -643,7 +648,8 @@ namespace ImpartialUI.Services.DatabaseProvider
 
                     foreach (var competitor in pairedPrelimCompetition.FollowerPrelimCompetition.Competitors)
                     {
-                        if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
+                        if (!prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId)
+                            && !uploadedCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId))
                         {
                             prelimCompetitorRegistrations.Add(new PgCompetitorRegistrationModel
                             {
@@ -654,15 +660,31 @@ namespace ImpartialUI.Services.DatabaseProvider
                             });
                         }
 
-                        if (!prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                            && !uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId)
-                            && (bool)!competition.FinalCompetition?.Couples.Any(c => c.Follower.CompetitorId == competitor.CompetitorId))
+                        bool pendingRegistration = prelimCompetitorRegistrations.Any(reg => reg.competitor_profile_id == competitor.CompetitorId);
+                        bool recordAlreadyUploaded = pendingRegistration ?
+                            uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == prelimCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == competitor.CompetitorId)?.id)
+                            : uploadedCompetitorRecords.Any(rec => rec.competitor_registration_id == uploadedCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == competitor.CompetitorId)?.id);
+                        bool alreadyInRecords = prelimCompetitorRecords.Any(rec => rec.competitor_registration_id == competitor.CompetitorId);
+                        bool willBeUploadedDuringFinals = (bool)competition.FinalCompetition?.Couples.Any(c => c.Follower.CompetitorId == competitor.CompetitorId);
+
+                        if (!(recordAlreadyUploaded || alreadyInRecords || willBeUploadedDuringFinals))
                         {
-                            prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                            if (pendingRegistration)
                             {
-                                competition_id = competition.Id,
-                                competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
-                            });
+                                prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                                {
+                                    competition_id = competition.Id,
+                                    competitor_registration_id = prelimCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                                });
+                            }
+                            else
+                            {
+                                prelimCompetitorRecords.Add(new PgCompetitorRecordModel
+                                {
+                                    competition_id = competition.Id,
+                                    competitor_registration_id = uploadedCompetitorRegistrations.First(reg => reg.competitor_profile_id == competitor.CompetitorId).id,
+                                });
+                            }
                         }
                     }
 
@@ -691,21 +713,21 @@ namespace ImpartialUI.Services.DatabaseProvider
                 // Save all data
                 foreach (var competitorRegistration in prelimCompetitorRegistrations)
                 {
-                    await SaveDataAsync(PG_COMPETITOR_REGISTRATIONS_TABLE_NAME, competitorRegistration);
+                    await SaveDataAsync(PgCompetitorRegistrationsTableSchema.TableName, competitorRegistration);
                 }
 
                 foreach (var competitorRecord in prelimCompetitorRecords)
                 {
-                    await SaveDataAsync(PG_COMPETITOR_RECORDS_TABLE_NAME, competitorRecord);
+                    await SaveDataAsync(PgCompetitorRecordsTableSchema.TableName, competitorRecord);
                 }
 
                 if (pairedPrelimCompetition.LeaderPrelimCompetition != null)
                 {
-                    await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, leaderPrelimCompetitionModel);
+                    await SaveDataAsync(PgPrelimCompetitionsTableSchema.TableName, leaderPrelimCompetitionModel);
 
                     foreach (var leaderPromotedCompetitor in leaderPromotedCompetitors)
                     {
-                        await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, leaderPromotedCompetitor);
+                        await SaveDataAsync(PgPromotedCompetitorsTableSchema.TableName, leaderPromotedCompetitor);
                     }
 
                     foreach (var judge in pairedPrelimCompetition.LeaderPrelimCompetition.Judges)
@@ -716,11 +738,11 @@ namespace ImpartialUI.Services.DatabaseProvider
 
                 if (pairedPrelimCompetition.FollowerPrelimCompetition != null)
                 {
-                    await SaveDataAsync(PG_PRELIM_COMPETITIONS_TABLE_NAME, followerPrelimCompetitionModel);
+                    await SaveDataAsync(PgPrelimCompetitionsTableSchema.TableName, followerPrelimCompetitionModel);
                 
                     foreach (var followerPromotedCompetitor in followerPromotedCompetitors)
                     {
-                        await SaveDataAsync(PG_PROMOTED_COMPETITORS_TABLE_NAME, followerPromotedCompetitor);
+                        await SaveDataAsync(PgPromotedCompetitorsTableSchema.TableName, followerPromotedCompetitor);
                     }
 
                     foreach (var judge in pairedPrelimCompetition.FollowerPrelimCompetition.Judges)
@@ -731,7 +753,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
                 foreach (var prelimScore in prelimScores)
                 {
-                    await SaveDataAsync(PG_PRELIM_SCORES_TABLE_NAME, prelimScore);
+                    await SaveDataAsync(PgPrelimScoresTableSchema.TableName, prelimScore);
                 }
 
                 uploadedCompetitorRegistrations.AddRange(prelimCompetitorRegistrations);
@@ -773,6 +795,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                             id = Guid.NewGuid(),
                             competitor_profile_id = couple.Leader.CompetitorId,
                             dance_convention_id = danceConventionId,
+                            bib_number = couple.LeaderRegistration.BibNumber
                         });
                     }
 
@@ -784,8 +807,7 @@ namespace ImpartialUI.Services.DatabaseProvider
                             id = Guid.NewGuid(),
                             competitor_profile_id = couple.Follower.CompetitorId,
                             dance_convention_id = danceConventionId,
-                            // TODO
-                            //bib_number = 
+                            bib_number = couple.FollowerRegistration.BibNumber
                         });
                     }
 
@@ -805,12 +827,12 @@ namespace ImpartialUI.Services.DatabaseProvider
                         });
                     }
 
-                    var followerRecord = finalCompetitorRecords.Where(rec => rec.competitor_registration_id == couple.Leader.CompetitorId).FirstOrDefault();
+                    var followerRecord = finalCompetitorRecords.Where(rec => rec.competitor_registration_id == couple.Follower.CompetitorId).FirstOrDefault();
                     if (followerRecord == null)
                     {
                         var registrationId = 
-                            uploadedCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == couple.Leader.CompetitorId)?.id ??
-                            finalCompetitorRegistrations.First(reg => reg.competitor_profile_id == couple.Leader.CompetitorId).id;
+                            uploadedCompetitorRegistrations.FirstOrDefault(reg => reg.competitor_profile_id == couple.Follower.CompetitorId)?.id ??
+                            finalCompetitorRegistrations.First(reg => reg.competitor_profile_id == couple.Follower.CompetitorId).id;
 
                         finalCompetitorRecords.Add(new PgCompetitorRecordModel
                         {
@@ -838,19 +860,19 @@ namespace ImpartialUI.Services.DatabaseProvider
                 // Sava all data
                 foreach (var registration in finalCompetitorRegistrations)
                 {
-                    await SaveDataAsync(PG_COMPETITOR_REGISTRATIONS_TABLE_NAME, registration);
+                    await SaveDataAsync(PgCompetitorRegistrationsTableSchema.TableName, registration);
                 }
 
                 foreach (var record in finalCompetitorRecords)
                 {
-                    await SaveDataAsync(PG_COMPETITOR_RECORDS_TABLE_NAME, record);
+                    await SaveDataAsync(PgCompetitorRecordsTableSchema.TableName, record);
                 }
 
-                await SaveDataAsync(PG_FINAL_COMPETITIONS_TABLE_NAME, finalCompetitionModel);
+                await SaveDataAsync(PgFinalCompetitionsTableSchema.TableName, finalCompetitionModel);
 
                 foreach (var placementModel in placements)
                 {
-                    await SaveDataAsync(PG_PLACEMENTS_TABLE_NAME, placementModel);
+                    await SaveDataAsync(PgPlacementsTableSchema.TableName, placementModel);
                 }
 
                 foreach (var judge in competition.FinalCompetition.Judges)
@@ -860,7 +882,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
                 foreach (var finalScore in finalScores)
                 {
-                    await SaveDataAsync(PG_FINAL_SCORES_TABLE_NAME, finalScore);
+                    await SaveDataAsync(PgFinalScoresTableSchema.TableName, finalScore);
                 }
             }
 
@@ -872,8 +894,8 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             string query =
                 "SELECT dance_conventions.id, dance_conventions.name, dance_conventions.date, competitions.division"
-                + " FROM " + PG_COMPETITIONS_TABLE_NAME
-                + " INNER JOIN " + PG_DANCE_CONVENTIONS_TABLE_NAME + " ON dance_conventions.id = competitions.dance_convention_id"
+                + " FROM " + PgCompetitionsTableSchema.TableName
+                + " INNER JOIN " + PgDanceConventionsTableSchema.TableName + " ON dance_conventions.id = competitions.dance_convention_id"
                 + " WHERE competitions.id = \'" + id + "\';";
 
             await using (var cmd = _dataSource.CreateCommand(query))
@@ -896,7 +918,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             string prelimCompetitionQuery =
                 "SELECT id, date_time, role, round, alternate1_id, alternate2_id"
-                + " FROM " + PG_PRELIM_COMPETITIONS_TABLE_NAME
+                + " FROM " + PgPrelimCompetitionsTableSchema.TableName
                 + " WHERE prelim_competitions.competition_id = \'" + id + "\';";
 
             await using (var cmd = _dataSource.CreateCommand(prelimCompetitionQuery))
@@ -1024,7 +1046,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             string finalCompetitionQuery =
                 "SELECT id, date_time"
-                + " FROM " + PG_FINAL_COMPETITIONS_TABLE_NAME
+                + " FROM " + PgFinalCompetitionsTableSchema.TableName
                 + " WHERE competition_id = \'" + id + "\';";
 
             await using (var cmd = _dataSource.CreateCommand(finalCompetitionQuery))
@@ -1160,7 +1182,7 @@ namespace ImpartialUI.Services.DatabaseProvider
 
             string query =
                 "SELECT id"
-                + " FROM " + PG_COMPETITIONS_TABLE_NAME;
+                + " FROM " + PgCompetitionsTableSchema.TableName;
 
             await using (var cmd = _dataSource.CreateCommand(query))
             await using (var reader = await cmd.ExecuteReaderAsync())
@@ -1181,7 +1203,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteCompetitionAsync(Guid id)
         {
-            string query = "DELETE FROM " + PG_COMPETITIONS_TABLE_NAME + " WHERE id = \'" + id + "\';";
+            string query = "DELETE FROM " + PgCompetitionsTableSchema.TableName + " WHERE id = \'" + id + "\';";
             await using (var cmd = _dataSource.CreateCommand(query))
             {
                 await cmd.ExecuteNonQueryAsync();
@@ -1191,7 +1213,7 @@ namespace ImpartialUI.Services.DatabaseProvider
         }
         public async Task DeleteAllCompetitionsAsync()
         {
-            await DeleteAllDataAsync(PG_COMPETITIONS_TABLE_NAME);
+            await DeleteAllDataAsync(PgCompetitionsTableSchema.TableName);
             await DeleteHangingCompetitorRegistrations();
         }
 
@@ -1202,9 +1224,9 @@ namespace ImpartialUI.Services.DatabaseProvider
 
         private async Task DeleteHangingCompetitorRegistrations()
         {
-            string query = "DELETE FROM " + PG_COMPETITOR_REGISTRATIONS_TABLE_NAME
+            string query = "DELETE FROM " + PgCompetitorRegistrationsTableSchema.TableName
                 + " WHERE NOT EXISTS ("
-                + "SELECT FROM " + PG_COMPETITOR_RECORDS_TABLE_NAME
+                + "SELECT FROM " + PgCompetitorRecordsTableSchema.TableName
                 + " WHERE competitor_records.competitor_registration_id = competitor_registrations.id"
                 + ");";
 

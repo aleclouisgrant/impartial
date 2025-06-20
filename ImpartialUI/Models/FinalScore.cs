@@ -13,18 +13,17 @@ namespace ImpartialUI.Models
         public ICompetitorRegistration LeaderRegistration { get; set; }
         public ICompetitorRegistration FollowerRegistration { get; set; }
 
-        private ICompetitor _leader;
         public ICompetitor Leader
         {
             get
             {
-                return LeaderRegistration == null ? _leader : LeaderRegistration.Competitor;
+                return LeaderRegistration?.Competitor;
             }
             set
             {
                 if (LeaderRegistration == null)
                 {
-                    _leader = value;
+                    LeaderRegistration = new CompetitorRegistration(value, string.Empty);
                 }
                 else
                 {
@@ -33,18 +32,17 @@ namespace ImpartialUI.Models
             }
         }
 
-        private ICompetitor _follower;
         public ICompetitor Follower
         {
             get
             {
-                return FollowerRegistration == null ? _follower : FollowerRegistration.Competitor;
+                return FollowerRegistration?.Competitor;
             }
             set
             {
                 if (FollowerRegistration == null)
                 {
-                    _follower = value;
+                    FollowerRegistration = new CompetitorRegistration(value, string.Empty);
                 }
                 else
                 {
@@ -78,12 +76,12 @@ namespace ImpartialUI.Models
             SetFollower(followerId);
         }
 
-        public FinalScore(IJudge judge, ICompetitorRegistration leader, ICompetitorRegistration follower, int score, int placement, Guid? id = null)
+        public FinalScore(IJudge judge, ICompetitorRegistration leaderRegistration, ICompetitorRegistration followerRegistration, int score, int placement, Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
 
             Judge = judge; 
-            LeaderRegistration = leader; FollowerRegistration = follower;
+            LeaderRegistration = leaderRegistration; FollowerRegistration = followerRegistration;
             Score = score; Placement = placement;
         }
 

@@ -15,7 +15,7 @@ namespace ImpartialUI.Controls
         private static readonly int COUNT_COLUMN = 1;
         private static readonly int BIB_COLUMN = 2;
         private static readonly int COMPETITOR_COLUMN = 3;
-        private static readonly int SCORE_COLUMN_START = 4;
+        private static readonly int SCORES_START_COLUMN = 4;
 
         private class PrelimCompetitorScores
         {
@@ -235,18 +235,9 @@ namespace ImpartialUI.Controls
                 var promotedButton = new PromotedButton()
                 {
                     Margin = new Thickness(20, 0, 0, 0),
-                    CallbackScore = promoted ? Impartial.Enums.CallbackScore.Yes : Impartial.Enums.CallbackScore.No,
+                    CallbackScore = competitorNode.Value.Callback,
                     Editable = false
                 };
-
-                if (competitorNode.Value.Competitor == competition.Alternate1)
-                {
-                    promotedButton.CallbackScore = Impartial.Enums.CallbackScore.Alt1;
-                }
-                if (competitorNode.Value.Competitor == competition.Alternate2)
-                {
-                    promotedButton.CallbackScore = Impartial.Enums.CallbackScore.Alt2;
-                }
 
                 control.ScoreGrid.Children.Add(promotedButton);
                 Grid.SetRow(promotedButton, row);
@@ -280,7 +271,7 @@ namespace ImpartialUI.Controls
                 Grid.SetColumn(nameTextBlock, COMPETITOR_COLUMN);
 
                 // scores
-                int scoreColumn = SCORE_COLUMN_START;
+                int scoreColumn = SCORES_START_COLUMN;
                 foreach (var score in competitorNode.Value.PrelimScores.OrderBy(c => c.Judge.FullName))
                 {
                     var callbackScoreViewer = new CallbackScoreViewer()

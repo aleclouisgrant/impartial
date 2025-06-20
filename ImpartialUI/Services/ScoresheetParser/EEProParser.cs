@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using HtmlAgilityPack;
 using Impartial;
 using Impartial.Enums;
@@ -188,16 +189,23 @@ namespace ImpartialUI.Services.ScoresheetParser
 
             var nodes = doc.DocumentNode.SelectNodes("tr");
 
-            var leaders = new List<ICompetitor>();
-            var followers = new List<ICompetitor>();
+            var leaderRegistrations = new List<ICompetitorRegistration>();
+            var followerRegistations = new List<ICompetitorRegistration>();
 
             var scores = new List<IFinalScore>();
             for (int i = 1; i < nodes.Count; i++)
             {
                 var node = nodes[i].SelectNodes("td");
-                int placement = int.Parse(node[0].InnerText);
 
-                for (int j = 2; j < judges.Count + 2; j++)
+                //placement, competitor names, scores, bib numbers, marks sorted
+                int PLACEMENT_COLUMN = 0;
+                int COMPETITORS_COLUMN = 1;
+                int SCORES_START_COLUMN = 2;
+                int BIB_NUMBERS_COLUMN = SCORES_START_COLUMN + judges.Count;
+                //int MARKS_SORTED_COLUMN = SCORES_START_COLUMN + judges.Count + 1;
+                
+                int placement = int.Parse(node[PLACEMENT_COLUMN].InnerText);
+                for (int j = SCORES_START_COLUMN; j < judges.Count + SCORES_START_COLUMN; j++)
                 {
                     int score;
 
@@ -210,43 +218,48 @@ namespace ImpartialUI.Services.ScoresheetParser
                         score = int.Parse(node[j].InnerText.Substring(0, 1));
                     }
 
-                    string leaderName = node[1].InnerText.Substring(0, node[1].InnerText.IndexOf(" and "));
+                    string bibNumbers = node[BIB_NUMBERS_COLUMN].InnerText;
+                    int bibPos = bibNumbers.IndexOf("/");
+                    string leaderBibNumber = bibNumbers.Substring(0, bibPos).Trim();
+                    string followerBibNumber = bibNumbers.Substring(bibPos + 1).Trim();
+
+                    string leaderName = node[COMPETITORS_COLUMN].InnerText.Substring(0, node[COMPETITORS_COLUMN].InnerText.IndexOf(" and "));
                     int leadPos = leaderName.IndexOf(' ');
                     string leaderFirstName = leaderName.Substring(0, leadPos).Trim();
                     string leaderLastName = leaderName.Substring(leadPos + 1).Trim();
 
-                    ICompetitor leader = leaders.Where(c => c.FullName == leaderFirstName + " " + leaderLastName)?.FirstOrDefault();
-                    if (leader == null)
+                    ICompetitorRegistration leaderRegistration = leaderRegistrations.Where(c => c.Competitor.FullName == leaderFirstName + " " + leaderLastName)?.FirstOrDefault();
+                    if (leaderRegistration == null)
                     {
-                        leader = new Competitor(leaderFirstName, leaderLastName);
-                        leaders.Add(leader);
+                        leaderRegistration = new CompetitorRegistration(new Competitor(leaderFirstName, leaderLastName), leaderBibNumber);
+                        leaderRegistrations.Add(leaderRegistration);
                     }
 
-                    string followerName = node[1].InnerText.Substring(node[1].InnerText.IndexOf(" and ") + " and ".Length);
+                    string followerName = node[COMPETITORS_COLUMN].InnerText.Substring(node[COMPETITORS_COLUMN].InnerText.IndexOf(" and ") + " and ".Length);
                     int followPos = followerName.IndexOf(' ');
                     string followerFirstName = followerName.Substring(0, followPos).Trim();
                     string followerLastName = followerName.Substring(followPos + 1).Trim();
 
-                    ICompetitor follower = followers.Where(c => c.FullName == followerFirstName + " " + followerLastName)?.FirstOrDefault();
-                    if (follower == null)
+                    ICompetitorRegistration followerRegistration = followerRegistations.Where(c => c.Competitor.FullName == followerFirstName + " " + followerLastName)?.FirstOrDefault();
+                    if (followerRegistration == null)
                     {
-                        follower = new Competitor(followerFirstName, followerLastName);
-                        followers.Add(follower);
+                        followerRegistration = new CompetitorRegistration(new Competitor(followerFirstName, followerLastName), followerBibNumber);
+                        followerRegistations.Add(followerRegistration);
                     }
 
                     var finalScore = new FinalScore(
                         judge: judges[j - 2],
-                        leader: leader,
-                        follower: follower,
+                        leaderRegistration: leaderRegistration,
+                        followerRegistration: followerRegistration,
                         score: score, 
                         placement: placement);
 
                     scores.Add(finalScore);
 
-                    if (judges[j - 2].Scores == null)
-                        judges[j - 2].Scores = new List<IFinalScore>();
+                    if (judges[j - SCORES_START_COLUMN].Scores == null)
+                        judges[j - SCORES_START_COLUMN].Scores = new List<IFinalScore>();
 
-                    judges[j - 2].Scores.Add(finalScore);
+                    judges[j - SCORES_START_COLUMN].Scores.Add(finalScore);
                 }
             }
 

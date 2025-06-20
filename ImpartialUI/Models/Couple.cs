@@ -8,18 +8,17 @@ namespace ImpartialUI.Models
         public ICompetitorRegistration LeaderRegistration { get; set; }
         public ICompetitorRegistration FollowerRegistration { get; set; }
 
-        private ICompetitor _leader;
         public ICompetitor Leader
         {
             get
             {
-                return LeaderRegistration == null ? _leader : LeaderRegistration.Competitor;
+                return LeaderRegistration?.Competitor;
             }
             set
             {
                 if (LeaderRegistration == null)
                 {
-                    _leader = value;
+                    LeaderRegistration = new CompetitorRegistration(value, string.Empty);
                 }
                 else
                 {
@@ -28,18 +27,17 @@ namespace ImpartialUI.Models
             }
         }
 
-        private ICompetitor _follower;
         public ICompetitor Follower
         {
             get
             {
-                return FollowerRegistration == null ? _follower : FollowerRegistration.Competitor;
+                return FollowerRegistration?.Competitor;
             }
             set
             {
                 if (FollowerRegistration == null)
                 {
-                    _follower = value;
+                    FollowerRegistration = new CompetitorRegistration(value, string.Empty);
                 }
                 else
                 {

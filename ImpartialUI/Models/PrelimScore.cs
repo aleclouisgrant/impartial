@@ -11,18 +11,17 @@ namespace ImpartialUI.Models
         public IJudge Judge { get; set; }
         public ICompetitorRegistration CompetitorRegistration { get; set; }
 
-        private ICompetitor _competitor;
         public ICompetitor Competitor
         {
             get
             {
-                return CompetitorRegistration == null ? _competitor : CompetitorRegistration.Competitor;
+                return CompetitorRegistration?.Competitor;
             }
             set
             {
                 if (CompetitorRegistration == null)
                 {
-                    _competitor = value;
+                    CompetitorRegistration = new CompetitorRegistration(value, string.Empty);
                 }
                 else
                 {

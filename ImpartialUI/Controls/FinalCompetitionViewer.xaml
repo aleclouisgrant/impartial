@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="100" Style="{StaticResource ScoreViewerHeaderBorderStyle}"/>

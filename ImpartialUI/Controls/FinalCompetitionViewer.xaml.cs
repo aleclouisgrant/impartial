@@ -14,7 +14,7 @@ namespace ImpartialUI.Controls
         private static readonly int PLACEMENT_COLUMN = 0;
         private static readonly int BIB_COLUMN = 1;
         private static readonly int COMPETITORS_COLUMN = 2;
-        private static readonly int SCORE_COLUMN_START = 3;
+        private static readonly int SCORES_START_COLUMN = 3;
 
         #region DependencyProperties
         public static readonly DependencyProperty ShowJudgeAccuracyProperty = DependencyProperty.Register(
@@ -114,7 +114,7 @@ namespace ImpartialUI.Controls
 
                     control.ScoreGrid.Children.Add(judgeTextBlock);
                     Grid.SetRow(judgeTextBlock, 0);
-                    Grid.SetColumn(judgeTextBlock, SCORE_COLUMN_START + judgeIndex);
+                    Grid.SetColumn(judgeTextBlock, SCORES_START_COLUMN + judgeIndex);
                 }
                 else
                 {
@@ -145,7 +145,7 @@ namespace ImpartialUI.Controls
 
                     control.ScoreGrid.Children.Add(judgeNameStackPanel);
                     Grid.SetRow(judgeNameStackPanel, 0);
-                    Grid.SetColumn(judgeNameStackPanel, SCORE_COLUMN_START + judgeIndex);
+                    Grid.SetColumn(judgeNameStackPanel, SCORES_START_COLUMN + judgeIndex);
                 }
 
                 var judgeBorder = new Border()
@@ -155,7 +155,7 @@ namespace ImpartialUI.Controls
                 control.ScoreGrid.Children.Add(judgeBorder);
                 Grid.SetRow(judgeBorder, 0);
                 Grid.SetRowSpan(judgeBorder, int.MaxValue);
-                Grid.SetColumn(judgeBorder, SCORE_COLUMN_START + judgeIndex);
+                Grid.SetColumn(judgeBorder, SCORES_START_COLUMN + judgeIndex);
             }
 
             #endregion
@@ -220,7 +220,7 @@ namespace ImpartialUI.Controls
 
                     control.ScoreGrid.Children.Add(scoreTextBlock);
                     Grid.SetRow(scoreTextBlock, couple.Placement);
-                    Grid.SetColumn(scoreTextBlock, SCORE_COLUMN_START + i);
+                    Grid.SetColumn(scoreTextBlock, SCORES_START_COLUMN + i);
                 }
 
                 var competitorBorder = new Border()
